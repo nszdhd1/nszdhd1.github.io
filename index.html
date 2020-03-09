@@ -12,7 +12,7 @@
 <meta property="og:title" content="Hexo">
 <meta property="og:url" content="http://yoursite.com/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:locale" content="en_US">
+<meta property="og:locale" content="cn">
 <meta property="article:author" content="newbiemiao">
 <meta name="twitter:card" content="summary">
   
@@ -128,6 +128,133 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-Magisk检测" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/03/09/Magisk%E6%A3%80%E6%B5%8B/">Magisk检测</a>
+    </h1>
+  
+
+        
+        <a href="/2020/03/09/Magisk%E6%A3%80%E6%B5%8B/" class="archive-article-date">
+  	<time datetime="2020-03-09T07:50:42.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-09</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="Magisk检测"><a href="#Magisk检测" class="headerlink" title="Magisk检测"></a>Magisk检测</h1><h2 id="Magisk-原理"><a href="#Magisk-原理" class="headerlink" title="Magisk 原理"></a>Magisk 原理</h2><h3 id="原理图"><a href="#原理图" class="headerlink" title="原理图"></a>原理图</h3><p><img src="C:%5CUsers%5Cyangtong%5CDesktop%5Cblog%5Csource_posts%5Cassets%5Cimage-20200220161119719.png" alt="image-20200220161119719"></p>
+<h3 id="Xposed-原理"><a href="#Xposed-原理" class="headerlink" title="Xposed 原理"></a>Xposed 原理</h3><p>详细讲解：<a href="https://blog.csdn.net/ascii2/article/details/47974217" target="_blank" rel="noopener">https://blog.csdn.net/ascii2/article/details/47974217</a></p>
+<p>Xposed修改了app_process程序，在执行第一个java程序（com.Android.internal.os.ZygoteInit）之前进行截获,改变执行流程，进入到XposedBridge.jar，通过INI方法hookMethodNative指向Native方法xposedCallHandler，xposedCallHandler在转入handleHookedMethod这个Java方法执行用户规定的Hook Func</p>
+<h3 id="xposed-检测方法"><a href="#xposed-检测方法" class="headerlink" title="xposed 检测方法"></a>xposed 检测方法</h3><h5 id="1-检测包名"><a href="#1-检测包名" class="headerlink" title="1. 检测包名"></a>1. 检测包名</h5><p> 检测是否安装de.robv.android.xposed.installer</p>
+<h5 id="2-调用栈"><a href="#2-调用栈" class="headerlink" title="2.调用栈"></a>2.调用栈</h5><p>抛出一个异常并捕获，将堆栈信息打印出来：</p>
+<p><img src="C:%5CUsers%5Cyangtong%5CDesktop%5Cblog%5Csource_posts%5Cassets%5Cimage-20200220164108776.png" alt="image-20200220164108776"></p>
+<p>可以看到每个App是先执行的XposedBridge.jar的main方法，之后再调用的Zygote的main方法。通过检测堆栈中是否包含<code>Xposed</code>等字样即可知道是否安装了Xposed</p>
+<h5 id="3-xposed相关文件"><a href="#3-xposed相关文件" class="headerlink" title="3. xposed相关文件"></a>3. xposed相关文件</h5><p>Xposed的组件需要被加载，必然在内存空间留下痕迹，通过遍历/proc/<pid>/maps内容，观察是否加载/system/framework/XposedBridge.jar</p>
+<h5 id="4-检测并且关闭HOOK"><a href="#4-检测并且关闭HOOK" class="headerlink" title="4. 检测并且关闭HOOK"></a>4. 检测并且关闭HOOK</h5><p>在<code>de.robv.android.xposed.XposedBridge</code>中有一个<code>disableHooks</code>字段用于标记对于当前应用是否要进行hook。通过获取这个字段的值就可以知道是否在我们App上启用hook了，甚至可以通过将其设置为true停掉Xposed。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Field disableHooksFiled = ClassLoader.getSystemClassLoader()</span><br><span class="line">        .loadClass(<span class="string">"de.robv.android.xposed.XposedBridge"</span>)</span><br><span class="line">        .getDeclaredField(<span class="string">"disableHooks"</span>);</span><br><span class="line">disableHooksFiled.setAccessible(<span class="keyword">true</span>);</span><br><span class="line">Object enable = disableHooksFiled.get(<span class="keyword">null</span>);  <span class="comment">// 当前状态</span></span><br><span class="line">disableHooksFiled.set(<span class="keyword">null</span>, <span class="keyword">true</span>);            <span class="comment">// 设置为关闭</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h5 id="5-来自支付宝的xposed-HOOK检测"><a href="#5-来自支付宝的xposed-HOOK检测" class="headerlink" title="5. 来自支付宝的xposed HOOK检测"></a>5. 来自支付宝的xposed HOOK检测</h5><p> 原文地址：<a href="https://segmentfault.com/a/1190000009976827" target="_blank" rel="noopener">https://segmentfault.com/a/1190000009976827</a></p>
+<p>反射获得一个类de.robv.android.xposed.XposedHelpers 的对象，检测obXposedHelper成员fieldCache,methodCache,constructorCache是否有支付宝包的关键字。</p>
+<h3 id="Magisk-原理-1"><a href="#Magisk-原理-1" class="headerlink" title="Magisk 原理"></a>Magisk 原理</h3><p>网上分析magisk的资料很少，都只说：</p>
+<p>Magisk则另辟蹊径，通过挂载一个与系统文件相隔离的文件系统来加载自定义内容，为系统分区打开了一个通往平行世界的入口，所有改动在那个世界（Magisk分区）里发生，在必要的时候却又可以被认为是（从系统分区的角度而言）没有发生过。</p>
+<p>就这种程度的原理想检测magisk是不可能的。</p>
+<p>因为知道magisk是靠修改boot.img来实现的，找到修改的shell脚本，介绍如下：</p>
+<p><img src="C:%5CUsers%5Cyangtong%5CDesktop%5Cblog%5Csource_posts%5Cassets%5Cimage-20200220172723250.png" alt="image-20200220172723250"></p>
+<p>通过阅读脚本，可知：</p>
+<p>修改boot.img成功后，会将修改后的镜像添加到系统中去，主要为initialize()、main()函数。</p>
+<p>initialize主要做一些检查、加载的工作，根据代码可知，magisk的工作目录在/data/adb/magisk</p>
+<p><img src="C:%5CUsers%5Cyangtong%5CDesktop%5Cblog%5Csource_posts%5Cassets%5Cimage-20200221110120916.png" alt="image-20200221110120916"></p>
+<p>main函数主要是安装magisk</p>
+<p><img src="C:%5CUsers%5Cyangtong%5CDesktop%5Cblog%5Csource_posts%5Cassets%5Cimage-20200221112244735.png" alt="image-20200221112244735"></p>
+<p>对main函数中的每个函数进行粗略的分析，mount_partitions主要是获取root权限，然后挂载一些自己的东西到系统</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">mount_partitions() &#123;</span><br><span class="line"><span class="meta">  #</span><span class="bash"> Check A/B slot</span></span><br><span class="line">  SLOT=`grep_cmdline androidboot.slot_suffix`</span><br><span class="line">  if [ -z $SLOT ]; then</span><br><span class="line">    SLOT=`grep_cmdline androidboot.slot`</span><br><span class="line">    [ -z $SLOT ] || SLOT=_$&#123;SLOT&#125;</span><br><span class="line">  fi</span><br><span class="line">  [ -z $SLOT ] || ui_print "- Current boot slot: $SLOT"</span><br><span class="line"></span><br><span class="line"><span class="meta">  #</span><span class="bash"> Mount ro partitions</span></span><br><span class="line">  mount_ro_ensure system</span><br><span class="line">  if [ -f /system/init.rc ]; then</span><br><span class="line">    SYSTEM_ROOT=true</span><br><span class="line">    [ -L /system_root ] &amp;&amp; rm -f /system_root</span><br><span class="line">    mkdir /system_root 2&gt;/dev/null</span><br><span class="line">    mount --move /system /system_root</span><br><span class="line">    mount -o bind /system_root/system /system</span><br><span class="line">  else</span><br><span class="line">    grep ' / ' /proc/mounts | grep -qv 'rootfs' || grep -q ' /system_root ' /proc/mounts \</span><br><span class="line">    &amp;&amp; SYSTEM_ROOT=true || SYSTEM_ROOT=false</span><br><span class="line">  fi</span><br><span class="line">  [ -L /system/vendor ] &amp;&amp; mount_ro_ensure vendor</span><br><span class="line"><span class="meta">  $</span><span class="bash">SYSTEM_ROOT &amp;&amp; ui_print <span class="string">"- Device is system-as-root"</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">  #</span><span class="bash"> Mount persist partition <span class="keyword">in</span> recovery</span></span><br><span class="line">  if ! $BOOTMODE &amp;&amp; [ ! -z $PERSISTDIR ]; then</span><br><span class="line">    # Try to mount persist</span><br><span class="line">    PERSISTDIR=/persist</span><br><span class="line">    mount_name persist /persist</span><br><span class="line">    if ! is_mounted /persist; then</span><br><span class="line">      # Fallback to cache</span><br><span class="line">      mount_name cache /cache</span><br><span class="line">      is_mounted /cache &amp;&amp; PERSISTDIR=/cache || PERSISTDIR=</span><br><span class="line">    fi</span><br><span class="line">  fi</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>find_manager_apk顾名思义，它提供了apk可能存在的几个路径：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">find_manager_apk() &#123;</span><br><span class="line">  [ -z $APK ] &amp;&amp; APK=/data/adb/magisk.apk</span><br><span class="line">  [ -f $APK ] || APK=/data/magisk/magisk.apk</span><br><span class="line">  [ -f $APK ] || APK=/data/app/com.topjohnwu.magisk*/*.apk</span><br><span class="line">  if [ ! -f $APK ]; then</span><br><span class="line">    DBAPK=`magisk --sqlite "SELECT value FROM strings WHERE key='requester'" 2&gt;/dev/null | cut -d= -f2`</span><br><span class="line">    [ -z $DBAPK ] &amp;&amp; DBAPK=`strings /data/adb/magisk.db | grep 5requester | cut -c11-`</span><br><span class="line">    [ -z $DBAPK ] || APK=/data/user_de/*/$DBAPK/dyn/*.apk</span><br><span class="line">    [ -f $APK ] || [ -z $DBAPK ] || APK=/data/app/$DBAPK*/*.apk</span><br><span class="line">  fi</span><br><span class="line">  [ -f $APK ] || ui_print "! Unable to detect Magisk Manager APK for BootSigner"</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>install_magisk函数中的run_migrations，主要是将修boot.img.gz文件保存起来：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">run_migrations() &#123;</span><br><span class="line">  local LOCSHA1</span><br><span class="line">  local TARGET</span><br><span class="line"><span class="meta">  #</span><span class="bash"> Legacy app installation</span></span><br><span class="line">  local BACKUP=/data/adb/magisk/stock_boot*.gz</span><br><span class="line">  if [ -f $BACKUP ]; then</span><br><span class="line">    cp $BACKUP /data</span><br><span class="line">    rm -f $BACKUP</span><br><span class="line">  fi</span><br><span class="line"></span><br><span class="line"><span class="meta">  #</span><span class="bash"> Legacy backup</span></span><br><span class="line">  for gz in /data/stock_boot*.gz; do</span><br><span class="line">    [ -f $gz ] || break</span><br><span class="line">    LOCSHA1=`basename $gz | sed -e 's/stock_boot_//' -e 's/.img.gz//'`</span><br><span class="line">    [ -z $LOCSHA1 ] &amp;&amp; break</span><br><span class="line">    mkdir /data/magisk_backup_$&#123;LOCSHA1&#125; 2&gt;/dev/null</span><br><span class="line">    mv $gz /data/magisk_backup_$&#123;LOCSHA1&#125;/boot.img.gz</span><br><span class="line">  done</span><br><span class="line"></span><br><span class="line"><span class="meta">  #</span><span class="bash"> Stock backups</span></span><br><span class="line">  LOCSHA1=$SHA1</span><br><span class="line">  for name in boot dtb dtbo; do</span><br><span class="line">    BACKUP=/data/adb/magisk/stock_$&#123;name&#125;.img</span><br><span class="line">    [ -f $BACKUP ] || continue</span><br><span class="line">    if [ $name = 'boot' ]; then</span><br><span class="line">      LOCSHA1=`$MAGISKBIN/magiskboot sha1 $BACKUP`</span><br><span class="line">      mkdir /data/magisk_backup_$&#123;LOCSHA1&#125; 2&gt;/dev/null</span><br><span class="line">    fi</span><br><span class="line">    TARGET=/data/magisk_backup_$&#123;LOCSHA1&#125;/$&#123;name&#125;.img</span><br><span class="line">    cp $BACKUP $TARGET</span><br><span class="line">    rm -f $BACKUP</span><br><span class="line">    gzip -9f $TARGET</span><br><span class="line">  done</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Magisk-检测方法"><a href="#Magisk-检测方法" class="headerlink" title="Magisk 检测方法"></a>Magisk 检测方法</h3><h5 id="1-检测是否安装Magisk-manager"><a href="#1-检测是否安装Magisk-manager" class="headerlink" title="1. 检测是否安装Magisk manager"></a>1. 检测是否安装Magisk manager</h5><p>检查是否安装包名为 com.topjohnwu.magisk</p>
+<h3 id="2-Magisk-相关的文件"><a href="#2-Magisk-相关的文件" class="headerlink" title="2. Magisk 相关的文件"></a>2. Magisk 相关的文件</h3><ol>
+<li><p>是否存在magisk的工作目录：/data/adb/magisk</p>
+</li>
+<li><p>app安装相关目录：</p>
+<p>/data/app/com.topjohnwu.magisk、/data/user_de/0/com.topjohnwu.magisk、/config/sdcardfs/com.topjohnwu.magisk、/data/data/com.topjohnwu.magisk、/data/media/0/Android/data/com.topjohnwu.magisk、/mnt/runtime/default/emulated/0/Android/data/com.topjohnwu.magisk、/config/sdcardfs/com.topjohnwu.magisk</p>
+</li>
+<li><p>magisk运行产生的目录和文件：</p>
+<p>/data/magisk_backup_[md5]、/sbin/magisk、/cache/magisk.log、/mnt/vendor/persist/magisk</p>
+</li>
+<li><p>所有安装的magisk模块：/data/adb/modules</p>
+</li>
+</ol>
+<h5 id="3-系统信息"><a href="#3-系统信息" class="headerlink" title="3.  系统信息"></a>3.  系统信息</h5><p>通过遍历<code>/proc/mounts</code> 或<code>/proc/self/mounts</code>中内容，观察是否有/sbin/magisk路径下的文件被挂载进系统</p>
+<h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><ol>
+<li>目前magisk的检测方法，仅仅只是检测到手机上有magisk，并不能获得该用户在攻击自己app的证据</li>
+</ol>
+<h3 id="检测代码示例"><a href="#检测代码示例" class="headerlink" title="检测代码示例"></a>检测代码示例</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line">app普通权限下 </span><br><span class="line"></span><br><span class="line"><span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>&gt; p;</span><br><span class="line"></span><br><span class="line"><span class="comment">//都失败：</span></span><br><span class="line">    p.push_back(<span class="string">"/data/adb/magisk"</span>);</span><br><span class="line">    p.push_back(<span class="string">"/data/app/com.topjohnwu.magisk"</span>);</span><br><span class="line">    p.push_back(<span class="string">"/config/sdcardfs/com.topjohnwu.magisk"</span>);</span><br><span class="line">    p.push_back(<span class="string">"/data/media/0/Android/data/com.topjohnwu.magisk"</span>);</span><br><span class="line">    p.push_back(<span class="string">"/mnt/runtime/default/emulated/0/Android/data/com.topjohnwu.magisk"</span>);</span><br><span class="line">    p.push_back(<span class="string">"/config/sdcardfs/com.topjohnwu.magisk"</span>);</span><br><span class="line">    p.push_back(<span class="string">"/cache/magisk.log"</span>);</span><br><span class="line">    p.push_back(<span class="string">"/mnt/vendor/persist/magisk"</span>);</span><br><span class="line">    p.push_back(<span class="string">"/data/adb/modules"</span>);</span><br><span class="line">    p.push_back(<span class="string">"/config/sdcardfs/com.topjohnwu.magisk/appid"</span>);</span><br><span class="line">    p.push_back(<span class="string">"/data/adb/magisk/chromeos/kernel.keyblock"</span>);</span><br><span class="line">    p.push_back(<span class="string">"/data/system/graphicsstats/1582156800000/com.topjohnwu.magisk"</span>);</span><br><span class="line">    p.push_back(<span class="string">"/data/system_ce/0/shortcut_service/bitmaps/com.topjohnwu.magisk"</span>);</span><br><span class="line">    p.push_back(<span class="string">"/mnt/runtime/default/emulated/0/Android/data/com.topjohnwu.magisk"</span>);</span><br><span class="line">    p.push_back(<span class="string">"/mnt/runtime/write/emulated/0/Android/data/com.topjohnwu.magisk"</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// access成功 ，open 失败 , stat失败：</span></span><br><span class="line"></span><br><span class="line">    p.push_back(<span class="string">"/data/misc/profiles/ref/com.topjohnwu.magisk"</span>);</span><br><span class="line">    p.push_back(<span class="string">"/data/misc/profiles/cur/0/com.topjohnwu.magisk"</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// access成功 stat成功，open 失败：</span></span><br><span class="line">    p.push_back(<span class="string">"/data/user_de/0/com.topjohnwu.magisk"</span>);</span><br><span class="line">    p.push_back(<span class="string">"/data/data/com.topjohnwu.magisk"</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">//都成功：</span></span><br><span class="line">    p.push_back(<span class="string">"/sbin/magiskpolicy"</span>);</span><br><span class="line">    p.push_back(<span class="string">"/sbin/magiskinit"</span>);</span><br><span class="line">    p.push_back(<span class="string">"/sbin/magiskhide"</span>);</span><br><span class="line">    p.push_back(<span class="string">"/sbin/magisk"</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> openfd = sys_open(<span class="string">"/proc/self/mounts"</span>,<span class="number">0</span>,O_RDWR);</span><br><span class="line">    LOGE(<span class="string">"open fd:  %d"</span>,openfd);</span><br><span class="line">    <span class="keyword">char</span> buff[<span class="number">1024</span>] = &#123;<span class="number">0</span>&#125;;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (sys_read(openfd,buff,<span class="number">1024</span>))&#123;</span><br><span class="line">        LOGE(<span class="string">"%s"</span>,buff);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    sys_close(openfd);</span><br></pre></td></tr></table></figure>
+
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">other</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/03/09/Magisk%E6%A3%80%E6%B5%8B/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-new-test-1" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -148,7 +275,8 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        
+        <h2 id="test"><a href="#test" class="headerlink" title="test"></a>test</h2><p>12345</p>
+
       
 
       
