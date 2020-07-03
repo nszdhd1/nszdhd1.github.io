@@ -16,7 +16,7 @@
 <meta property="og:description" content="IL2CPP 保护方案背景如果 Unity 游戏 选择使用IL2CPP编译的话，那么会将代码编译到libil2cpp.so，并且将字符串信息保存在一个叫global-metadata.dat的资源文件里。 IL2CPP详细介绍：https:&#x2F;&#x2F;blog.csdn.net&#x2F;feibabeibei_beibei&#x2F;artic le&#x2F;details&#x2F;95922520 IL2CPP 加载过程github上随">
 <meta property="og:locale" content="cn">
 <meta property="article:published_time" content="2020-07-03T03:54:52.000Z">
-<meta property="article:modified_time" content="2020-07-03T06:24:11.366Z">
+<meta property="article:modified_time" content="2020-07-03T07:00:44.792Z">
 <meta property="article:author" content="newbiemiao">
 <meta property="article:tag" content="protect">
 <meta name="twitter:card" content="summary">
@@ -155,6 +155,8 @@
 <p>IL2CPP详细介绍：<a href="https://blog.csdn.net/feibabeibei_beibei/artic" target="_blank" rel="noopener">https://blog.csdn.net/feibabeibei_beibei/artic</a> le/details/95922520</p>
 <h2 id="IL2CPP-加载过程"><a href="#IL2CPP-加载过程" class="headerlink" title="IL2CPP 加载过程"></a>IL2CPP 加载过程</h2><p>github上随便找一个使用il2cpp项目的源码，搜索global-metadata.dat，发现只有函数MetadataCache::Initialize()处使用。</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">MetadataCache::Initialize</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    s_GlobalMetadata = vm::MetadataLoader::LoadMetadataFile(<span class="string">"global-metadata.dat"</span>);</span><br><span class="line">    s_GlobalMetadataHeader = (<span class="keyword">const</span> Il2CppGlobalMetadataHeader*)s_GlobalMetadata;</span><br><span class="line">    ...</span><br><span class="line">        </span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+<a id="more"></a>
 
 <p>查看LoadMetadataFile代码：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span>* <span class="title">MetadataLoader::LoadMetadataFile</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span>* fileName)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">string</span> resourcesDirectory = utils::PathUtils::Combine(utils::Runtime::GetDataDir(), utils::StringView&lt;<span class="keyword">char</span>&gt;(<span class="string">"Metadata"</span>));</span><br><span class="line"></span><br><span class="line">    <span class="built_in">std</span>::<span class="built_in">string</span> resourceFilePath = utils::PathUtils::Combine(resourcesDirectory, utils::StringView&lt;<span class="keyword">char</span>&gt;(fileName, <span class="built_in">strlen</span>(fileName)));</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> error = <span class="number">0</span>;</span><br><span class="line">    FileHandle* handle = <span class="built_in">File</span>::Open(resourceFilePath, kFileModeOpen, kFileAccessRead, kFileShareRead, kFileOptionsNone, &amp;error);</span><br><span class="line">    <span class="keyword">if</span> (error != <span class="number">0</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">void</span>* fileBuffer = utils::MemoryMappedFile::Map(handle);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">File</span>::Close(handle, &amp;error);</span><br><span class="line">    <span class="keyword">if</span> (error != <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        utils::MemoryMappedFile::Unmap(fileBuffer);</span><br><span class="line">        fileBuffer = <span class="literal">NULL</span>;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> fileBuffer;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -315,6 +317,19 @@
             </div>
         </div>
         
+        
+        <div class="toc-container tooltip-left">
+            <i class="icon-font icon-category"></i>
+            <div class="tooltip tooltip-east">
+                <span class="tooltip-item">
+                </span>
+                <span class="tooltip-content">
+                    <div class="toc-article">
+                    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#IL2CPP-保护方案"><span class="toc-number">1.</span> <span class="toc-text">IL2CPP 保护方案</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#背景"><span class="toc-number">1.1.</span> <span class="toc-text">背景</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#IL2CPP-加载过程"><span class="toc-number">1.2.</span> <span class="toc-text">IL2CPP 加载过程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#IL2CPP-global-metadata-dat-文件加密及还原"><span class="toc-number">1.3.</span> <span class="toc-text">IL2CPP global-metadata.dat 文件加密及还原</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-加密方式的选择"><span class="toc-number">1.3.1.</span> <span class="toc-text">1. 加密方式的选择</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-加密文件格式设计"><span class="toc-number">1.3.2.</span> <span class="toc-text">2. 加密文件格式设计</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-其他准备工作"><span class="toc-number">1.3.3.</span> <span class="toc-text">3. 其他准备工作</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-方案弊端"><span class="toc-number">1.3.4.</span> <span class="toc-text">4. 方案弊端</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-优势"><span class="toc-number">1.3.5.</span> <span class="toc-text">5. 优势</span></a></li></ol></li></ol></li></ol>
+                    </div>
+                </span>
+            </div>
+        </div>
         
     </div>
 </aside>

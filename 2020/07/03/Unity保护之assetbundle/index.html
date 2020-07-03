@@ -16,7 +16,7 @@
 <meta property="og:description" content="AssetBundle加密1.简介1.1 什么是AssetBundleAssetBundle是Unity pro提供的一种用来存储资源的文件格式，它可以存储任意一种Unity引擎能够识别的资源，如Scene、Mesh、Material、Texture、Audio、noxss等等，同时，AssetBundle也可以包含开发者自定义的二进制文件，只需要将自定义文件的扩展名改为.bytes，Unity就">
 <meta property="og:locale" content="cn">
 <meta property="article:published_time" content="2020-07-03T03:55:02.000Z">
-<meta property="article:modified_time" content="2020-07-03T06:24:17.283Z">
+<meta property="article:modified_time" content="2020-07-03T07:00:32.843Z">
 <meta property="article:author" content="newbiemiao">
 <meta property="article:tag" content="protect">
 <meta name="twitter:card" content="summary">
@@ -163,6 +163,8 @@
 <p><strong>BuildPipeline.BuildAssetBundles（string outputPath, BuildAssetBundleOptions assetBundleOptions, BuildTarget targetPlatform）</strong></p>
 <p>加载静态ab文件，在unity里使用（从服务器下载没有静态文件，暂不考虑）：</p>
 <p><strong>AssetBundle.Load (name : string)</strong> </p>
+<a id="more"></a>
+
 <h4 id="2-加密"><a href="#2-加密" class="headerlink" title="2.加密"></a>2.加密</h4><h5 id="2-1-文件加密格式"><a href="#2-1-文件加密格式" class="headerlink" title="2.1  文件加密格式"></a>2.1  文件加密格式</h5><p>加密后的文件内容为 sign + enc_str</p>
 <table>
 <thead>
@@ -307,6 +309,19 @@
             </div>
         </div>
         
+        
+        <div class="toc-container tooltip-left">
+            <i class="icon-font icon-category"></i>
+            <div class="tooltip tooltip-east">
+                <span class="tooltip-item">
+                </span>
+                <span class="tooltip-content">
+                    <div class="toc-article">
+                    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#AssetBundle加密"><span class="toc-number">1.</span> <span class="toc-text">AssetBundle加密</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-简介"><span class="toc-number">1.0.0.1.</span> <span class="toc-text">1.简介</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-1-什么是AssetBundle"><span class="toc-number">1.0.0.1.1.</span> <span class="toc-text">1.1 什么是AssetBundle</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#1-2-AssetBundle的特点"><span class="toc-number">1.0.0.1.2.</span> <span class="toc-text">1.2 AssetBundle的特点</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#1-3-AssetBundle-使用（开发视角）"><span class="toc-number">1.0.0.1.3.</span> <span class="toc-text">1.3 AssetBundle 使用（开发视角）</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-加密"><span class="toc-number">1.0.0.2.</span> <span class="toc-text">2.加密</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#2-1-文件加密格式"><span class="toc-number">1.0.0.2.1.</span> <span class="toc-text">2.1  文件加密格式</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-2-加密代码"><span class="toc-number">1.0.0.2.2.</span> <span class="toc-text">2.2 加密代码</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-解密（旧版）"><span class="toc-number">1.0.0.3.</span> <span class="toc-text">3. 解密（旧版）</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#3-1-解密代码"><span class="toc-number">1.0.0.3.1.</span> <span class="toc-text">3.1 解密代码</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-2-注意事项"><span class="toc-number">1.0.0.3.2.</span> <span class="toc-text">3.2 注意事项</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-解密（新版）"><span class="toc-number">1.0.0.4.</span> <span class="toc-text">5. 解密（新版）</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#5-1-加载概述"><span class="toc-number">1.0.0.4.1.</span> <span class="toc-text">5.1 加载概述</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#5-2-解密代码"><span class="toc-number">1.0.0.4.2.</span> <span class="toc-text">5.2 解密代码</span></a></li></ol></li></ol></li></ol></li></ol></li></ol>
+                    </div>
+                </span>
+            </div>
+        </div>
         
     </div>
 </aside>

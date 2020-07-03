@@ -21,7 +21,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/03/09/Magisk%E6%A3%80%E6%B5%8B/image-20200221110120916.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/03/09/Magisk%E6%A3%80%E6%B5%8B/image-20200221112244735.png">
 <meta property="article:published_time" content="2020-03-09T07:50:42.000Z">
-<meta property="article:modified_time" content="2020-07-03T02:26:03.704Z">
+<meta property="article:modified_time" content="2020-07-03T07:00:23.172Z">
 <meta property="article:author" content="newbiemiao">
 <meta property="article:tag" content="other">
 <meta name="twitter:card" content="summary">
@@ -164,6 +164,8 @@
 <h5 id="2-调用栈"><a href="#2-调用栈" class="headerlink" title="2.调用栈"></a>2.调用栈</h5><p>抛出一个异常并捕获，将堆栈信息打印出来：</p>
 <p><img src="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/03/09/Magisk%E6%A3%80%E6%B5%8B/image-20200220164108776.png" alt="image-20200220164108776"></p>
 <p>可以看到每个App是先执行的XposedBridge.jar的main方法，之后再调用的Zygote的main方法。通过检测堆栈中是否包含<code>Xposed</code>等字样即可知道是否安装了Xposed</p>
+<a id="more"></a>
+
 <h5 id="3-xposed相关文件"><a href="#3-xposed相关文件" class="headerlink" title="3. xposed相关文件"></a>3. xposed相关文件</h5><p>Xposed的组件需要被加载，必然在内存空间留下痕迹，通过遍历/proc/<pid>/maps内容，观察是否加载/system/framework/XposedBridge.jar</pid></p>
 <h5 id="4-检测并且关闭HOOK"><a href="#4-检测并且关闭HOOK" class="headerlink" title="4. 检测并且关闭HOOK"></a>4. 检测并且关闭HOOK</h5><p>在<code>de.robv.android.xposed.XposedBridge</code>中有一个<code>disableHooks</code>字段用于标记对于当前应用是否要进行hook。通过获取这个字段的值就可以知道是否在我们App上启用hook了，甚至可以通过将其设置为true停掉Xposed。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Field disableHooksFiled = ClassLoader.getSystemClassLoader()</span><br><span class="line">        .loadClass(<span class="string">"de.robv.android.xposed.XposedBridge"</span>)</span><br><span class="line">        .getDeclaredField(<span class="string">"disableHooks"</span>);</span><br><span class="line">disableHooksFiled.setAccessible(<span class="keyword">true</span>);</span><br><span class="line">Object enable = disableHooksFiled.get(<span class="keyword">null</span>);  <span class="comment">// 当前状态</span></span><br><span class="line">disableHooksFiled.set(<span class="keyword">null</span>, <span class="keyword">true</span>);            <span class="comment">// 设置为关闭</span></span><br></pre></td></tr></table></figure>
@@ -318,6 +320,19 @@
             </div>
         </div>
         
+        
+        <div class="toc-container tooltip-left">
+            <i class="icon-font icon-category"></i>
+            <div class="tooltip tooltip-east">
+                <span class="tooltip-item">
+                </span>
+                <span class="tooltip-content">
+                    <div class="toc-article">
+                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Magisk-原理"><span class="toc-number">1.</span> <span class="toc-text">Magisk 原理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Xposed-和-Magisk原理图"><span class="toc-number">1.1.</span> <span class="toc-text">Xposed 和 Magisk原理图</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Xposed-原理"><span class="toc-number">1.2.</span> <span class="toc-text">Xposed 原理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#xposed-检测方法"><span class="toc-number">1.3.</span> <span class="toc-text">xposed 检测方法</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-检测包名"><span class="toc-number">1.3.0.1.</span> <span class="toc-text">1. 检测包名</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-调用栈"><span class="toc-number">1.3.0.2.</span> <span class="toc-text">2.调用栈</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-xposed相关文件"><span class="toc-number">1.3.0.3.</span> <span class="toc-text">3. xposed相关文件</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-检测并且关闭HOOK"><span class="toc-number">1.3.0.4.</span> <span class="toc-text">4. 检测并且关闭HOOK</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#5-来自支付宝的xposed-HOOK检测"><span class="toc-number">1.3.0.5.</span> <span class="toc-text">5. 来自支付宝的xposed HOOK检测</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Magisk-原理-1"><span class="toc-number">1.4.</span> <span class="toc-text">Magisk 原理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Magisk-检测方法"><span class="toc-number">1.5.</span> <span class="toc-text">Magisk 检测方法</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-检测是否安装Magisk-manager"><span class="toc-number">1.5.0.1.</span> <span class="toc-text">1. 检测是否安装Magisk manager</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-Magisk-相关的文件"><span class="toc-number">1.6.</span> <span class="toc-text">2. Magisk 相关的文件</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#3-系统信息"><span class="toc-number">1.6.0.1.</span> <span class="toc-text">3.  系统信息</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#问题"><span class="toc-number">1.7.</span> <span class="toc-text">问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#检测代码示例"><span class="toc-number">1.8.</span> <span class="toc-text">检测代码示例</span></a></li></ol></li></ol>
+                    </div>
+                </span>
+            </div>
+        </div>
         
     </div>
 </aside>
