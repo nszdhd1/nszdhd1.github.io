@@ -6,14 +6,19 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Archives: 2020 | Hexo</title>
+  <title>基于va的luajit hook | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Hexo">
-<meta property="og:url" content="http://yoursite.com/archives/2020/index.html">
+  <meta name="description" content="hook时机根据  jithook中介绍，luaopen_jit 是 最后一个加载的库 lua lib_init.c 所以选择在 hook luaopen_jit 来加载hook.lua 123456789101112131415161718192021222324252627282930313233343536373839404142static const luaL_Reg lj_lib_lo">
+<meta property="og:type" content="article">
+<meta property="og:title" content="基于va的luajit hook">
+<meta property="og:url" content="http://yoursite.com/2020/07/03/%E5%9F%BA%E4%BA%8Eva%E7%9A%84luajit-hook/index.html">
 <meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="hook时机根据  jithook中介绍，luaopen_jit 是 最后一个加载的库 lua lib_init.c 所以选择在 hook luaopen_jit 来加载hook.lua 123456789101112131415161718192021222324252627282930313233343536373839404142static const luaL_Reg lj_lib_lo">
 <meta property="og:locale" content="cn">
+<meta property="article:published_time" content="2020-07-03T03:53:55.000Z">
+<meta property="article:modified_time" content="2020-07-03T03:57:52.880Z">
 <meta property="article:author" content="newbiemiao">
+<meta property="article:tag" content="tools">
 <meta name="twitter:card" content="summary">
   
     <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
@@ -126,112 +131,58 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-基于va的luajit-hook" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2020" class="archive-year">2020</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/07/03/Unity%E4%BF%9D%E6%8A%A4%E4%B9%8Bassetbundle/" class="archive-article-date">
-  	<time datetime="2020-07-03T03:55:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-07-03</time>
-</a>
-        </div>
-    	 
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/07/03/Unity%E4%BF%9D%E6%8A%A4%E4%B9%8Bassetbundle/">Unity保护之assetbundle</a>
+    <h1 class="article-title" itemprop="name">
+      基于va的luajit hook
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">protect</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/07/03/Unity%E4%BF%9D%E6%8A%A4%E4%B9%8Bil2cpp/" class="archive-article-date">
-  	<time datetime="2020-07-03T03:54:52.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-07-03</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/07/03/Unity%E4%BF%9D%E6%8A%A4%E4%B9%8Bil2cpp/">Unity保护之il2cpp</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">protect</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/07/03/%E5%9F%BA%E4%BA%8Eva%E7%9A%84luajit-hook/" class="archive-article-date">
+        
+        <a href="/2020/07/03/%E5%9F%BA%E4%BA%8Eva%E7%9A%84luajit-hook/" class="archive-article-date">
   	<time datetime="2020-07-03T03:53:55.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-07-03</time>
 </a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/07/03/%E5%9F%BA%E4%BA%8Eva%E7%9A%84luajit-hook/">基于va的luajit hook</a>
-    </h1>
-  
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="hook时机"><a href="#hook时机" class="headerlink" title="hook时机"></a>hook时机</h2><p>根据  <a href="https://www.anquanke.com/post/id/86958" target="_blank" rel="noopener">jithook</a>中介绍，luaopen_jit 是 最后一个加载的库 <a href="https://github.com/LuaDist/luajit/blob/master/src/lib_init.c#L18-L30" target="_blank" rel="noopener">lua lib_init.c</a></p>
+<p>所以选择在 hook luaopen_jit 来加载hook.lua</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">const</span> luaL_Reg lj_lib_load[] = &#123;</span><br><span class="line">  &#123; <span class="string">""</span>,			luaopen_base &#125;,</span><br><span class="line">  &#123; LUA_LOADLIBNAME,	luaopen_package &#125;,</span><br><span class="line">  &#123; LUA_TABLIBNAME,	luaopen_table &#125;,</span><br><span class="line">  &#123; LUA_IOLIBNAME,	luaopen_io &#125;,</span><br><span class="line">  &#123; LUA_OSLIBNAME,	luaopen_os &#125;,</span><br><span class="line">  &#123; LUA_STRLIBNAME,	luaopen_string &#125;,</span><br><span class="line">  &#123; LUA_MATHLIBNAME,	luaopen_math &#125;,</span><br><span class="line">  &#123; LUA_DBLIBNAME,	luaopen_debug &#125;,</span><br><span class="line">  &#123; LUA_BITLIBNAME,	luaopen_bit &#125;,</span><br><span class="line">  &#123; LUA_JITLIBNAME,	luaopen_jit &#125;,</span><br><span class="line">  &#123; <span class="literal">NULL</span>,		<span class="literal">NULL</span> &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">const</span> luaL_Reg lj_lib_preload[] = &#123;</span><br><span class="line">#<span class="keyword">if</span> LJ_HASFFI</span><br><span class="line">  &#123; LUA_FFILIBNAME,	luaopen_ffi &#125;,</span><br><span class="line">#endif</span><br><span class="line">  &#123; <span class="literal">NULL</span>,		<span class="literal">NULL</span> &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function">LUALIB_API <span class="keyword">void</span> <span class="title">luaL_openlibs</span><span class="params">(lua_State *L)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">  <span class="keyword">const</span> luaL_Reg *lib;</span><br><span class="line">  <span class="keyword">for</span> (lib = lj_lib_load; lib-&gt;func; lib++) &#123;</span><br><span class="line">    lua_pushcfunction(L, lib-&gt;func);<span class="comment">//将一个 C 函数压入堆栈。 这个函数接收一个 C 函数指针，并将一个类型为 function 的 Lua 值 压入堆栈。当这个栈定的值被调用时，将触发对应的 C 函数。(其实就是注册函数，不过传入的函数还是要遵循lua_CFunction的那个规则，此处不重要)</span></span><br><span class="line">    lua_pushstring(L, lib-&gt;func);<span class="comment">//同理，把指针lib-&gt;name指向的以零结尾的字符串压栈</span></span><br><span class="line">    lua_call(L, <span class="number">1</span>, <span class="number">0</span>);<span class="comment">//执行 lib-&gt;func（lib-&gt;func），相似的还有个pcall，多了个返回错误</span></span><br><span class="line"></span><br><span class="line">  &#125;</span><br><span class="line">  luaL_findtable(L, LUA_REGISTRYINDEX, <span class="string">"_PRELOAD"</span>,</span><br><span class="line">		 <span class="keyword">sizeof</span>(lj_lib_preload)/<span class="keyword">sizeof</span>(lj_lib_preload[<span class="number">0</span>])<span class="number">-1</span>);</span><br><span class="line">  <span class="keyword">for</span> (lib = lj_lib_preload; lib-&gt;func; lib++) &#123;</span><br><span class="line">    lua_pushcfunction(L, lib-&gt;func);</span><br><span class="line">    lua_setfield(L, <span class="number">-2</span>, lib-&gt;name);</span><br><span class="line">  &#125;</span><br><span class="line">  lua_pop(L, <span class="number">1</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*lua_call</span></span><br><span class="line"><span class="comment">要调用一个函数请遵循以下协议：首先，要调用的函数应该被压入栈；接着，把需要传递给这个函数的参数按正序压栈； 这是指第一个参数首先压栈。最后调用一下 lua_call；nargs 是你压入栈的参数个数。 当函数调用完毕后，所有的参数以及函数本身都会出栈。 而函数的返回值这时则被压栈。 返回值的个数将被调整为 nresults 个，除非 nresults 被设置成 LUA_MULTRET。 在这种情况下，所有的返回值都被压入堆栈中。 Lua 会保证返回值都放入栈空间中。 函数返回值将按正序压栈（第一个返回值首先压栈）， 因此在调用结束后，最后一个返回值将被放在栈顶。</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
 
-        <div class="article-info info-on-right">
-          
+
+
+<h3 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h3><p>当VA加载libtolua.so的时候，找到函数luaopen_jit，jit加载完毕后，加载/sdcard/mydump/hook.lua并执行。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">    <span class="keyword">if</span> (<span class="built_in">strstr</span>(name, <span class="string">"libtolua.so"</span>) != <span class="literal">NULL</span> &amp;&amp; Count != <span class="literal">true</span>) &#123;</span><br><span class="line"></span><br><span class="line">        MYLOGD(<span class="string">"onSoLoaded==&gt;%s"</span>, name);</span><br><span class="line">        <span class="keyword">void</span> *xluaL_loadbuffer = (<span class="keyword">void</span> *) dlsym(handle, <span class="string">"luaL_loadbuffer"</span>);</span><br><span class="line">        MYLOGD(<span class="string">"onSoLoaded=&gt; xluaL_loadbuffer:%p"</span>, xluaL_loadbuffer);</span><br><span class="line">        <span class="keyword">if</span> (xluaL_loadbuffer != <span class="literal">NULL</span>) &#123;</span><br><span class="line">            MSHookFunction((<span class="keyword">void</span> *) xluaL_loadbuffer, (<span class="keyword">void</span> *) new_luaL_loadbuffer,</span><br><span class="line">                           (<span class="keyword">void</span> **) &amp;old_luaL_loadbuffer);</span><br><span class="line">            Count = <span class="literal">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">void</span>* luaopen_jit = dlsym(handle,<span class="string">"luaopen_jit"</span>);</span><br><span class="line"></span><br><span class="line">        _lua_pcall = (<span class="keyword">int</span>(*)(lua_State *L, <span class="keyword">int</span> nargs, <span class="keyword">int</span> nresults, <span class="keyword">int</span> errfunc))dlsym(handle,<span class="string">"lua_pcall"</span>);</span><br><span class="line"></span><br><span class="line">        _luaL_loadfilex = (<span class="keyword">int</span>(*)(lua_State *L, <span class="keyword">const</span> <span class="keyword">char</span> *filename, <span class="keyword">const</span> <span class="keyword">char</span> *mode))dlsym(handle,<span class="string">"luaL_loadfilex"</span>);</span><br><span class="line"></span><br><span class="line">        MSHookFunction((<span class="keyword">void</span> *) luaopen_jit, (<span class="keyword">void</span> *) new_luaopen_jit,(<span class="keyword">void</span> **) &amp;old_luaopen_jit);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">new_luaopen_jit</span><span class="params">(lua_State *L)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    MYLOGD(<span class="string">"luajit luaopen call"</span>);</span><br><span class="line">    <span class="keyword">int</span> ret_val = old_luaopen_jit(L);</span><br><span class="line">    <span class="keyword">if</span>(!has_load_jithook)&#123;</span><br><span class="line">        _luaL_loadfilex(L, <span class="string">"/sdcard/mydump/hook.lua"</span>, <span class="literal">NULL</span>) || _lua_pcall(L, <span class="number">0</span>, <span class="number">-1</span>, <span class="number">0</span>);</span><br><span class="line">        <span class="comment">//int luaL_loadfilex (lua_State *L, const char *filename,const char *mode);</span></span><br><span class="line">        <span class="comment">//lua_pcall (lua_State *L, int nargs, int nresults, int errfunc);</span></span><br><span class="line">        has_load_jithook = <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> ret_val;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="hook-lua"><a href="#hook-lua" class="headerlink" title="hook.lua"></a>hook.lua</h3><p>使用lua 自带的debug库，<a href="http://lua-users.org/wiki/DebugLibraryTutorial" target="_blank" rel="noopener">详细介绍</a></p>
+<p>大体作用就是 每次调用某个函数会检查函数名或者其他信息是否可疑，将可疑函数的相关的局部变量保存到文件里。找到参数时用相应函数修改。</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">serialize</span><span class="params">(obj)</span></span>  </span><br><span class="line">    <span class="keyword">local</span> lua = <span class="string">""</span>  </span><br><span class="line">    <span class="keyword">local</span> t = <span class="built_in">type</span>(obj)  </span><br><span class="line">    <span class="keyword">if</span> t == <span class="string">"number"</span> <span class="keyword">then</span>  </span><br><span class="line">        lua = lua .. obj  </span><br><span class="line">    <span class="keyword">elseif</span> t == <span class="string">"boolean"</span> <span class="keyword">then</span>  </span><br><span class="line">        lua = lua .. <span class="built_in">tostring</span>(obj)</span><br><span class="line">    <span class="keyword">elseif</span> t == <span class="string">"userdata"</span> <span class="keyword">then</span>  </span><br><span class="line">    	lua = lua .. <span class="string">"userdata:&#123;\n"</span>  </span><br><span class="line">    	<span class="comment">-- if udata ~= nil then</span></span><br><span class="line">    	<span class="comment">-- 	for k, v in pairs(udata) do  </span></span><br><span class="line">	    <span class="comment">--    lua = lua .. "[" .. serialize(k) .. "]=" .. serialize(v) .. ",\n"</span></span><br><span class="line">	    <span class="comment">--     end</span></span><br><span class="line">	    <span class="comment">-- end  </span></span><br><span class="line">	    lua = lua .. <span class="string">"&#125;"</span></span><br><span class="line">  </span><br><span class="line">    <span class="keyword">elseif</span> t == <span class="string">"function"</span> <span class="keyword">then</span>  </span><br><span class="line">        lua = lua .. <span class="string">"function"</span>  </span><br><span class="line">    <span class="keyword">elseif</span> t == <span class="string">"string"</span> <span class="keyword">then</span>  </span><br><span class="line">        lua = lua .. obj</span><br><span class="line">    <span class="keyword">elseif</span> t == <span class="string">"table"</span> <span class="keyword">then</span>  </span><br><span class="line"></span><br><span class="line">    	<span class="comment">-- if obj then</span></span><br><span class="line">    	<span class="comment">-- 	lua = lua .. luaJson.table2json(obj)</span></span><br><span class="line">    	<span class="comment">-- else</span></span><br><span class="line">    	<span class="comment">-- 	lua = lua .. "[empty table]"</span></span><br><span class="line">    	<span class="comment">-- end</span></span><br><span class="line">    	</span><br><span class="line">        lua = lua .. <span class="string">"&#123;\n"</span>  </span><br><span class="line">	    <span class="keyword">for</span> k, v <span class="keyword">in</span> <span class="built_in">pairs</span>(obj) <span class="keyword">do</span>  </span><br><span class="line">	        lua = lua .. <span class="string">"["</span> .. serialize(k) .. <span class="string">"]="</span> .. serialize(v) .. <span class="string">",\n"</span>  </span><br><span class="line">	    <span class="keyword">end</span>  </span><br><span class="line"></span><br><span class="line">        lua = lua .. <span class="string">"&#125;"</span>  </span><br><span class="line">    <span class="keyword">elseif</span> t == <span class="string">"nil"</span> <span class="keyword">then</span>  </span><br><span class="line">        <span class="keyword">return</span> <span class="literal">nil</span>  </span><br><span class="line">    <span class="keyword">else</span>  </span><br><span class="line">        <span class="keyword">return</span> <span class="string">"can not serialize a "</span> .. t .. <span class="string">" type."</span> </span><br><span class="line">    <span class="keyword">end</span>  </span><br><span class="line">    <span class="keyword">return</span> lua  </span><br><span class="line"></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">trace</span><span class="params">(event, line)</span></span></span><br><span class="line">    <span class="keyword">local</span> info = <span class="built_in">debug</span>.<span class="built_in">getinfo</span>(<span class="number">2</span>)</span><br><span class="line">    <span class="comment">-- debug.getinfo ([thread,] f [, what])</span></span><br><span class="line">    <span class="comment">-- f 表示运行在指定线程的调用栈对应层次上的函数</span></span><br><span class="line">    <span class="comment">-- what 描述需要返回的内容，不指定就返回全部</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> info <span class="keyword">then</span> <span class="keyword">return</span> <span class="keyword">end</span></span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> info.name <span class="keyword">then</span> <span class="keyword">return</span> <span class="keyword">end</span></span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">string</span>.<span class="built_in">len</span>(info.name) &lt;= <span class="number">1</span> <span class="keyword">then</span> <span class="keyword">return</span> <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">   <span class="comment">-- if string.find(info.name,"printJson") == nil  and         	 string.find(info.name,"callEx") == nil then</span></span><br><span class="line">   <span class="comment">-- 		return</span></span><br><span class="line">   <span class="comment">-- end</span></span><br><span class="line">   <span class="keyword">if</span> <span class="built_in">string</span>.<span class="built_in">find</span>(info.name,<span class="string">"Surrender"</span>) == <span class="literal">nil</span>  <span class="keyword">and</span> <span class="built_in">string</span>.<span class="built_in">find</span>(info.name,<span class="string">"callEx"</span>) == <span class="literal">nil</span> <span class="keyword">then</span></span><br><span class="line">   		<span class="keyword">return</span></span><br><span class="line">   <span class="keyword">end</span></span><br><span class="line"> 	<span class="comment">-- if info.what == "C" then</span></span><br><span class="line"> 	<span class="comment">-- 	return</span></span><br><span class="line"> 	<span class="comment">-- end</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">local</span> traceFile = <span class="built_in">io</span>.<span class="built_in">open</span>(<span class="string">"/sdcard/mydump/luajit_log.txt"</span>, <span class="string">"a"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">local</span> i = <span class="number">1</span></span><br><span class="line">    traceFile:<span class="built_in">write</span>(<span class="string">"\n\n"</span>..info.short_src .. <span class="string">":"</span>.. info.name .. <span class="string">"()\n"</span>)</span><br><span class="line"></span><br><span class="line">	<span class="comment">-- local func = debug.getinfo(2).func</span></span><br><span class="line">	<span class="comment">-- traceFile:write("\n----------------[upval]----------------\n")</span></span><br><span class="line">	<span class="comment">-- repeat</span></span><br><span class="line">	<span class="comment">--     name, val = debug.getupvalue(info.func, i)</span></span><br><span class="line">	<span class="comment">--     if name then</span></span><br><span class="line">	<span class="comment">--         traceFile:write("[index] :" .. i .."\n[" ..  serialize(name) .. "]:".. serialize(val) .. "\n")    -- 依次输出两个"upvalues"的名字和值。</span></span><br><span class="line">	<span class="comment">--     end</span></span><br><span class="line">	<span class="comment">--     i = i+1</span></span><br><span class="line">	<span class="comment">-- until not name</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	traceFile:<span class="built_in">write</span>(<span class="string">"\n----------------[local]----------------\n"</span>)</span><br><span class="line">	hookcount = <span class="number">1</span>;</span><br><span class="line">    a = <span class="number">1</span></span><br><span class="line">	<span class="keyword">while</span> <span class="literal">true</span> <span class="keyword">do</span></span><br><span class="line">        <span class="keyword">local</span> name, value = <span class="built_in">debug</span>.<span class="built_in">getlocal</span>(<span class="number">2</span>, a)</span><br><span class="line">        <span class="comment">-- debug.getlocal ([thread,] f, local)</span></span><br><span class="line">        <span class="comment">-- 此函数返回在栈的 f 层处函数的索引为 local 的局部变量的名字和值。这个函数不仅用于访问显式定义的局部变量，也包括形参、临时变量等</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> name <span class="keyword">then</span> <span class="keyword">break</span> <span class="keyword">end</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> value <span class="keyword">then</span> <span class="keyword">break</span> <span class="keyword">end</span></span><br><span class="line">        <span class="comment">-- print(name, value)</span></span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">type</span>(value) == <span class="string">"string"</span> <span class="keyword">then</span></span><br><span class="line"></span><br><span class="line">        	<span class="keyword">if</span> <span class="built_in">string</span>.<span class="built_in">find</span>(value,<span class="string">"buy"</span>) ~= <span class="literal">nil</span> <span class="keyword">then</span></span><br><span class="line"></span><br><span class="line">        	hookcount = a + <span class="number">1</span>;</span><br><span class="line">        	<span class="keyword">end</span></span><br><span class="line">        <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">        traceFile:<span class="built_in">write</span>(name .. <span class="string">": "</span> .. serialize(value)  .. <span class="string">"\n"</span>)</span><br><span class="line">        a = a + <span class="number">1</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">   <span class="comment">--  if hookcount ~= 1 then</span></span><br><span class="line">   <span class="comment">--      	val = &#123;</span></span><br><span class="line">			<span class="comment">-- 	["shelfid"]=31003,</span></span><br><span class="line">			<span class="comment">-- 	["costType"]=111,</span></span><br><span class="line">			<span class="comment">-- 	["num"]=100,</span></span><br><span class="line">			<span class="comment">-- 	["price"]=25,</span></span><br><span class="line">			<span class="comment">-- &#125;</span></span><br><span class="line">   <span class="comment">--      	debug.setlocal(2,hookcount,val)</span></span><br><span class="line">   <span class="comment">--  end</span></span><br><span class="line"></span><br><span class="line">	traceFile:<span class="built_in">write</span>(name .. <span class="string">": "</span> .. value .. <span class="string">"\n"</span>)</span><br><span class="line">	traceFile:<span class="built_in">write</span>(<span class="string">"\n----------------"</span>.. info.name.. <span class="string">"----------------\n"</span>)</span><br><span class="line">	traceFile:<span class="built_in">flush</span>()</span><br><span class="line">	traceFile:<span class="built_in">close</span>()</span><br><span class="line"></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">debug</span>.<span class="built_in">sethook</span>(trace, <span class="string">"c"</span>)</span><br><span class="line"><span class="comment">-- 每调用一个lua函数的时候会触发trace</span></span><br><span class="line"><span class="comment">-- debug.sethook ([thread,] hook, mask [, count])</span></span><br><span class="line"><span class="comment">-- 当调用一个lua函数的时候，会触发call事件 "c"</span></span><br><span class="line"><span class="comment">-- 当函数返回的时候，会触发一个return事件  "r"</span></span><br><span class="line"><span class="comment">-- 当执行下一行代码的时候，会触发一个line事件 "l"</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><p>对于local  value 的解析，游戏里个别地方 数据结构复杂，会table嵌套table、userdata。</p>
+<p>（userdata 是一种用户自定义数据，用于表示一种由应用程序或 C/C++ 语言库所创建的类型，可以将任意 C/C++ 的任意数据类型的数据（通常是 struct 和 指针）存储到 Lua 变量中调用）</p>
+<p><code>debug.getuservalue (u)</code> 这个是把userdata转换成table</p>
+<p>Returns the Lua value associated to <code>u</code>. If <code>u</code> is not a userdata, returns <strong>nil</strong>.</p>
+<p>网上常见的两种解析方法都不可行：</p>
+<p> 递归解析（emm）<a href="https://www.jianshu.com/p/9b388de0899b" target="_blank" rel="noopener">https://www.jianshu.com/p/9b388de0899b</a></p>
+<p>可解析userdata，但是数据过于复杂，lua报错无限递归栈溢出</p>
+<p>json编码</p>
+<p>可解析复杂的table，但是，json库、cjson库，网友实现的其他json库都不能解析userdata</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
@@ -243,133 +194,115 @@
 		</ul>
 	</div>
 
-          
+      
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2020/07/03/%E5%9F%BA%E4%BA%8Eva%E7%9A%84luajit-hook/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/" class="archive-article-date">
-  	<time datetime="2020-07-03T03:53:28.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-07-03</time>
-</a>
+<nav id="article-nav">
+  
+    <a href="/2020/07/03/Unity%E4%BF%9D%E6%8A%A4%E4%B9%8Bil2cpp/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          Unity保护之il2cpp
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">网易保护分析</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
+        
+        
+    </div>
+</aside>
+
+
+
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/">网易保护分析</a>
-    </h1>
+  
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">protect</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/04/07/magisk-riru/" class="archive-article-date">
-  	<time datetime="2020-04-07T09:51:27.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-04-07</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/04/07/magisk-riru/">magisk-riru 使用</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">tools</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/03/09/Magisk%E6%A3%80%E6%B5%8B/" class="archive-article-date">
-  	<time datetime="2020-03-09T07:50:42.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-03-09</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/03/09/Magisk%E6%A3%80%E6%B5%8B/">Magisk检测</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">other</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
   
-  
-    </div></section>
-  
-
-    
 
 
           </div>
@@ -392,8 +325,8 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,
