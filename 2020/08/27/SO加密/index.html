@@ -6,15 +6,38 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Tag: protect | Hexo</title>
+  <title>SO加密 | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Hexo">
-<meta property="og:url" content="http://yoursite.com/tags/protect/index.html">
+  <meta name="description" content="so加密分享基础知识一、ELF文件（更详细可看 elf讲解） ELF是Linux下的可执行连接格式文件，类似于windows下的PE文件。 ELF文件（目标文件）格式主要三种：  可重定向文件(Relocatable file)：文件保存着代码和适当的数据，用来和其他的目标文件一起来创建一个可执行文件或者是一个共享目标文件。（目标文件或者静态库文件，即linux通常后缀为.a和.o的文件）这是由汇">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SO加密">
+<meta property="og:url" content="http://yoursite.com/2020/08/27/SO%E5%8A%A0%E5%AF%86/index.html">
 <meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="so加密分享基础知识一、ELF文件（更详细可看 elf讲解） ELF是Linux下的可执行连接格式文件，类似于windows下的PE文件。 ELF文件（目标文件）格式主要三种：  可重定向文件(Relocatable file)：文件保存着代码和适当的数据，用来和其他的目标文件一起来创建一个可执行文件或者是一个共享目标文件。（目标文件或者静态库文件，即linux通常后缀为.a和.o的文件）这是由汇">
 <meta property="og:locale" content="cn">
+<meta property="og:image" content="http://yoursite.com/2020/08/27/SO%E5%8A%A0%E5%AF%86/image-20200722200900804.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/27/SO%E5%8A%A0%E5%AF%86/image-20200722202815692.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/27/SO%E5%8A%A0%E5%AF%86/image-20200722202418781.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/27/SO%E5%8A%A0%E5%AF%86/image-20200722204307424.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/27/SO%E5%8A%A0%E5%AF%86/image-20200722205838088.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/27/SO%E5%8A%A0%E5%AF%86/image-20200723202546045.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/27/SO%E5%8A%A0%E5%AF%86/image-20200826211930404.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/27/SO%E5%8A%A0%E5%AF%86/image-20200826211956696.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/27/SO%E5%8A%A0%E5%AF%86/image-20200827143911255.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/27/SO%E5%8A%A0%E5%AF%86/image-20200827144338193.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/27/SO%E5%8A%A0%E5%AF%86/image-20200827144827705.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/27/SO%E5%8A%A0%E5%AF%86/image-20200827145222734.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/27/SO%E5%8A%A0%E5%AF%86/image-20200827150229908.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/27/SO%E5%8A%A0%E5%AF%86/image-20200827152258578.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/27/SO%E5%8A%A0%E5%AF%86/image-20200827152450124.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/27/SO%E5%8A%A0%E5%AF%86/image-20200827152727259.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/27/SO%E5%8A%A0%E5%AF%86/image-20200827152830212.png">
+<meta property="article:published_time" content="2020-08-27T11:53:03.000Z">
+<meta property="article:modified_time" content="2020-08-27T12:17:08.850Z">
 <meta property="article:author" content="newbiemiao">
+<meta property="article:tag" content="protect">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/2020/08/27/SO%E5%8A%A0%E5%AF%86/image-20200722200900804.png">
   
     <link rel="alternative" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -126,36 +149,163 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
+            <article id="post-SO加密" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
   
+    <h1 class="article-title" itemprop="name">
+      SO加密
+    </h1>
   
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2020" class="archive-year">2020</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/08/27/SO%E5%8A%A0%E5%AF%86/" class="archive-article-date">
+
+        
+        <a href="/2020/08/27/SO%E5%8A%A0%E5%AF%86/" class="archive-article-date">
   	<time datetime="2020-08-27T11:53:03.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-08-27</time>
 </a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/08/27/SO%E5%8A%A0%E5%AF%86/">SO加密</a>
-    </h1>
-  
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="so加密分享"><a href="#so加密分享" class="headerlink" title="so加密分享"></a>so加密分享</h1><h2 id="基础知识"><a href="#基础知识" class="headerlink" title="基础知识"></a>基础知识</h2><h3 id="一、ELF文件"><a href="#一、ELF文件" class="headerlink" title="一、ELF文件"></a>一、ELF文件</h3><p>（更详细可看 <a href="https://blog.csdn.net/jinking01/article/details/105387253" target="_blank" rel="noopener">elf讲解</a>）</p>
+<p>ELF是Linux下的可执行连接格式文件，类似于windows下的PE文件。</p>
+<p>ELF文件（目标文件）格式主要三种：</p>
+<ol>
+<li><p>可重定向文件(Relocatable file)：文件保存着代码和适当的数据，用来和其他的目标文件一起来创建一个可执行文件或者是一个共享目标文件。（目标文件或者静态库文件，即linux通常后缀为.a和.o的文件）这是由汇编器汇编生成的 .o 文件。后面的链接器(link editor)拿一个或一些 Relocatable object files 作为输入，经链接处理后，生成一个可执行的对象文件 (Executable file) 或者一个可被共享的对象文件(Shared object file)，内核可加载模块 .ko 文件也是 Relocatable object file</p>
+</li>
+<li><p>可执行文件(Executable file)：文件保存着一个用来执行的程序。（例如bash，gcc等）</p>
+</li>
+<li><p>共享目标文件：即 .so 文件。如果拿前面的静态库来生成可执行程序，那每个生成的可执行程序中都会有一份库代码的拷贝。如果在磁盘中存储这些可执行程序，那就会占用额外的磁盘空 间；另外如果拿它们放到Linux系统上一起运行，也会浪费掉宝贵的物理内存。如果将静态库换成动态库，那么这些问题都不会出现</p>
+</li>
+</ol>
+<h4 id="1-1-ELF-文件结构"><a href="#1-1-ELF-文件结构" class="headerlink" title="1.1 ELF 文件结构"></a>1.1 ELF 文件结构</h4><p>elf文件主要有两种格式，一是链接状态、二是运行状态。</p>
+<p><img src="/2020/08/27/SO%E5%8A%A0%E5%AF%86/image-20200722200900804.png" alt="image-20200722200900804"></p>
+<p>这里再放一张 32位数据类型，方便理解。</p>
+<p><img src="/2020/08/27/SO%E5%8A%A0%E5%AF%86/image-20200722202815692.png" alt="image-20200722202815692"></p>
+<a id="more"></a>
 
-        <div class="article-info info-on-right">
-          
+<p>首先看图：</p>
+<p><img src="/2020/08/27/SO%E5%8A%A0%E5%AF%86/image-20200722202418781.png" alt="image-20200722202418781"></p>
+<p>一个ELF文件由以下三部分组成：</p>
+<ul>
+<li>ELF头(ELF header) - 描述文件的主要特性：类型，CPU架构，入口地址，现有部分的大小和偏移等等；</li>
+<li>程序头表(Program header table) - 列举了所有有效的段(segments)和他们的属性。 程序头表需要加载器将文件中的节加载到虚拟内存段中；</li>
+<li>节头表(Section header table) - 包含对节(sections)的描述。</li>
+</ul>
+<h4 id="1-2-ELF头-ELF-header"><a href="#1-2-ELF头-ELF-header" class="headerlink" title="1.2 ELF头(ELF header)"></a>1.2 ELF头(ELF header)</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 32位 elf头 */</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">char</span>  e_ident[EI_NIDENT]; <span class="comment">/* Magic number and other info */</span></span><br><span class="line">    Elf32_Half  e_type;         <span class="comment">/* Object file type */</span></span><br><span class="line">    Elf32_Half  e_machine;      <span class="comment">/* Architecture */</span></span><br><span class="line">    Elf32_Word  e_version;      <span class="comment">/* Object file version */</span></span><br><span class="line">    Elf32_Addr  e_entry;        <span class="comment">/* Entry point virtual address */</span></span><br><span class="line">    Elf32_Off   e_phoff;        <span class="comment">/* Program header table file offset */</span></span><br><span class="line">    Elf32_Off   e_shoff;        <span class="comment">/* Section header table file offset */</span></span><br><span class="line">    Elf32_Word  e_flags;        <span class="comment">/* Processor-specific flags */</span></span><br><span class="line">    Elf32_Half  e_ehsize;       <span class="comment">/* ELF header size in bytes */</span></span><br><span class="line">    Elf32_Half  e_phentsize;        <span class="comment">/* Program header table entry size */</span></span><br><span class="line">    Elf32_Half  e_phnum;        <span class="comment">/* Program header table entry count */</span></span><br><span class="line">    Elf32_Half  e_shentsize;        <span class="comment">/* Section header table entry size */</span></span><br><span class="line">    Elf32_Half  e_shnum;        <span class="comment">/* Section header table entry count */</span></span><br><span class="line">    Elf32_Half  e_shstrndx;     <span class="comment">/* Section header string table index */</span></span><br><span class="line">&#125; Elf32_Ehdr;</span><br></pre></td></tr></table></figure>
+
+<p>这里可以借助 010editor 和 readelf 来理解文件，蓝色的这一块就是名叫libhooklib.so文件的elf头。</p>
+<p><img src="/2020/08/27/SO%E5%8A%A0%E5%AF%86/image-20200722204307424.png" alt="image-20200722204307424"></p>
+<h4 id="1-3-程序头表-Program-header-table"><a href="#1-3-程序头表-Program-header-table" class="headerlink" title="1.3  程序头表(Program header table)"></a>1.3  程序头表(Program header table)</h4><p>一个可执行文件或共享目标文件的程序头表(program header table)是一个数组， 数组中的每一个元素称为“程序头(program header)”，每一个程序头描述了一个 “段(segment)”或者一块用于准备执行程序的信息。一个目标文件中的“段 (segment)”包含一个或者多个“节(section)”。程序头只对可执行文件或共享目标 文件有意义，对于其它类型的目标文件，该信息可以忽略。在目标文件的文件头 (elf header)中，e_phentsize 和 e_phnum 成员指定了程序头的大小。</p>
+<p>根据elf头，可以看到 Program header table 在文件中的偏移为52（0x34）。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 程序头表Program header.就是段描述头 */</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    Elf32_Word  p_type;         <span class="comment">// 见下面的enum segment_type</span></span><br><span class="line">    Elf32_Off   p_offset;       <span class="comment">/* Segment file offset */</span></span><br><span class="line">    Elf32_Addr  p_vaddr;        <span class="comment">/* Segment virtual address */</span></span><br><span class="line">    Elf32_Addr  p_paddr;        <span class="comment">/* Segment physical address */</span></span><br><span class="line">    Elf32_Word  p_filesz;       <span class="comment">/* Segment size in file */</span></span><br><span class="line">    Elf32_Word  p_memsz;        <span class="comment">/* Segment size in memory */</span></span><br><span class="line">    Elf32_Word  p_flags;        <span class="comment">/* Segment flags , I.E execute|read|write */</span></span><br><span class="line">    Elf32_Word  p_align;        <span class="comment">/* Segment alignment */</span></span><br><span class="line">&#125; Elf32_Phdr;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 段类型 */</span></span><br><span class="line"><span class="keyword">enum</span> segment_type</span><br><span class="line">&#123;</span><br><span class="line">    PT_NULL,    <span class="comment">// 忽略</span></span><br><span class="line">    PT_LOAD,    <span class="comment">// 可加载程序段</span></span><br><span class="line">    PT_DYNAMIC, <span class="comment">// 动态加载信息</span></span><br><span class="line">    PT_INTERP,  <span class="comment">// 动态加载器名称</span></span><br><span class="line">    PT_NOTE,    <span class="comment">// 一些辅助信息</span></span><br><span class="line">    PT_SHLIB,   <span class="comment">// 保留</span></span><br><span class="line">    PT_PHDR     <span class="comment">// 程序头表</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/2020/08/27/SO%E5%8A%A0%E5%AF%86/image-20200722205838088.png" alt="image-20200722205838088"></p>
+<p>这里需要了解一下PT_LOAD、PT_DYNAMIC、PT_PHDR这三个类型的程序头。</p>
+<h5 id="PT-PHDR"><a href="#PT-PHDR" class="headerlink" title="PT_PHDR"></a>PT_PHDR</h5><p>PT_HDR段保存了程序头表本身的位置和大小。Phdr表保存了所有的Phdr对文件（以及内存镜像）中段的描述信息</p>
+<h5 id="PT-LOAD"><a href="#PT-LOAD" class="headerlink" title="PT_LOAD"></a>PT_LOAD</h5><p>一个可执行文件至少有一个PT_LOAD类型的段。这类程序头描述的是可装载的段，也就是说，这种类型的段将被装载或映射到内存中。</p>
+<p>例如，一个需要动态链接的ELF可执行文件通常包含以下两个可装载的段（类型为PT_LOAD）：</p>
+<p>存放程序代码的text段；</p>
+<p>存放全局变量和动态链接信息的data段。</p>
+<p>上面的两个段将会被映射到内存中，并根据p_align中存放的值在内存中对齐。</p>
+<p>Text段（代码段）的权限设置为PF_X|PF_R时，可读可执行。</p>
+<p>Data段的权限设置为PF_W|PF_R，可读可写。</p>
+<h5 id="PT-DYNAMIC"><a href="#PT-DYNAMIC" class="headerlink" title="PT_DYNAMIC"></a>PT_DYNAMIC</h5><p>动态段是动态链接可执行文件所特有的，包含了动态链接器所必需的一些信息。在动态段中包含了一些标记值和指针，包含但不限于以下内容：</p>
+<blockquote>
+<ul>
+<li>运行时需要链接的共享库列表；</li>
+<li>全局偏移表（GOT）的地址——ELF动态链接库部分；</li>
+<li>重定位条目的相关信息。</li>
+</ul>
+</blockquote>
+<h4 id="1-4-节头表-Section-header-table"><a href="#1-4-节头表-Section-header-table" class="headerlink" title="1.4 节头表(Section header table)"></a>1.4 节头表(Section header table)</h4><p>在程序中，段（segment）并不等于节（section）。段是程序执行的必要组成部分，在每个段中，会有代码或者数据被划分为不同的节。节头表是对这些节的位置和大小描述，主要用于链接和调试。节头表对于程序的执行来说不是必需的，没有节头表，程序仍然可以正常执行，因为节头表没有对程序的内存布局进行描述，对程序内存布局描述是程序头表的任务。</p>
+<p>如果二进制文件中缺少节头，并不意味着节就不存在。只是没有办法通过节头来引用节，对于调试器或者反编译程序来说，只是可以参考的信息变少了而已。</p>
+<p>每一个节都保存了某种类型的代码或者数据。数据可以是程序中的全局变量，也可以是链接器所需要的动态链接信息。正如前面所提到的，每个ELF目标文件都有节，但是不一定有节头，尤其是有人故意将节头从节头表中删除了之后。当然，默认是有节头的。</p>
+<p>ELF文件节头结构如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    Elf32_Word  sh_name;        <span class="comment">/* Section name (string tbl index) */</span></span><br><span class="line">    Elf32_Word  sh_type;        <span class="comment">/* Section type */</span></span><br><span class="line">    Elf32_Word  sh_flags;       <span class="comment">/* Section flags */</span></span><br><span class="line">    Elf32_Addr  sh_addr;        <span class="comment">/* Section virtual addr at execution */</span></span><br><span class="line">    Elf32_Off   sh_offset;      <span class="comment">/* Section file offset */</span></span><br><span class="line">    Elf32_Word  sh_size;        <span class="comment">/* Section size in bytes */</span></span><br><span class="line">    Elf32_Word  sh_link;        <span class="comment">/* Link to another section */</span></span><br><span class="line">    Elf32_Word  sh_info;        <span class="comment">/* Additional section information */</span></span><br><span class="line">    Elf32_Word  sh_addralign;       <span class="comment">/* Section alignment */</span></span><br><span class="line">    Elf32_Word  sh_entsize;     <span class="comment">/* Entry size if section holds table */</span></span><br><span class="line">&#125; Elf32_Shdr;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>.text节是保留了程序代码指令的代码节。一段可执行程序，如果存在Phdr，.text节就会存放在text段中。由于.text节保存了程序代码，因此节的类型为SHT_PROGBITS。</li>
+<li>.rodata节保存了只读数据，因此只能存放于一个可执行文件的只读段中。也因此，只能在text段（不是data段）中找到.rodata节。由于.rodata节是只读的，因此节类型为SHT_PROGBITS。</li>
+<li>过程链接表（Procedure Linkage Table，PLT），.plt节中包含了动态链接器调用从共享库导入的函数所必需的相关代码。由于其存在于text段中，同样保存了代码，因此节类型为SHT_PROGBITS。</li>
+<li>.data节存在于data段中，保存了初始化的全局变量等数据。由于其保存了程序的变量数据，因此节类型被标记为SHT_PROGBITS。</li>
+<li>.bss节保存了未进行初始化的全局数据，是data段的一部分，占用空间不超过4字节，仅表示这个节本身的空间。程序加载时数据被初始化为0，在程序执行期间可以进行赋值。由于.bss节未保存实际的数据，因此节类型为SHT_PROGBITS。</li>
+<li>.got节保存了全局偏移表。.got节和.plt节一起提供了对导入的共享库函数的访问入口，由动态链接器在运行时进行修改。如果攻击者获得了堆或者.bss漏洞的一个指针大小的写原语，就可以对该节任意进行修改。.got.plt节跟程序执行有关，因此节类型被标记为SHT_PROGBITS。</li>
+<li>.dynsym节保存了从共享库导入的动态符号信息，该节保存在text段中，节类型被标记为SHT_PROGBITS。</li>
+<li>.dynstr节保存了动态符号字符串表，表中存放了一系列字符串，这些字符串代表了符号的名称，以空字符作为终止符。</li>
+<li>.rel.*节 重定位节保存了重定位相关的信息，这些信息描述；了在链接或者运行时，对ELF目标文件的某部分内容或者进程镜像进行补充或者修改。重定位节保存了重定位相关的数据，因此节类型被标记为SHT_REL。</li>
+<li>.hash节有时也称为.gnu.hahs，保存了一个用于查找符号的散列表。</li>
+<li>.symtab节保存了ElfN_Sym类型的符号信息，因此节类型被标记为SHT_SYMTAB。</li>
+<li>.strtab节保存的是符号字符串表，表中的内容会被.symtab的ElfN_Sym结构中的st_name条目引用。由于其保存了字符串表，因此节类型被标记为SHT_STRTAB。</li>
+<li>.shstrtab节保存节头字符串表，该表是一个以空字符终止的字符串的集合，字符串保存了每个节的节名，如.text、.data等。有一个名为e_shsrndx的ELF文件头条目会指向.shstrtab节，e_shstrndx中保存了.shstrtab的偏移量。由于其保存了字符串表，因此节类型被标记为SHT_STRTAB。</li>
+<li>.ctors（构造器）和.dtors（析构器）这两个节保存了指向析构函数和析构函数的指针，构造函数是在main函数执行之前需要执行的代码，析构函数是在main函数之后需要执行的代码。</li>
+</ul>
+<h5 id="符号表"><a href="#符号表" class="headerlink" title="符号表"></a>符号表</h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span> </span><br><span class="line">Elf32_Word st_name; <span class="comment">//符号表项名称。如果该值非0，则表示符号名的字</span></span><br><span class="line"><span class="comment">//符串表索引(offset)，否则符号表项没有名称。</span></span><br><span class="line">Elf32_Addr st_value; <span class="comment">//符号的取值。依赖于具体的上下文，可能是一个绝对值、一个地址等等。</span></span><br><span class="line">Elf32_Word st_size; <span class="comment">//符号的尺寸大小。例如一个数据对象的大小是对象中包含的字节数。</span></span><br><span class="line"><span class="keyword">unsigned</span> <span class="keyword">char</span> st_info; <span class="comment">//符号的类型和绑定属性。</span></span><br><span class="line"><span class="keyword">unsigned</span> <span class="keyword">char</span> st_other; <span class="comment">//未定义。</span></span><br><span class="line">Elf32_Half st_shndx; <span class="comment">//每个符号表项都以和其他节区的关系的方式给出定义。</span></span><br><span class="line"><span class="comment">//此成员给出相关的节区头部表索引。</span></span><br><span class="line">&#125; Elf32_sym;</span><br></pre></td></tr></table></figure>
+
+<p><strong>符号是对某些类型的数据或代码（如全局变量或函数）的符号引用，函数名或变量名就是符号名</strong>。例如，<code>printf()</code>函数会在动态链接符号表<code>.dynsym</code>中存有一个指向该函数的符号项（以<code>Elf_Sym</code>数据结构表示）。在大多数共享库和动态链接可执行文件中，存在两个符号表。即<code>.dynsym</code>和<code>.symtab</code>。</p>
+<p><strong><code>.dynsym</code>保存了引用来自外部文件符号的全局符号</strong>。如<code>printf</code>库函数。<strong><code>.dynsym</code>保存的符号是<code>.symtab</code>所保存符合的子集，<code>.symtab</code>中还保存了可执行文件的本地符号</strong>。如全局变量，代码中定义的本地函数等。</p>
+<p>既然<code>.dynsym</code>是<code>.symtab</code>的子集，那为何要同时存在两个符号表呢？</p>
+<p>通过<code>readelf -S</code>命令可以查看可执行文件的输出，一部分节标志位（<code>sh_flags</code>）被标记为了<strong>A（ALLOC）、WA（WRITE/ALLOC）、AX（ALLOC/EXEC）</strong>。其中，<code>.dynsym</code>被标记为ALLOC，而<code>.symtab</code>则没有标记。</p>
+<p>ALLOC表示有该标记的节会在运行时分配并装载进入内存，而<code>.symtab</code>不是在运行时必需的，因此不会被装载到内存中。<strong><code>.dynsym</code>保存的符号只能在运行时被解析，因此是运行时动态链接器所需的唯一符号</strong>。<code>.dynsym</code>对于动态链接可执行文件的执行是必需的，而<code>.symtab</code>只是用来进行调试和链接的。</p>
+<p><img src="/2020/08/27/SO%E5%8A%A0%E5%AF%86/image-20200723202546045.png" alt="image-20200723202546045"></p>
+<h5 id="字符串表"><a href="#字符串表" class="headerlink" title="字符串表"></a>字符串表</h5><p>类似于符号表，在大多数共享库和动态链接可执行文件中，也存在两个字符串表。即<code>.dynstr</code>和<code>.strtab</code>，分别对应于<code>.dynsym</code>和<code>symtab</code>。此外，还有一个<code>.shstrtab</code>的节头字符串表，用于保存节头表中用到的字符串，可通过<code>sh_name</code>进行索引。</p>
+<p>字符串表中包含有若干个以 ’ null ’ 结尾的字符序列，即字符串。在目标文件中， 这些字符串通常是符号的名字或者节的名字。在目标文件的其它部分中，当需要引 用某个字符串时，只需要提供该字符串在字符串表中的序号即可。 </p>
+<p>字符串表中的第一个字符串（序号为 0）永远是空串，即”null”，它可以用于表 示一个空的名字或者没有名字。所以，字符串表的第一个字节是’null’。由于每一 个字符串都是以’null’结尾，所以字符串表的最后一个字节也必然为’null’。 </p>
+<p>字符串表也可以是空的，不含有任何字符串，这时，节头中的 sh_size 成员必须 是 0。 </p>
+<p>一个目标文件中可能有多个字符串表，其中一个称为“节名字表(.shstrtab)”， 它包含所有节的名字。每一个节头的 sh_name 成员应该是一个索引值，它指向节 名字表中的一个位置，从这个位置开始到接下来第一个’null’字符为止的这个字符 串，正是这个节的名字。</p>
+<h5 id="重定位"><a href="#重定位" class="headerlink" title="重定位"></a>重定位</h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line"> Elf32_Addr r_offset;<span class="comment">//出重定位所作用的位置</span></span><br><span class="line"> Elf32_Word r_info;<span class="comment">//重定位所作用的符号表索引，也给出了重定位的类型</span></span><br><span class="line">&#125; Elf32_Rel;</span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line"> Elf32_Addr r_offset;</span><br><span class="line"> Elf32_Word r_info;</span><br><span class="line"> Elf32_Sword r_addend;</span><br><span class="line">&#125; Elf32_Rela;</span><br></pre></td></tr></table></figure>
+
+<p>重定位(relocation)是把符号引用与符号定义连接在一起的过程。比如，当程序 调用一个函数时，将从当前运行的指令跳转到一个新的指令地址去执行。在编写程 序的时候，我们只需指明所要调用的函数名（即符号引用），在重定位的过程中， 函数名会与实际的函数所在地址（即符号定义）联系起来，使程序知道应该跳转到 哪里去。 </p>
+<p>重定位文件必须知道如何修改其所包含的“节”的内容，在构建可执行文件或 共享目标文件的时候，把节中的符号引用换成这些符号在进程空间中的虚拟地址。 包含这些转换信息的数据也就是“重定位项(relocation entries)”。</p>
+<h3 id="关于linker"><a href="#关于linker" class="headerlink" title="关于linker"></a>关于linker</h3><p>参考：<a href="https://cloud.tencent.com/developer/article/1193474" target="_blank" rel="noopener">so加载过程</a>、<a href="https://segmentfault.com/a/1190000007008889" target="_blank" rel="noopener">参考2</a></p>
+<p>作用：1. 关于解密时机的选择</p>
+<p>​            2. 静态文件可以修改的地方</p>
+<h3 id="ELF-静态注入"><a href="#ELF-静态注入" class="headerlink" title="ELF  静态注入"></a>ELF  静态注入</h3><p>参考：<a href="https://gslab.qq.com/portal.php?mod=view&aid=163" target="_blank" rel="noopener">腾讯</a></p>
+<p>作用：无源码情况下解密（主要是分无源码和有源码）</p>
+<h2 id="正文开始"><a href="#正文开始" class="headerlink" title="正文开始"></a>正文开始</h2><h3 id="so节加密demo"><a href="#so节加密demo" class="headerlink" title="so节加密demo"></a>so节加密demo</h3><p>demo是我将一个testfunc的方法放在 .itext,然后将itext节加密，这样就把testfunc保护起来了</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">testfunc</span><span class="params">()</span>__<span class="title">attribute__</span><span class="params">((section(<span class="string">".itext"</span>)))</span></span>&#123;</span><br><span class="line">    LOGD(<span class="string">"im encrypt"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/2020/08/27/SO%E5%8A%A0%E5%AF%86/image-20200826211930404.png" alt="image-20200826211930404"></p>
+<p><img src="/2020/08/27/SO%E5%8A%A0%E5%AF%86/image-20200826211956696.png" alt="image-20200826211956696"></p>
+<p>加密python：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> lief</span><br><span class="line"><span class="keyword">import</span> math</span><br><span class="line"></span><br><span class="line">sobin =lief.parse(<span class="string">"libnative-lib.so"</span>)</span><br><span class="line"></span><br><span class="line">sobin.add_library(<span class="string">"libpro.so"</span>) <span class="comment"># 这个就是前面腾讯的ELF注入</span></span><br><span class="line"></span><br><span class="line">itext = sobin.get_section(<span class="string">".itext"</span>)</span><br><span class="line"></span><br><span class="line">offset = itext.offset</span><br><span class="line">size = itext.size</span><br><span class="line">print(size)</span><br><span class="line"></span><br><span class="line">sobin.header.section_header_offset = offset <span class="comment"># 虽然被加载了，但修改了不会被影响，所以可以用来记录偏移和大小</span></span><br><span class="line">sobin.header.entrypoint = size</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">copyfile(<span class="string">"libnative-lib.so"</span>,<span class="string">"libout.so"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">infile =  open(<span class="string">"libnative-lib.so"</span>,<span class="string">"rb"</span>)</span><br><span class="line">file = infile.read()</span><br><span class="line">out = open(<span class="string">"libout.so"</span>,<span class="string">"wb"</span>)</span><br><span class="line"></span><br><span class="line">enc = []</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> itext.content:</span><br><span class="line">    enc.append(struct.pack(<span class="string">'h'</span>,~i)[<span class="number">0</span>])</span><br><span class="line"></span><br><span class="line">print(hex(file.find(bytes(itext.content))))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">out.write(file.replace(bytes(itext.content),bytes(enc)))</span><br><span class="line">out.close()</span><br></pre></td></tr></table></figure>
+
+
+
+<p>解密cpp文件：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// libpro.so</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">init_getString</span><span class="params">()</span> __<span class="title">attribute__</span><span class="params">((constructor))</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">unsigned</span> <span class="keyword">long</span> <span class="title">getLibAddr</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">init_getString</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">char</span> name[<span class="number">15</span>];</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> nblock;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> nsize;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">long</span> base;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">long</span> text_addr;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> i;</span><br><span class="line">    Elf32_Ehdr *ehdr;</span><br><span class="line">    Elf32_Shdr *shdr;</span><br><span class="line"></span><br><span class="line">    base = getLibAddr();</span><br><span class="line"></span><br><span class="line">    ehdr = (Elf32_Ehdr *)base;</span><br><span class="line"></span><br><span class="line">   <span class="comment">// text_addr = ehdr-&gt;e_shoff + base;</span></span><br><span class="line">  <span class="comment">//  nsize = ehdr-&gt;e_entry &amp; 0xffff;</span></span><br><span class="line">   <span class="comment">// npage =nsize / PAGE_SIZE + ((nsize % PAGE_SIZE == 0) ? 0 : 1);</span></span><br><span class="line">    </span><br><span class="line">    text_addr = ehdr-&gt;e_flags + base;</span><br><span class="line">    nsize = ehdr-&gt;e_entry &amp; <span class="number">0xffff</span>;</span><br><span class="line">    npage =nsize / PAGE_SIZE + ((nsize % PAGE_SIZE == <span class="number">0</span>) ? <span class="number">0</span> : <span class="number">1</span>);</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span>(mprotect((<span class="keyword">void</span> *) (text_addr / PAGE_SIZE * PAGE_SIZE), <span class="number">4096</span> * npage, PROT_READ | PROT_EXEC | PROT_WRITE) != <span class="number">0</span>)&#123;</span><br><span class="line">        __android_log_print(ANDROID_LOG_INFO, <span class="string">"JNITag"</span>, <span class="string">"mem privilege change failed"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span>(i=<span class="number">0</span>;i&lt; nsize; i++)&#123;</span><br><span class="line">        <span class="keyword">char</span> *addr = (<span class="keyword">char</span>*)(text_addr + i);</span><br><span class="line">        *addr = ~(*addr);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(mprotect((<span class="keyword">void</span> *) (text_addr / PAGE_SIZE * PAGE_SIZE), <span class="number">4096</span> * npage, PROT_READ | PROT_EXEC) != <span class="number">0</span>)&#123;</span><br><span class="line">        __android_log_print(ANDROID_LOG_INFO, <span class="string">"JNITag"</span>, <span class="string">"mem privilege change failed"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    __android_log_print(ANDROID_LOG_INFO, <span class="string">"JNITag"</span>, <span class="string">"Decrypt success"</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">unsigned</span> <span class="keyword">long</span> <span class="title">getLibAddr</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">long</span> ret = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">char</span> name[] = <span class="string">"libnative-lib.so"</span>;</span><br><span class="line">    <span class="keyword">char</span> buf[<span class="number">4096</span>], *temp;</span><br><span class="line">    <span class="keyword">int</span> pid;</span><br><span class="line">    FILE *fp;</span><br><span class="line">    pid = getpid();</span><br><span class="line">    <span class="built_in">sprintf</span>(buf, <span class="string">"/proc/%d/maps"</span>, pid);</span><br><span class="line">    fp = fopen(buf, <span class="string">"r"</span>);</span><br><span class="line">    <span class="keyword">if</span>(fp == <span class="literal">NULL</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">puts</span>(<span class="string">"open failed"</span>);</span><br><span class="line">        <span class="keyword">goto</span> _error;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">while</span>(fgets(buf, <span class="keyword">sizeof</span>(buf), fp))&#123;</span><br><span class="line">        <span class="keyword">if</span>(<span class="built_in">strstr</span>(buf, name))&#123;</span><br><span class="line">            temp = strtok(buf, <span class="string">"-"</span>);</span><br><span class="line">            ret = strtoul(temp, <span class="literal">NULL</span>, <span class="number">16</span>);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    _error:</span><br><span class="line">    fclose(fp);</span><br><span class="line">    <span class="keyword">return</span> ret;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>会遇到的情况：<br> 对so进行section加密后，提示.dynamic section header was not found<br>遇到问题：Android7.0后JNI库必须保留Section Headers。由于加密时修改了shoff值，导致加载so库值解析Section Headers 解析不了，.dynamic section header was not found。</p>
+<p>修改测量：shoff和entry目的是为了存储加密的偏移大小和加密的大小。使用e_flags和e_entry来储存段的偏移和大小</p>
+<h3 id="腾讯so加密"><a href="#腾讯so加密" class="headerlink" title="腾讯so加密"></a>腾讯so加密</h3><p>首先，当王者荣耀加载libil2cpp.so时，会先加载libtprt.so(对应我们的mps)</p>
+<p><img src="/2020/08/27/SO%E5%8A%A0%E5%AF%86/image-20200827143911255.png" alt="image-20200827143911255"></p>
+<p>libtprt.so对自身的tptext节进行了加密，分析init_array,可以看到解密函数如下，关键函数时mprotect，因为解密会用到。</p>
+<p><img src="/2020/08/27/SO%E5%8A%A0%E5%AF%86/image-20200827144338193.png" alt="image-20200827144338193"></p>
+<p><img src="/2020/08/27/SO%E5%8A%A0%E5%AF%86/image-20200827144827705.png" alt="image-20200827144827705"></p>
+<p>根据分析解密函数：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">tprt = lief.parse(name)</span><br><span class="line">tptext_section = tprt.get_section(<span class="string">".tptext"</span>).content</span><br><span class="line"></span><br><span class="line">print(len(tptext_section))</span><br><span class="line">offset = tprt.get_section(<span class="string">".tptext"</span>).offset</span><br><span class="line">out = <span class="string">b""</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(len(tptext_section)):</span><br><span class="line">    out += (tptext_section[i] ^ <span class="number">0xb8</span>).to_bytes(<span class="number">1</span>,byteorder=<span class="string">'little'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">print(len(out))</span><br><span class="line">tpp = tprt_bin[:offset]+out+tprt_bin[offset+len(tptext_section):]</span><br><span class="line"><span class="keyword">with</span> open(<span class="string">"tpp.so"</span>, <span class="string">'wb'</span>) <span class="keyword">as</span> fp:</span><br><span class="line">    fp.write(tpp)</span><br></pre></td></tr></table></figure>
+
+<p><img src="/2020/08/27/SO%E5%8A%A0%E5%AF%86/image-20200827145222734.png" alt="image-20200827145222734"></p>
+<p>tptext节里的函数主要用于初始化各类保护，会被jni_onload调用。现在tprt已经被成功加载，现在就需要解密libil2cpp.so（linker加载先加载链接库，再执行构造函数）</p>
+<p><img src="/2020/08/27/SO%E5%8A%A0%E5%AF%86/image-20200827150229908.png" alt="image-20200827150229908"></p>
+<p>问题1：关于ADRL作用<a href="http://blog.sina.com.cn/s/blog_4b5210840100c80i.html" target="_blank" rel="noopener">http://blog.sina.com.cn/s/blog_4b5210840100c80i.html</a></p>
+<p>取得基址后，根据base+0x1d0处的偏移获得解密函数地址，调用解密函数，在此处调用libtprt.so的导出函数g_tprt_pfn_array，init_proc -&gt; 调用g_tprt_pfn_array（“.text”,?,3）-&gt; 解密  .text段</p>
+<p><img src="/2020/08/27/SO%E5%8A%A0%E5%AF%86/image-20200827152258578.png" alt="image-20200827152258578"></p>
+<p><img src="/2020/08/27/SO%E5%8A%A0%E5%AF%86/image-20200827152450124.png" alt="image-20200827152450124"></p>
+<p>查看lintprt.so的导出函数，</p>
+<p><img src="/2020/08/27/SO%E5%8A%A0%E5%AF%86/image-20200827152727259.png" alt="image-20200827152727259"></p>
+<p><img src="/2020/08/27/SO%E5%8A%A0%E5%AF%86/image-20200827152830212.png" alt="image-20200827152830212"></p>
+<p>end：到目前为止，都很简单，加密的难点在于如何修改elf文件要在能正常运行的情况下添加需要的数据。</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
@@ -167,133 +317,119 @@
 		</ul>
 	</div>
 
-          
+      
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2020/08/27/SO%E5%8A%A0%E5%AF%86/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/07/03/Unity%E4%BF%9D%E6%8A%A4%E4%B9%8Bassetbundle/" class="archive-article-date">
-  	<time datetime="2020-07-03T03:55:02.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-07-03</time>
-</a>
+<nav id="article-nav">
+  
+  
+    <a href="/2020/07/03/Unity%E4%BF%9D%E6%8A%A4%E4%B9%8Bassetbundle/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Unity保护之assetbundle</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/07/03/Unity%E4%BF%9D%E6%8A%A4%E4%B9%8Bassetbundle/">Unity保护之assetbundle</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">protect</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
+        
+        
+        <div class="toc-container tooltip-left">
+            <i class="icon-font icon-category"></i>
+            <div class="tooltip tooltip-east">
+                <span class="tooltip-item">
+                </span>
+                <span class="tooltip-content">
+                    <div class="toc-article">
+                    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#so加密分享"><span class="toc-number">1.</span> <span class="toc-text">so加密分享</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#基础知识"><span class="toc-number">1.1.</span> <span class="toc-text">基础知识</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#一、ELF文件"><span class="toc-number">1.1.1.</span> <span class="toc-text">一、ELF文件</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1-ELF-文件结构"><span class="toc-number">1.1.1.1.</span> <span class="toc-text">1.1 ELF 文件结构</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-2-ELF头-ELF-header"><span class="toc-number">1.1.1.2.</span> <span class="toc-text">1.2 ELF头(ELF header)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-3-程序头表-Program-header-table"><span class="toc-number">1.1.1.3.</span> <span class="toc-text">1.3  程序头表(Program header table)</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#PT-PHDR"><span class="toc-number">1.1.1.3.1.</span> <span class="toc-text">PT_PHDR</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#PT-LOAD"><span class="toc-number">1.1.1.3.2.</span> <span class="toc-text">PT_LOAD</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#PT-DYNAMIC"><span class="toc-number">1.1.1.3.3.</span> <span class="toc-text">PT_DYNAMIC</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-4-节头表-Section-header-table"><span class="toc-number">1.1.1.4.</span> <span class="toc-text">1.4 节头表(Section header table)</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#符号表"><span class="toc-number">1.1.1.4.1.</span> <span class="toc-text">符号表</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#字符串表"><span class="toc-number">1.1.1.4.2.</span> <span class="toc-text">字符串表</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#重定位"><span class="toc-number">1.1.1.4.3.</span> <span class="toc-text">重定位</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#关于linker"><span class="toc-number">1.1.2.</span> <span class="toc-text">关于linker</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ELF-静态注入"><span class="toc-number">1.1.3.</span> <span class="toc-text">ELF  静态注入</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#正文开始"><span class="toc-number">1.2.</span> <span class="toc-text">正文开始</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#so节加密demo"><span class="toc-number">1.2.1.</span> <span class="toc-text">so节加密demo</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#腾讯so加密"><span class="toc-number">1.2.2.</span> <span class="toc-text">腾讯so加密</span></a></li></ol></li></ol></li></ol>
+                    </div>
+                </span>
+            </div>
         </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
+        
+    </div>
+</aside>
+
+
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/07/03/Unity%E4%BF%9D%E6%8A%A4%E4%B9%8Bil2cpp/" class="archive-article-date">
-  	<time datetime="2020-07-03T03:54:52.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-07-03</time>
-</a>
-        </div>
-    	 
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/07/03/Unity%E4%BF%9D%E6%8A%A4%E4%B9%8Bil2cpp/">Unity保护之il2cpp</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">protect</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/" class="archive-article-date">
-  	<time datetime="2020-07-03T03:53:28.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-07-03</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/">网易保护分析</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">protect</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-  
-    </div></section>
   
 
-    
+  
 
 
           </div>
@@ -316,9 +452,9 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
+		isPost: true,
 		isArchive: false,
-		isTag: true,
+		isTag: false,
 		isCategory: false,
 		open_in_new: false,
 		toc_hide_index: true,

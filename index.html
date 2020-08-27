@@ -128,6 +128,96 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-SO加密" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/08/27/SO%E5%8A%A0%E5%AF%86/">SO加密</a>
+    </h1>
+  
+
+        
+        <a href="/2020/08/27/SO%E5%8A%A0%E5%AF%86/" class="archive-article-date">
+  	<time datetime="2020-08-27T11:53:03.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-08-27</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="so加密分享"><a href="#so加密分享" class="headerlink" title="so加密分享"></a>so加密分享</h1><h2 id="基础知识"><a href="#基础知识" class="headerlink" title="基础知识"></a>基础知识</h2><h3 id="一、ELF文件"><a href="#一、ELF文件" class="headerlink" title="一、ELF文件"></a>一、ELF文件</h3><p>（更详细可看 <a href="https://blog.csdn.net/jinking01/article/details/105387253" target="_blank" rel="noopener">elf讲解</a>）</p>
+<p>ELF是Linux下的可执行连接格式文件，类似于windows下的PE文件。</p>
+<p>ELF文件（目标文件）格式主要三种：</p>
+<ol>
+<li><p>可重定向文件(Relocatable file)：文件保存着代码和适当的数据，用来和其他的目标文件一起来创建一个可执行文件或者是一个共享目标文件。（目标文件或者静态库文件，即linux通常后缀为.a和.o的文件）这是由汇编器汇编生成的 .o 文件。后面的链接器(link editor)拿一个或一些 Relocatable object files 作为输入，经链接处理后，生成一个可执行的对象文件 (Executable file) 或者一个可被共享的对象文件(Shared object file)，内核可加载模块 .ko 文件也是 Relocatable object file</p>
+</li>
+<li><p>可执行文件(Executable file)：文件保存着一个用来执行的程序。（例如bash，gcc等）</p>
+</li>
+<li><p>共享目标文件：即 .so 文件。如果拿前面的静态库来生成可执行程序，那每个生成的可执行程序中都会有一份库代码的拷贝。如果在磁盘中存储这些可执行程序，那就会占用额外的磁盘空 间；另外如果拿它们放到Linux系统上一起运行，也会浪费掉宝贵的物理内存。如果将静态库换成动态库，那么这些问题都不会出现</p>
+</li>
+</ol>
+<h4 id="1-1-ELF-文件结构"><a href="#1-1-ELF-文件结构" class="headerlink" title="1.1 ELF 文件结构"></a>1.1 ELF 文件结构</h4><p>elf文件主要有两种格式，一是链接状态、二是运行状态。</p>
+<p><img src="/2020/08/27/SO%E5%8A%A0%E5%AF%86/image-20200722200900804.png" alt="image-20200722200900804"></p>
+<p>这里再放一张 32位数据类型，方便理解。</p>
+<p><img src="/2020/08/27/SO%E5%8A%A0%E5%AF%86/image-20200722202815692.png" alt="image-20200722202815692"></p>
+        
+          <a class="article-more-a" href="/2020/08/27/SO%E5%8A%A0%E5%AF%86/#more">more >></a>
+        
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">protect</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2020/08/27/SO%E5%8A%A0%E5%AF%86/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-Unity保护之assetbundle" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
