@@ -20,7 +20,7 @@
 <meta property="og:image" content="http://yoursite.com/2020/12/04/%E4%BD%BF%E7%94%A8frida%E8%8E%B7%E5%8F%96il2cpp%E7%AC%A6%E5%8F%B7%E4%BF%A1%E6%81%AF/%E4%BD%BF%E7%94%A8frida%E8%8E%B7%E5%8F%96il2cpp%E7%AC%A6%E5%8F%B7%E4%BF%A1%E6%81%AF%5Cimage-20201203142517555.png">
 <meta property="og:image" content="http://yoursite.com/2020/12/04/%E4%BD%BF%E7%94%A8frida%E8%8E%B7%E5%8F%96il2cpp%E7%AC%A6%E5%8F%B7%E4%BF%A1%E6%81%AF/assets%5Cimage-20201207213554471.png">
 <meta property="article:published_time" content="2020-12-04T07:55:31.000Z">
-<meta property="article:modified_time" content="2020-12-08T02:12:49.574Z">
+<meta property="article:modified_time" content="2021-01-15T07:23:05.554Z">
 <meta property="article:author" content="newbiemiao">
 <meta property="article:tag" content="game">
 <meta name="twitter:card" content="summary">
@@ -160,6 +160,8 @@
 <h2 id="0x1-背景"><a href="#0x1-背景" class="headerlink" title="0x1 背景"></a>0x1 背景</h2><p>本次分析选取的是android平台的，游戏采用unity开发，使用il2cpp模式编译。</p>
 <p>使用 IL2CPP 模式编译，游戏中使用的字符串都被保存在了一个global-metadata.dat的资源文件里，只有在动态运行时才会将这些字符串读入内存。一般使用Il2CppDumper就可以读取global-metadata.dat文件中的信息，帮助反编译。</p>
 <p>有破解就有保护，可能会遇到无法dump或者global-metadata.dat文件结构被修改的情况，无法使用Il2CppDumper，这个时候就需要自己动手了。</p>
+<a id="more"></a>
+
 <h2 id="0x2-IL2CPP-加载过程"><a href="#0x2-IL2CPP-加载过程" class="headerlink" title="0x2 IL2CPP 加载过程"></a>0x2 IL2CPP 加载过程</h2><p>github上随便找一个il2cpp的源码，搜索global-metadata.dat，发现只有函数MetadataCache::Initialize()处使用。</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">MetadataCache::Initialize</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    s_GlobalMetadata = vm::MetadataLoader::LoadMetadataFile(<span class="string">"global-metadata.dat"</span>);</span><br><span class="line">    s_GlobalMetadataHeader = (<span class="keyword">const</span> Il2CppGlobalMetadataHeader*)s_GlobalMetadata;</span><br><span class="line">    ...</span><br><span class="line">        </span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
 
