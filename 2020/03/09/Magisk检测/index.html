@@ -17,13 +17,13 @@
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+    var CONFIG = {"hostname":"nszdhd1.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
   <meta name="description" content="Magisk 原理Xposed 和 Magisk原理图 Xposed 原理详细讲解：https:&#x2F;&#x2F;blog.csdn.net&#x2F;ascii2&#x2F;article&#x2F;details&#x2F;47974217 Xposed修改了app_process程序，在执行第一个java程序（com.Android.internal.os.ZygoteInit）之前进行截获,改变执行流程，进入到XposedBridge.jar">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Magisk检测">
-<meta property="og:url" content="http://example.com/2020/03/09/Magisk%E6%A3%80%E6%B5%8B/index.html">
+<meta property="og:url" content="https://nszdhd1.github.io/2020/03/09/Magisk%E6%A3%80%E6%B5%8B/index.html">
 <meta property="og:site_name" content="喵喵的blog">
 <meta property="og:description" content="Magisk 原理Xposed 和 Magisk原理图 Xposed 原理详细讲解：https:&#x2F;&#x2F;blog.csdn.net&#x2F;ascii2&#x2F;article&#x2F;details&#x2F;47974217 Xposed修改了app_process程序，在执行第一个java程序（com.Android.internal.os.ZygoteInit）之前进行截获,改变执行流程，进入到XposedBridge.jar">
 <meta property="og:locale" content="zh_CN">
@@ -39,7 +39,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/03/09/Magisk%E6%A3%80%E6%B5%8B/image-20200220161119719.png">
 
-<link rel="canonical" href="http://example.com/2020/03/09/Magisk%E6%A3%80%E6%B5%8B/">
+<link rel="canonical" href="https://nszdhd1.github.io/2020/03/09/Magisk%E6%A3%80%E6%B5%8B/">
 
 
 <script id="page-configurations">
@@ -157,7 +157,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2020/03/09/Magisk%E6%A3%80%E6%B5%8B/">
+    <link itemprop="mainEntityOfPage" href="https://nszdhd1.github.io/2020/03/09/Magisk%E6%A3%80%E6%B5%8B/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -210,7 +210,7 @@
 <p>可以看到每个App是先执行的XposedBridge.jar的main方法，之后再调用的Zygote的main方法。通过检测堆栈中是否包含<code>Xposed</code>等字样即可知道是否安装了Xposed</p>
 <span id="more"></span>
 
-<h5 id="3-xposed相关文件"><a href="#3-xposed相关文件" class="headerlink" title="3. xposed相关文件"></a>3. xposed相关文件</h5><p>Xposed的组件需要被加载，必然在内存空间留下痕迹，通过遍历/proc/<pid>/maps内容，观察是否加载/system/framework/XposedBridge.jar</p>
+<h5 id="3-xposed相关文件"><a href="#3-xposed相关文件" class="headerlink" title="3. xposed相关文件"></a>3. xposed相关文件</h5><p>Xposed的组件需要被加载，必然在内存空间留下痕迹，通过遍历/proc/<pid>/maps内容，观察是否加载/system/framework/XposedBridge.jar</pid></p>
 <h5 id="4-检测并且关闭HOOK"><a href="#4-检测并且关闭HOOK" class="headerlink" title="4. 检测并且关闭HOOK"></a>4. 检测并且关闭HOOK</h5><p>在<code>de.robv.android.xposed.XposedBridge</code>中有一个<code>disableHooks</code>字段用于标记对于当前应用是否要进行hook。通过获取这个字段的值就可以知道是否在我们App上启用hook了，甚至可以通过将其设置为true停掉Xposed。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Field disableHooksFiled = ClassLoader.getSystemClassLoader()</span><br><span class="line">        .loadClass(<span class="string">&quot;de.robv.android.xposed.XposedBridge&quot;</span>)</span><br><span class="line">        .getDeclaredField(<span class="string">&quot;disableHooks&quot;</span>);</span><br><span class="line">disableHooksFiled.setAccessible(<span class="keyword">true</span>);</span><br><span class="line">Object enable = disableHooksFiled.get(<span class="keyword">null</span>);  <span class="comment">// 当前状态</span></span><br><span class="line">disableHooksFiled.set(<span class="keyword">null</span>, <span class="keyword">true</span>);            <span class="comment">// 设置为关闭</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
