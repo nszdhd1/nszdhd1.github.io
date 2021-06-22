@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+
+
+<html lang="zh-CN">
+
+
+<head>
+  <meta charset="utf-8" />
+    
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>
+    使用LIEF打造MTP加固 |  喵喵的blog
+  </title>
+  <meta name="generator" content="hexo-theme-ayer">
+  
+  
+<link rel="stylesheet" href="/dist/main.css">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Shen-Yu/cdn/css/remixicon.min.css">
+  
+<link rel="stylesheet" href="/css/custom.css">
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/pace-js@1.0.2/pace.min.js"></script>
+  
+  
+
+  
+
+</head>
+
+</html>
+
+<body>
+  <div id="app">
+    
+      
+    <main class="content on">
+      <section class="outer">
+  <article
+  id="post-使用LIEF打造MTP加固"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  使用LIEF打造MTP加固
+</h1>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2021/03/29/%E4%BD%BF%E7%94%A8LIEF%E6%89%93%E9%80%A0MTP%E5%8A%A0%E5%9B%BA/" class="article-date">
+  <time datetime="2021-03-29T06:56:24.000Z" itemprop="datePublished">2021-03-29</time>
+</a>   
+<div class="word_count">
+    <span class="post-time">
+        <span class="post-meta-item-icon">
+            <i class="ri-quill-pen-line"></i>
+            <span class="post-meta-item-text"> 字数统计:</span>
+            <span class="post-count">2.9k</span>
+        </span>
+    </span>
+
+    <span class="post-time">
+        &nbsp; | &nbsp;
+        <span class="post-meta-item-icon">
+            <i class="ri-book-open-line"></i>
+            <span class="post-meta-item-text"> 阅读时长≈</span>
+            <span class="post-count">13 分钟</span>
+        </span>
+    </span>
+</div>
+ 
+    </div>
+      
+    <div class="tocbot"></div>
+
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h1 id="使用LIEF打造MTP加固"><a href="#使用LIEF打造MTP加固" class="headerlink" title="使用LIEF打造MTP加固"></a>使用LIEF打造MTP加固</h1><p>使用lief工具写一个类似于腾讯so保护这样一个东西。本篇记录lief工具的使用和TX加固的原理，不会对ELF文件格式进行记录。</p>
+<h2 id="一、工具介绍"><a href="#一、工具介绍" class="headerlink" title="一、工具介绍"></a>一、工具介绍</h2><p>首先，lief是一个文件解析工具，可以解析ELF、PE、DEX等，用途比较广泛。</p>
+<p>github 地址：<a href="https://github.com/lief-project/LIEF" target="_blank" rel="noopener">https://github.com/lief-project/LIEF</a></p>
+<p>我使用的是python版，在使用过程中经常出现毛病，所以并不建议使用python版，最好还是用c版的。最好是不怕麻烦自己写一个，就可以避免很多不稳定的fix代码。</p>
+<h2 id="二、TX-SO加密介绍"><a href="#二、TX-SO加密介绍" class="headerlink" title="二、TX SO加密介绍"></a>二、TX SO加密介绍</h2><p>之前的SO加密里介绍过，但是写得比较随意且笼统，这里我决定再详细写一下。</p>
+<p>首先，王者荣耀采用的是il2cpp，比较关键的so有3个，libil2cpp.so、libGameCore.so、libtprt.so。其中libtprt.so为保护so。</p>
+<p>王者荣耀加载被保护so（il2cpp或GameCore）时，会优先加载链接库。所以，整个流程unity启动后，会优先加载libtprt.so。</p>
+<a id="more"></a>
+
+<p><img src="/2021/03/29/%E4%BD%BF%E7%94%A8LIEF%E6%89%93%E9%80%A0MTP%E5%8A%A0%E5%9B%BA/image-20200827143911255.png" alt="image-20200827143911255"></p>
+<p>libtprt.so对自身的tptext节进行了加密，在加载过程中执行init_array进行解密，跟踪mprotect，可以看到解密代码：</p>
+<p><img src="/2021/03/29/%E4%BD%BF%E7%94%A8LIEF%E6%89%93%E9%80%A0MTP%E5%8A%A0%E5%9B%BA/image-20200827144338193-1615899791930.png" alt="image-20200827144338193"></p>
+<p><img src="/2021/03/29/%E4%BD%BF%E7%94%A8LIEF%E6%89%93%E9%80%A0MTP%E5%8A%A0%E5%9B%BA/image-20200827144827705-1615899791930.png" alt="image-20200827144827705"></p>
+<p>使用lief快速解密：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">tprt = lief.parse(name)</span><br><span class="line">tptext_section = tprt.get_section(<span class="string">".tptext"</span>).content</span><br><span class="line"></span><br><span class="line">print(len(tptext_section))</span><br><span class="line">offset = tprt.get_section(<span class="string">".tptext"</span>).offset</span><br><span class="line">out = <span class="string">b""</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(len(tptext_section)):</span><br><span class="line">    out += (tptext_section[i] ^ <span class="number">0xb8</span>).to_bytes(<span class="number">1</span>,byteorder=<span class="string">'little'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">print(len(out))</span><br><span class="line">tpp = tprt_bin[:offset]+out+tprt_bin[offset+len(tptext_section):]</span><br><span class="line"><span class="keyword">with</span> open(<span class="string">"tpp.so"</span>, <span class="string">'wb'</span>) <span class="keyword">as</span> fp:</span><br><span class="line">    fp.write(tpp)</span><br></pre></td></tr></table></figure>
+
+<p><img src="/2021/03/29/%E4%BD%BF%E7%94%A8LIEF%E6%89%93%E9%80%A0MTP%E5%8A%A0%E5%9B%BA/image-20200827145222734.png" alt="image-20200827145222734"></p>
+<p>tptext节里的函数主要用于初始化各类保护，会被jni_onload调用。现在tprt已经被成功加载，现在就需要解密libil2cpp.so</p>
+<p>由于libGameCore.so小一点，分析起来方便，所以后面就不分析il2cpp了。先观察ELF结构，可以发现它的LOAD段格外多。</p>
+<p>个人分析他比原生多了3个LOAD段，新增的第一个LOAD段（04），里面是.dynamic 和 .init_array。很好理解，因为强行添加了一个依赖库和init_array，所以需要生成新的.dynamic，至于init_array个人猜测是添加字符串混淆之类的东西。</p>
+<p><img src="/2021/03/29/%E4%BD%BF%E7%94%A8LIEF%E6%89%93%E9%80%A0MTP%E5%8A%A0%E5%9B%BA/image-20210316211425806.png" alt="image-20210316211425806"></p>
+<p>新增的第二个LOAD段（05），是新的.rel.plt，用ida分析，可以明显看出有增加项，且增加项在新增的第三个LOAD段（06）：</p>
+<p><img src="/2021/03/29/%E4%BD%BF%E7%94%A8LIEF%E6%89%93%E9%80%A0MTP%E5%8A%A0%E5%9B%BA/image-20210316212245163.png" alt="image-20210316212245163"></p>
+<p>跳转到0x228cfcc，可以看到这是一个got表，并且它的plt表在新增的第二个LOAD段（05）。</p>
+<p><img src="/2021/03/29/%E4%BD%BF%E7%94%A8LIEF%E6%89%93%E9%80%A0MTP%E5%8A%A0%E5%9B%BA/image-20210317203303579.png" alt="image-20210317203303579"></p>
+<p><img src="/2021/03/29/%E4%BD%BF%E7%94%A8LIEF%E6%89%93%E9%80%A0MTP%E5%8A%A0%E5%9B%BA/image-20210317203340135.png" alt="image-20210317203340135"></p>
+<p><img src="/2021/03/29/%E4%BD%BF%E7%94%A8LIEF%E6%89%93%E9%80%A0MTP%E5%8A%A0%E5%9B%BA/image-20210317203646432.png" alt="image-20210317203646432"></p>
+<p>对添加的LOAD段有一定了解了，再看一下修改后的.dynamic有什么变化：</p>
+<p><img src="/2021/03/29/%E4%BD%BF%E7%94%A8LIEF%E6%89%93%E9%80%A0MTP%E5%8A%A0%E5%9B%BA/image-20210317204212498.png" alt="image-20210317204212498"></p>
+<p>需要关注的，我已经添加了红色方框。大部分只是修改偏移，指向新的节（JMPREL、INIT_ARRAY），值得注意的是DT_INIT，这个是init段，比init_array更早执行。更适合用来解密。</p>
+<p><img src="/2021/03/29/%E4%BD%BF%E7%94%A8LIEF%E6%89%93%E9%80%A0MTP%E5%8A%A0%E5%9B%BA/image-20210317204733631.png" alt="image-20210317204733631"></p>
+<p>通过取off_1cc的地址 - off_1cc的值（地址为base+0x1cc，值是自己设置的，为1cc）所以算出来是当前so的基址，然后调用sub_2289b58并且传入基址。</p>
+<p>sub_2289b58就是解密函数，网上对它的分析很多了，总的就是调用g_tprt_pfn_array（“.text”,base,3）对当前的text段进行解密。（“.text”这个字符串，在新增的第三个LOAD（06）中，意味着是写死的）</p>
+<p><img src="/2021/03/29/%E4%BD%BF%E7%94%A8LIEF%E6%89%93%E9%80%A0MTP%E5%8A%A0%E5%9B%BA/image-20200827152258578.png" alt="image-20200827152258578"></p>
+<p>所以总结一下：</p>
+<p>MTP对SO新增了3个LOAD段，第一个LOAD新增.dynamic、.init_array，第二个LOAD段是映射新的.rel.plt、.plt、.text节，第三个LOAD段用来映射.got、.data节。</p>
+<p>MTP在program header 之后添加了一段汇编，在init时执行，获取当前SO的基址，传入解密函数，并调用libtprt.so的导出函数g_tprt_pfn_array进行text节解密。</p>
+<h2 id="三、代码实现"><a href="#三、代码实现" class="headerlink" title="三、代码实现"></a>三、代码实现</h2><p>由于一次写完大概率会很乱思路不够清晰，所以分几步写，方便理解，也好记录。</p>
+<h3 id="步骤一：添加INIT段，并调用任意函数"><a href="#步骤一：添加INIT段，并调用任意函数" class="headerlink" title="步骤一：添加INIT段，并调用任意函数"></a>步骤一：添加INIT段，并调用任意函数</h3><p>首先，生成一个SO，很简单，有一个PrintLog函数没有调用，所以LOG只有一条：</p>
+<p><img src="/2021/03/29/%E4%BD%BF%E7%94%A8LIEF%E6%89%93%E9%80%A0MTP%E5%8A%A0%E5%9B%BA/image-20210317211746432.png" alt="image-20210317211746432"></p>
+<p><img src="/2021/03/29/%E4%BD%BF%E7%94%A8LIEF%E6%89%93%E9%80%A0MTP%E5%8A%A0%E5%9B%BA/image-20210324170642396.png" alt="image-20210324170642396"></p>
+<p>执行以下代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"""</span></span><br><span class="line"><span class="string">  添加init段，并且调用ADD_FUNC_NAME并传入一个参数（当前So的基址）</span></span><br><span class="line"><span class="string">"""</span></span><br><span class="line">INIT_PROC_SIZE = <span class="number">0x2c</span></span><br><span class="line">INIT_PROC_CONTENT = [<span class="number">0xC0</span>,<span class="number">0x46</span>,<span class="number">0xFF</span>,<span class="number">0xB5</span>,<span class="number">0x83</span>,<span class="number">0xB0</span>,<span class="number">0x6D</span>,<span class="number">0x46</span>,<span class="number">0x00</span>,<span class="number">0xA3</span>,<span class="number">0x14</span>,<span class="number">0x3B</span>,<span class="number">0x19</span>,<span class="number">0x1C</span>,<span class="number">0x1F</span>,<span class="number">0x68</span>,<span class="number">0xC9</span>,<span class="number">0x1B</span>,<span class="number">0x29</span>,<span class="number">0x60</span>,<span class="number">0x5E</span>,<span class="number">0x68</span>,<span class="number">0x03</span>,<span class="number">0xD0</span>,<span class="number">0x76</span>,<span class="number">0x18</span>,<span class="number">0x6E</span>,<span class="number">0x60</span>,<span class="number">0x28</span>,<span class="number">0x68</span>,<span class="number">0xB0</span>,<span class="number">0x47</span>,<span class="number">0x03</span>,<span class="number">0xB0</span>,<span class="number">0xFF</span>,<span class="number">0xBD</span>]<span class="comment"># 腾讯代码里扣出来的嘿嘿</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">add_init_proc</span><span class="params">()</span>:</span></span><br><span class="line"></span><br><span class="line">    binary = lief.parse(TARGET_BIN)</span><br><span class="line">    <span class="comment"># 检测.dynamic节的空位是否足够,如果小于3个就要拓展dynamic节内容</span></span><br><span class="line">    free_dynamic_entry = <span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> entry <span class="keyword">in</span> binary.dynamic_entries:</span><br><span class="line">        <span class="keyword">if</span> entry.tag == lief.ELF.DYNAMIC_TAGS.NULL:</span><br><span class="line">            free_dynamic_entry += <span class="number">1</span></span><br><span class="line">    print(<span class="string">"free dynamic entry num:"</span>, free_dynamic_entry)</span><br><span class="line">    <span class="keyword">assert</span> free_dynamic_entry &gt; <span class="number">3</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">#获取位于segment header 后的 offset，用于添加init_proc</span></span><br><span class="line">    init_proc_offset = binary.header.program_header_offset + \</span><br><span class="line">                       binary.header.program_header_size * (binary.header.numberof_segments + <span class="number">2</span> )</span><br><span class="line">    print(<span class="string">"init_proc offset:"</span>, hex(init_proc_offset))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment"># 添加init入口</span></span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> binary.has(ELF.DYNAMIC_TAGS.INIT):</span><br><span class="line">        <span class="comment"># 先用0占位,直接写入偏移，lief工具会有点问题</span></span><br><span class="line">        <span class="comment"># 如果不出问题 binary.add(ELF.DynamicEntry(ELF.DYNAMIC_TAGS.INIT,init_proc_offset + 8))</span></span><br><span class="line">        binary.add(ELF.DynamicEntry(ELF.DYNAMIC_TAGS.INIT,<span class="number">0</span>))</span><br><span class="line"></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        init_entry = binary.get(ELF.DYNAMIC_TAGS.INIT)</span><br><span class="line">        print(<span class="string">"[x] binary has init_proc:"</span>, init_entry)</span><br><span class="line">        exit(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">    binary.write(<span class="string">"libnative-lib.so"</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 手动修复 DynamicEntry 中的 value</span></span><br><span class="line">    outbin = lief.parse(<span class="string">"libnative-lib.so"</span>)</span><br><span class="line">    out_dynamic = outbin.get_section(<span class="string">".dynamic"</span>)</span><br><span class="line">    ADD_FUNC = outbin.get_symbol(ADD_FUNC_NAME).value</span><br><span class="line"></span><br><span class="line">    num = <span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> entry <span class="keyword">in</span> outbin.dynamic_entries:</span><br><span class="line">        <span class="keyword">if</span> entry.tag == ELF.DYNAMIC_TAGS.INIT:</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">        num+=<span class="number">1</span></span><br><span class="line"></span><br><span class="line">    init_entry_offset =  out_dynamic.offset + (num * out_dynamic.entry_size)</span><br><span class="line">    print(hex(init_entry_offset))</span><br><span class="line"></span><br><span class="line">    patch_file(<span class="string">"libnative-lib.so"</span>,init_entry_offset+<span class="number">4</span>,struct.pack(<span class="string">"&lt;I"</span>, init_proc_offset + <span class="number">8</span> + <span class="number">1</span>))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="keyword">global</span> INIT_PROC_CONTENT</span><br><span class="line">    <span class="comment">#前四位 为 init——proc 的 偏移 ,后四位 为 要调用的 函数地址</span></span><br><span class="line">    print(<span class="string">"init_proc_offset :"</span>,hex(init_proc_offset))</span><br><span class="line">    print(<span class="string">"ADD_FUNC :"</span>, hex(ADD_FUNC))</span><br><span class="line"></span><br><span class="line">    INIT_PROC_CONTENTS = list(struct.pack(<span class="string">"&lt;I"</span>, init_proc_offset)) + list(struct.pack(<span class="string">"&lt;I"</span>, ADD_FUNC)) + INIT_PROC_CONTENT</span><br><span class="line">    patch_file(<span class="string">"libnative-lib.so"</span>,init_proc_offset,INIT_PROC_CONTENTS)</span><br></pre></td></tr></table></figure>
+
+<p><img src="/2021/03/29/%E4%BD%BF%E7%94%A8LIEF%E6%89%93%E9%80%A0MTP%E5%8A%A0%E5%9B%BA/image-20210324170947496.png" alt="image-20210324170947496"></p>
+<p><img src="/2021/03/29/%E4%BD%BF%E7%94%A8LIEF%E6%89%93%E9%80%A0MTP%E5%8A%A0%E5%9B%BA/image-20210324171608139.png" alt="image-20210324171608139"></p>
+<p><strong>可以看到函数PrintLog优先于JNI函数执行，并且传入的参数为基址。</strong></p>
+<h3 id="步骤二：向so中添加可执行代码"><a href="#步骤二：向so中添加可执行代码" class="headerlink" title="步骤二：向so中添加可执行代码"></a>步骤二：向so中添加可执行代码</h3><p><a href="https://bbs.pediy.com/thread-221821.htm" target="_blank" rel="noopener">关于重定位</a></p>
+<p>需要记住的几个总结：</p>
+<p>rel.plt -&gt;got -&gt; plt -&gt; extern表（导入函数）</p>
+<p>rel.plt -&gt;got -&gt; text（导出）</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//ELF.h 查看rel.plt的格式，r_offset 指向got表的地址，r_info高8位为类型，后24位为</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Relocation entry, without explicit addend.</span></span><br><span class="line"> <span class="class"><span class="keyword">struct</span> <span class="title">Elf32_Rel</span> &#123;</span></span><br><span class="line">   Elf32_Addr r_offset; <span class="comment">// Location (file byte offset, or program virtual addr)</span></span><br><span class="line">   Elf32_Word r_info;   <span class="comment">// Symbol table index and type of relocation to apply</span></span><br><span class="line">  </span><br><span class="line">   <span class="comment">// These accessors and mutators correspond to the ELF32_R_SYM, ELF32_R_TYPE,</span></span><br><span class="line">   <span class="comment">// and ELF32_R_INFO macros defined in the ELF specification:</span></span><br><span class="line">   <span class="function">Elf32_Word <span class="title">getSymbol</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123; <span class="keyword">return</span> (r_info &gt;&gt; <span class="number">8</span>); &#125;</span><br><span class="line">   <span class="function"><span class="keyword">unsigned</span> <span class="keyword">char</span> <span class="title">getType</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123; <span class="keyword">return</span> (<span class="keyword">unsigned</span> <span class="keyword">char</span>)(r_info &amp; <span class="number">0x0ff</span>); &#125;</span><br><span class="line">   <span class="function"><span class="keyword">void</span> <span class="title">setSymbol</span><span class="params">(Elf32_Word s)</span> </span>&#123; setSymbolAndType(s, getType()); &#125;</span><br><span class="line">   <span class="function"><span class="keyword">void</span> <span class="title">setType</span><span class="params">(<span class="keyword">unsigned</span> <span class="keyword">char</span> t)</span> </span>&#123; setSymbolAndType(getSymbol(), t); &#125;</span><br><span class="line">   <span class="function"><span class="keyword">void</span> <span class="title">setSymbolAndType</span><span class="params">(Elf32_Word s, <span class="keyword">unsigned</span> <span class="keyword">char</span> t)</span> </span>&#123;</span><br><span class="line">     r_info = (s &lt;&lt; <span class="number">8</span>) + t;</span><br><span class="line">   &#125;</span><br><span class="line"> &#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"> <span class="comment">// Symbol table entries for ELF32.</span></span><br><span class="line"> <span class="class"><span class="keyword">struct</span> <span class="title">Elf32_Sym</span> &#123;</span></span><br><span class="line">   Elf32_Word st_name;     <span class="comment">// Symbol name (index into string table)</span></span><br><span class="line">   Elf32_Addr st_value;    <span class="comment">// Value or address associated with the symbol</span></span><br><span class="line">   Elf32_Word st_size;     <span class="comment">// Size of the symbol</span></span><br><span class="line">   <span class="keyword">unsigned</span> <span class="keyword">char</span> st_info;  <span class="comment">// Symbol's type and binding attributes</span></span><br><span class="line">   <span class="keyword">unsigned</span> <span class="keyword">char</span> st_other; <span class="comment">// Must be zero; reserved</span></span><br><span class="line">   Elf32_Half st_shndx;    <span class="comment">// Which section (header table index) it's defined in</span></span><br><span class="line">  </span><br><span class="line">   <span class="comment">// These accessors and mutators correspond to the ELF32_ST_BIND,</span></span><br><span class="line">   <span class="comment">// ELF32_ST_TYPE, and ELF32_ST_INFO macros defined in the ELF specification:</span></span><br><span class="line">   <span class="function"><span class="keyword">unsigned</span> <span class="keyword">char</span> <span class="title">getBinding</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123; <span class="keyword">return</span> st_info &gt;&gt; <span class="number">4</span>; &#125;</span><br><span class="line">   <span class="function"><span class="keyword">unsigned</span> <span class="keyword">char</span> <span class="title">getType</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123; <span class="keyword">return</span> st_info &amp; <span class="number">0x0f</span>; &#125;</span><br><span class="line">   <span class="function"><span class="keyword">void</span> <span class="title">setBinding</span><span class="params">(<span class="keyword">unsigned</span> <span class="keyword">char</span> b)</span> </span>&#123; setBindingAndType(b, getType()); &#125;</span><br><span class="line">   <span class="function"><span class="keyword">void</span> <span class="title">setType</span><span class="params">(<span class="keyword">unsigned</span> <span class="keyword">char</span> t)</span> </span>&#123; setBindingAndType(getBinding(), t); &#125;</span><br><span class="line">   <span class="function"><span class="keyword">void</span> <span class="title">setBindingAndType</span><span class="params">(<span class="keyword">unsigned</span> <span class="keyword">char</span> b, <span class="keyword">unsigned</span> <span class="keyword">char</span> t)</span> </span>&#123;</span><br><span class="line">     st_info = (b &lt;&lt; <span class="number">4</span>) + (t &amp; <span class="number">0x0f</span>);</span><br><span class="line">   &#125;</span><br><span class="line"> &#125;;</span><br></pre></td></tr></table></figure>
+
+<p>编译一个so，里面的示范代码：</p>
+<p><img src="/2021/03/29/%E4%BD%BF%E7%94%A8LIEF%E6%89%93%E9%80%A0MTP%E5%8A%A0%E5%9B%BA/image-20210324165354156.png" alt="image-20210324165354156"></p>
+<p>十分简单，就是一个打印log，将编译好的so拖入ida，可以看到，虽然我只写了一个函数，实际上so运行时还需要许多其他的函数。</p>
+<p><img src="/2021/03/29/%E4%BD%BF%E7%94%A8LIEF%E6%89%93%E9%80%A0MTP%E5%8A%A0%E5%9B%BA/image-20210324165609210.png" alt="image-20210324165609210"></p>
+<p>执行以下代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">add_symbol</span><span class="params">()</span>:</span></span><br><span class="line">    binary = lief.parse(TARGET_BIN)</span><br><span class="line">    add_bin = lief.parse(<span class="string">"libadd.so"</span>)</span><br><span class="line">    add_got = add_bin.get_section(<span class="string">".got"</span>)</span><br><span class="line">    add_data = add_bin.get_section(<span class="string">".data"</span>)</span><br><span class="line">    add_plt = add_bin.get_section(<span class="string">".plt"</span>)</span><br><span class="line">    add_text = add_bin.get_section(<span class="string">".text"</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    before_add_load_num = <span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> binary.segments:</span><br><span class="line">        <span class="keyword">if</span> i.type == ELF.SEGMENT_TYPES.LOAD:</span><br><span class="line">            before_add_load_num+=<span class="number">1</span></span><br><span class="line">    print(before_add_load_num)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    添加2个load段，用于将add中内容添加进target</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="comment"># 第一个可读可执行,用来映射新的.plt节 + .text节</span></span><br><span class="line">    add_RE_seg = lief.ELF.Segment()</span><br><span class="line">    add_RE_seg.alignment = <span class="number">0x1000</span></span><br><span class="line">    add_RE_seg.type = ELF.SEGMENT_TYPES.LOAD</span><br><span class="line">    add_RE_seg.add(ELF.SEGMENT_FLAGS.X)</span><br><span class="line">    add_RE_seg.add(ELF.SEGMENT_FLAGS.R)</span><br><span class="line">    add_RE_seg.content = add_plt.content + add_text.content</span><br><span class="line">    print(<span class="string">"add_RE_seg.content :"</span>, add_RE_seg.content)</span><br><span class="line">    binary.add(add_RE_seg)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">#第二个load段 可读可写 添加 .got .data</span></span><br><span class="line">    add_RW_seg = lief.ELF.Segment()</span><br><span class="line">    add_RW_seg.alignment = <span class="number">0x1000</span></span><br><span class="line">    add_RW_seg.type = ELF.SEGMENT_TYPES.LOAD</span><br><span class="line">    add_RW_seg.add(ELF.SEGMENT_FLAGS.W)</span><br><span class="line">    add_RW_seg.add(ELF.SEGMENT_FLAGS.R)</span><br><span class="line">    add_RW_seg.content = add_got.content + add_data.content</span><br><span class="line">    binary.add(add_RW_seg)</span><br><span class="line">    print(add_got.content)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    addbin_relplt = add_bin.pltgot_relocations</span><br><span class="line"></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">        添加addbin中的relplt，并且向dynsym添加对应的symbol。</span></span><br><span class="line"><span class="string">        此操作改动了dynstr、dynsym、rel.plt。</span></span><br><span class="line"><span class="string">        本来针对原节拓展即可，但lief工具新增了3个load段进行加载新的内容，所以还修改了dynamic</span></span><br><span class="line"><span class="string">        </span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    add_sym_value = list()</span><br><span class="line">    <span class="keyword">for</span> add_entry <span class="keyword">in</span> addbin_relplt:</span><br><span class="line">        <span class="keyword">if</span> binary.has_symbol(add_entry.symbol.name):</span><br><span class="line">            sym = binary.get_symbol(add_entry.symbol.name)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            sym = binary.add_dynamic_symbol(add_entry.symbol)<span class="comment">#后面修复</span></span><br><span class="line">            add_sym_value.append(add_entry.symbol.value - add_text.virtual_address)</span><br><span class="line">            print(hex(add_entry.symbol.value),hex(add_entry.symbol.value - add_text.virtual_address))</span><br><span class="line"></span><br><span class="line">            <span class="comment"># 此处lief工具又有问题，写入后value变了，坑爹货</span></span><br><span class="line">            <span class="comment">#工具不出问题，此处减掉add中text的虚拟地址，加上intermediate中的新增的text虚拟地址就行了</span></span><br><span class="line">            </span><br><span class="line">            add_reloc = ELF.Relocation()</span><br><span class="line">            add_reloc.type = add_entry.type</span><br><span class="line">            add_reloc.symbol = sym</span><br><span class="line">            add_reloc.address = add_entry.address - add_got.virtual_address</span><br><span class="line">            add_reloc.purpose = ELF.RELOCATION_PURPOSES.PLTGOT</span><br><span class="line">            add_reloc = binary.add_pltgot_relocation(add_reloc)</span><br><span class="line">            <span class="comment"># print("add_reloc - ", add_reloc)</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    binary.write(<span class="string">"intermediate.so"</span>)</span><br><span class="line">    <span class="comment">#辣鸡工具，会导致偏移出问题，所以不得不进行收工修复</span></span><br><span class="line">    inter = lief.parse(<span class="string">"intermediate.so"</span>)</span><br><span class="line">    <span class="comment">#获取前面添加的两个load段的虚拟地址</span></span><br><span class="line">    add_RE_seg_virtual_address = <span class="number">0</span></span><br><span class="line">    add_RW_seg_virtual_address = <span class="number">0</span></span><br><span class="line"></span><br><span class="line">    after_add_load_num = <span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> binary.segments:</span><br><span class="line">        <span class="keyword">if</span> i.type == ELF.SEGMENT_TYPES.LOAD:</span><br><span class="line">            after_add_load_num += <span class="number">1</span></span><br><span class="line">            <span class="keyword">if</span> after_add_load_num &gt; before_add_load_num <span class="keyword">and</span> after_add_load_num &lt;= before_add_load_num +<span class="number">2</span>:</span><br><span class="line">                <span class="keyword">if</span> i.has(ELF.SEGMENT_FLAGS.X):</span><br><span class="line">                    add_RE_seg_virtual_address = i.virtual_address</span><br><span class="line">                <span class="keyword">if</span> i.has(ELF.SEGMENT_FLAGS.W):</span><br><span class="line">                    add_RW_seg_virtual_address = i.virtual_address</span><br><span class="line"></span><br><span class="line">    print(hex(add_RE_seg_virtual_address))</span><br><span class="line">    print(hex(add_RW_seg_virtual_address))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	<span class="comment">#修复dynsym中新增的symbol，将Elf32_Sym-&gt;st_value 指向text段即可，0不修改是指向import func</span></span><br><span class="line">    new_dynsym_content = inter.get_section(<span class="string">".dynsym"</span>).content</span><br><span class="line">    add_dynsym_start = len(new_dynsym_content) - len(add_sym_value)*<span class="number">16</span></span><br><span class="line">    print(<span class="string">"add_dynsym_start:"</span>,add_dynsym_start)</span><br><span class="line"></span><br><span class="line">    modify_dynsym_content = []</span><br><span class="line">    inx = <span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> entry_content <span class="keyword">in</span> [new_dynsym_content[i:i + <span class="number">16</span>] <span class="keyword">for</span> i <span class="keyword">in</span> range(add_dynsym_start, len(new_dynsym_content), <span class="number">16</span>)]:</span><br><span class="line">        entry = DynSymEntry.parse_from_content(entry_content)</span><br><span class="line">        <span class="keyword">if</span>(entry.sym_value != <span class="number">0</span>):</span><br><span class="line">            print(hex(entry.sym_value))</span><br><span class="line">            entry.sym_value =add_sym_value[inx] +add_RE_seg_virtual_address +len(add_plt.content)</span><br><span class="line">            print(hex(entry.sym_value))</span><br><span class="line">        inx += <span class="number">1</span></span><br><span class="line">        modify_dynsym_content += entry.content</span><br><span class="line">    patch_file(<span class="string">"intermediate.so"</span>, inter.get_section(<span class="string">".dynsym"</span>).offset + add_dynsym_start, modify_dynsym_content)</span><br><span class="line"></span><br><span class="line">    <span class="comment">#修复.rel.plt中新增的rel项，指向新增的第二个load段中加载的add.so中的got表</span></span><br><span class="line">    modify_rel_content = []</span><br><span class="line">    relplt = binary.get_section(<span class="string">".rel.plt"</span>)</span><br><span class="line">    add_rel_start = binary.get_section(<span class="string">".rel.plt"</span>).size - len(add_sym_value)*<span class="number">8</span></span><br><span class="line">    print(<span class="string">"add_rel_start :"</span>, hex(add_rel_start))</span><br><span class="line"></span><br><span class="line">    add_entry_ndx = <span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> rel_content <span class="keyword">in</span> [relplt.content[i:i + <span class="number">8</span>] <span class="keyword">for</span> i <span class="keyword">in</span> range(add_rel_start, len(relplt.content), <span class="number">8</span>)]:</span><br><span class="line">        rel = RelEntry.parse_from_content(rel_content)</span><br><span class="line">        <span class="keyword">if</span>(rel.offset != <span class="number">0</span>):</span><br><span class="line">            print(<span class="string">"offset :"</span>, hex(rel.offset))</span><br><span class="line">            rel.offset = rel.offset + add_RW_seg_virtual_address</span><br><span class="line">            print(<span class="string">"offset :"</span>, hex(rel.offset))</span><br><span class="line">        modify_rel_content += rel.content</span><br><span class="line">        add_entry_ndx += <span class="number">1</span></span><br><span class="line">    patch_file(<span class="string">"intermediate.so"</span>, inter.get_section(<span class="string">".rel.plt"</span>).offset + add_rel_start, modify_rel_content)</span><br></pre></td></tr></table></figure>
+
+<p>将intermediate.so改名为libnative-lib.so,在apk里能成功执行。不报错就是胜利！</p>
+<p>ida打开intermediate.so可以看到相关的函数，虽然把plt解析成了函数，不过不影响。</p>
+<p><img src="/2021/03/29/%E4%BD%BF%E7%94%A8LIEF%E6%89%93%E9%80%A0MTP%E5%8A%A0%E5%9B%BA/image-20210324173723200.png" alt="image-20210324173723200"></p>
+<p>再对比libadd.so，可以看到，函数内容是一致的：</p>
+<p><img src="/2021/03/29/%E4%BD%BF%E7%94%A8LIEF%E6%89%93%E9%80%A0MTP%E5%8A%A0%E5%9B%BA/image-20210324173646176.png" alt="image-20210324173646176"></p>
+<p><img src="/2021/03/29/%E4%BD%BF%E7%94%A8LIEF%E6%89%93%E9%80%A0MTP%E5%8A%A0%E5%9B%BA/image-20210324173851821.png" alt="image-20210324173851821"></p>
+<p><strong>成功运行不报错~</strong></p>
+<h3 id="结合步骤一和步骤二，让添加的decrypt函数执行起来"><a href="#结合步骤一和步骤二，让添加的decrypt函数执行起来" class="headerlink" title="结合步骤一和步骤二，让添加的decrypt函数执行起来"></a>结合步骤一和步骤二，让添加的decrypt函数执行起来</h3><p>有两种方式，TX是让plt-》got表之间的偏移不变，就不需要修改plt表。</p>
+<p>如果修改了plt、got之间的偏移，就需要通过修改字节码来实现正常运行。</p>
+<p>首先可以看到plt表有三条指令，获取当前地址，添加偏移，跳转。</p>
+<p><img src="/2021/03/29/%E4%BD%BF%E7%94%A8LIEF%E6%89%93%E9%80%A0MTP%E5%8A%A0%E5%9B%BA/image-20210329104843164.png" alt="image-20210329104843164"></p>
+<p>第一个红框，由于是0不好理解，我换成0x01. 那么就是取当前地址+0x0100000</p>
+<p>第二个红框，0x62，向r12添加 0x62000</p>
+<p>第三个红框，0xf00c，通过a8028 - a801c = c 。所以低12位为添加的偏移-》0x00c、0x1fc</p>
+<p>由于其他代码与之前的相同，就没必要重复粘贴了。将新增的plt表修复相关代码粘贴出来。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 修复plt表的相关代码</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_offset</span><span class="params">(inaddr)</span>:</span></span><br><span class="line">    high = inaddr // <span class="number">0x0100000</span></span><br><span class="line">    mid = (inaddr &amp; <span class="number">0xfffff</span>)//<span class="number">0x1000</span></span><br><span class="line">    low = (inaddr &amp; <span class="number">0xfff</span>)</span><br><span class="line">    <span class="keyword">return</span> high,mid,low</span><br><span class="line"></span><br><span class="line"><span class="comment">#需要fix plt 表,调用外部函数时需要 通过plt表进行跳转</span></span><br><span class="line">add_plt_size = add_plt.size</span><br><span class="line">print(<span class="string">"add_plt_size:"</span>,add_plt_size)</span><br><span class="line">PLT_TABLE_HEAD_LEN = <span class="number">0x14</span></span><br><span class="line">need_fix_plt_content = add_RE_seg.content[PLT_TABLE_HEAD_LEN:add_plt_size]</span><br><span class="line">print(need_fix_plt_content)</span><br><span class="line"></span><br><span class="line">print(hex(add_RW_seg_virtual_address - add_RE_seg_virtual_address))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">inx = <span class="number">0</span></span><br><span class="line">modify_plt_content = []</span><br><span class="line"><span class="keyword">for</span> plt_entry <span class="keyword">in</span> [add_RE_seg.content[i:i+<span class="number">12</span>] <span class="keyword">for</span> i <span class="keyword">in</span> range(PLT_TABLE_HEAD_LEN,add_plt_size,<span class="number">12</span>)]:</span><br><span class="line">    <span class="comment">#+8是因为ADR取地址是取PC的值</span></span><br><span class="line">    got2plt_offset = got_address_list[inx] - (inx*<span class="number">12</span>+add_RE_seg_virtual_address+<span class="number">8</span> +PLT_TABLE_HEAD_LEN )</span><br><span class="line">    inx += <span class="number">1</span></span><br><span class="line">    print(<span class="string">"got -&gt; plt offset :"</span>, hex(got2plt_offset))</span><br><span class="line">    print(plt_entry)</span><br><span class="line">    h,m,l = get_offset(got2plt_offset)</span><br><span class="line">    plt_entry[<span class="number">0</span>] = h</span><br><span class="line">    plt_entry[<span class="number">4</span>] = m</span><br><span class="line">    plt_entry[<span class="number">8</span>] = l &amp; <span class="number">0xff</span></span><br><span class="line">    plt_entry[<span class="number">9</span>] = (plt_entry[<span class="number">9</span>]&amp;<span class="number">0xf0</span>) + (l &gt;&gt; <span class="number">8</span>)</span><br><span class="line">    print(<span class="string">"fix entry"</span>,plt_entry,hex(plt_entry[<span class="number">9</span>]))</span><br><span class="line">    modify_plt_content += plt_entry</span><br><span class="line">patch_file(<span class="string">"intermediate.so"</span>, add_RE_seg_offset + PLT_TABLE_HEAD_LEN, modify_plt_content)</span><br></pre></td></tr></table></figure>
+
+<p>修复plt表后，执行so，就可以看到我们注入的decrypt函数优先于JNI函数执行了。为什么需要修复plt表呢？是因为decrypt中使用了android_log这个系统函数（在正常解密函数中无法避免使用系统函数）</p>
+<p><img src="/2021/03/29/%E4%BD%BF%E7%94%A8LIEF%E6%89%93%E9%80%A0MTP%E5%8A%A0%E5%9B%BA/image-20210329115324525.png" alt="image-20210329115324525"></p>
+<p>到此，只需要将libadd.so中decrypt函数替换成真正的解密代码就行了。甚至是简单异或即可。</p>
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <div class="declare">
+      <ul class="post-copyright">
+        <li>
+          <i class="ri-copyright-line"></i>
+          <strong>版权声明： </strong>
+          
+          本博客所有文章除特别声明外，著作权归作者所有。转载请注明出处！
+          
+        </li>
+      </ul>
+    </div>
+    
+    <footer class="article-footer">
+       
+<div class="share-btn">
+      <span class="share-sns share-outer">
+        <i class="ri-share-forward-line"></i>
+        分享
+      </span>
+      <div class="share-wrap">
+        <i class="arrow"></i>
+        <div class="share-icons">
+          
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="ri-weibo-fill"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="ri-wechat-fill"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="ri-qq-fill"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="ri-douban-line"></i>
+          </a>
+          <!-- <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a> -->
+          
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="ri-facebook-circle-fill"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="ri-twitter-fill"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="ri-google-fill"></i>
+          </a>
+        </div>
+      </div>
+</div>
+
+<div class="wx-share-modal">
+    <a class="modal-close" href="javascript:;"><i class="ri-close-circle-line"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://yoursite.com/2021/03/29/%E4%BD%BF%E7%94%A8LIEF%E6%89%93%E9%80%A0MTP%E5%8A%A0%E5%9B%BA/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div id="share-mask"></div>  
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/protect/" rel="tag">protect</a></li></ul>
+
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+    
+      <a href="/2021/01/15/%E6%8A%96%E9%9F%B3%E8%AF%84%E8%AE%BA%E7%88%AC%E5%8F%96/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">抖音评论爬取</div>
+      </a>
+    
+  </nav>
+
+  
+   
+<div class="gitalk" id="gitalk-container"></div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.6.2/dist/gitalk.css">
+
+
+<script src="https://cdn.jsdelivr.net/npm/gitalk@1.6.2/dist/gitalk.min.js"></script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/blueimp-md5@2.10.0/js/md5.min.js"></script>
+
+<script type="text/javascript">
+  var gitalk = new Gitalk({
+    clientID: '59fe8a1890df193a5a4e',
+    clientSecret: '682960415d252223e1cbb87415486d12e01d48b3',
+    repo: 'nszdhd1.github.io',
+    owner: 'nszdhd1',
+    admin: ['nszdhd1'],
+    // id: location.pathname,      // Ensure uniqueness and length less than 50
+    id: md5(location.pathname),
+    distractionFreeMode: false,  // Facebook-like distraction free mode
+    pagerDirection: 'last'
+  })
+
+  gitalk.render('gitalk-container')
+</script>
+
+     
+</article>
+
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2021
+        <i class="ri-heart-fill heart_icon"></i> newbiemiao
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        
+        由 <a href="https://hexo.io" target="_blank">Hexo</a> 强力驱动
+        <span class="division">|</span>
+        主题 - <a href="https://github.com/Shen-Yu/hexo-theme-ayer" target="_blank">Ayer</a>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        <span>
+  <span><i class="ri-user-3-fill"></i>访问人数:<span id="busuanzi_value_site_uv"></span></s>
+  <span class="division">|</span>
+  <span><i class="ri-eye-fill"></i>浏览次数:<span id="busuanzi_value_page_pv"></span></span>
+</span>
+        
+      </li>
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+      </li>
+    </ul>
+  </div>
+</footer>
+      <div class="float_btns">
+        <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+      </div>
+    </main>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">归档</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      <a class="nav-item-link nav-item-search"  title="搜索">
+        <i class="ri-search-line"></i>
+      </a>
+      
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <script>
+      if (window.matchMedia("(max-width: 768px)").matches) {
+        document.querySelector('.content').classList.remove('on');
+        document.querySelector('.sidebar').classList.remove('on');
+      }
+    </script>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <div class="reward-box">
+    
+    <div class="reward-item">
+      <img class="reward-img" src="https://cdn.jsdelivr.net/gh/Shen-Yu/cdn/img/alipay.jpg">
+      <span class="reward-type">支付宝</span>
+    </div>
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="https://cdn.jsdelivr.net/gh/Shen-Yu/cdn/img/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-2.0.3.min.js"></script>
+
+
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+
+
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: '.tocbot',
+    contentSelector: '.article-entry',
+    headingSelector: 'h1, h2, h3, h4, h5, h6',
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: 'main',
+    positionFixedSelector: '.tocbot',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto'
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.css">
+<script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css">
+<script src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script>
+
+<!-- MathJax -->
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+
+
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+
+
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<!-- ClickBoom2 -->
+
+<!-- CodeCopy -->
+
+
+<link rel="stylesheet" href="/css/clipboard.css">
+
+<script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+<script>
+  function wait(callback, seconds) {
+    var timelag = null;
+    timelag = window.setTimeout(callback, seconds);
+  }
+  !function (e, t, a) {
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '<i class="ri-file-copy-2-line"></i><span>COPY</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      $(".article pre code").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        let $btn = $(e.trigger);
+        $btn.addClass('copied');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-checkbox-circle-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPIED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-checkbox-circle-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+      clipboard.on('error', function(e) {
+        e.clearSelection();
+        let $btn = $(e.trigger);
+        $btn.addClass('copy-failed');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-time-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPY FAILED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-time-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+    }
+    initCopyCode();
+  }(window, document);
+</script>
+
+
+<!-- CanvasBackground -->
+
+
+    
+  </div>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"position":"right","width":150,"height":300,"hOffset":100},"mobile":{"show":true},"react":{"opacity":0.7},"log":false});</script></body>
+
+</html>

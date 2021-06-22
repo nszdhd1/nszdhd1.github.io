@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="AssetBundle加密1.简介1.1 什么是AssetBundleAssetBundle是Unity pro提供的一种用来存储资源的文件格式，它可以存储任意一种Unity引擎能够识别的资源，如Scene、Mesh、Material、Texture、Audio、noxss等等，同时，AssetBundle也可以包含开发者自定义的二进制文件，只需要将自定义文件的扩展名改为.bytes，Unity就">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Unity保护之assetbundle">
+<meta property="og:url" content="http://example.com/2020/07/03/Unity%E4%BF%9D%E6%8A%A4%E4%B9%8Bassetbundle/index.html">
+<meta property="og:site_name" content="喵喵的blog">
+<meta property="og:description" content="AssetBundle加密1.简介1.1 什么是AssetBundleAssetBundle是Unity pro提供的一种用来存储资源的文件格式，它可以存储任意一种Unity引擎能够识别的资源，如Scene、Mesh、Material、Texture、Audio、noxss等等，同时，AssetBundle也可以包含开发者自定义的二进制文件，只需要将自定义文件的扩展名改为.bytes，Unity就">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-07-03T03:55:02.000Z">
+<meta property="article:modified_time" content="2021-05-17T02:41:57.428Z">
+<meta property="article:author" content="newbiemiao">
+<meta property="article:tag" content="protect">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2020/07/03/Unity%E4%BF%9D%E6%8A%A4%E4%B9%8Bassetbundle/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Unity保护之assetbundle | 喵喵的blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">喵喵的blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2020/07/03/Unity%E4%BF%9D%E6%8A%A4%E4%B9%8Bassetbundle/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="newbiemiao">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="喵喵的blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Unity保护之assetbundle
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-07-03 11:55:02" itemprop="dateCreated datePublished" datetime="2020-07-03T11:55:02+08:00">2020-07-03</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-05-17 10:41:57" itemprop="dateModified" datetime="2021-05-17T10:41:57+08:00">2021-05-17</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="AssetBundle加密"><a href="#AssetBundle加密" class="headerlink" title="AssetBundle加密"></a>AssetBundle加密</h1><h4 id="1-简介"><a href="#1-简介" class="headerlink" title="1.简介"></a>1.简介</h4><h5 id="1-1-什么是AssetBundle"><a href="#1-1-什么是AssetBundle" class="headerlink" title="1.1 什么是AssetBundle"></a>1.1 什么是AssetBundle</h5><p>AssetBundle是Unity pro提供的一种用来存储资源的文件格式，它可以存储任意一种Unity引擎能够识别的资源，如Scene、Mesh、Material、Texture、Audio、noxss等等，同时，AssetBundle也可以包含开发者自定义的二进制文件，只需要将自定义文件的扩展名改为.bytes，Unity就可以把它识别为TextAsset，进而就可以被打包到AssetBundle中。Unity引擎所能识别的资源我们称为Asset，AssetBundle就是Asset的一个集合。</p>
+<p>AssetBundle 加载，可分为请求服务器和本地资源，一般Assetbundle静态文件，</p>
+<h5 id="1-2-AssetBundle的特点"><a href="#1-2-AssetBundle的特点" class="headerlink" title="1.2 AssetBundle的特点"></a>1.2 AssetBundle的特点</h5><p>压缩（缺省）、动态载入、本地缓存</p>
+<h5 id="1-3-AssetBundle-使用（开发视角）"><a href="#1-3-AssetBundle-使用（开发视角）" class="headerlink" title="1.3 AssetBundle 使用（开发视角）"></a>1.3 AssetBundle 使用（开发视角）</h5><p>a、创建AssetBundle，并打包；</p>
+<p>b、上传到Server；</p>
+<p>c、游戏运行时根据需要下载（或者从本地cache中加载）AssetBundle文件；</p>
+<p>d、解析加载Assets；</p>
+<p>e、使用完毕后释放；</p>
+<p>将资源文件打包成ab包，在unity里使用：</p>
+<p><strong>BuildPipeline.BuildAssetBundles（string outputPath, BuildAssetBundleOptions assetBundleOptions, BuildTarget targetPlatform）</strong></p>
+<p>加载静态ab文件，在unity里使用（从服务器下载没有静态文件，暂不考虑）：</p>
+<p><strong>AssetBundle.Load (name : string)</strong> </p>
+<span id="more"></span>
+
+<h4 id="2-加密"><a href="#2-加密" class="headerlink" title="2.加密"></a>2.加密</h4><h5 id="2-1-文件加密格式"><a href="#2-1-文件加密格式" class="headerlink" title="2.1  文件加密格式"></a>2.1  文件加密格式</h5><p>加密后的文件内容为 sign + enc_str</p>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>释义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>sign</td>
+<td>长度固定用于替换文件头（ab包文件头为UnityFS）</td>
+</tr>
+<tr>
+<td>enc_str</td>
+<td>经过 异或后的内容</td>
+</tr>
+</tbody></table>
+<h5 id="2-2-加密代码"><a href="#2-2-加密代码" class="headerlink" title="2.2 加密代码"></a>2.2 加密代码</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">xor_encrypt</span>(<span class="params">tips,key</span>):</span></span><br><span class="line">    ltips=<span class="built_in">len</span>(tips)</span><br><span class="line">    lkey=<span class="built_in">len</span>(key)</span><br><span class="line">    secret=[]</span><br><span class="line">    num=<span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> each <span class="keyword">in</span> tips:</span><br><span class="line">        <span class="keyword">if</span> num&gt;=lkey:</span><br><span class="line">            num=num%lkey</span><br><span class="line">        secret.append( <span class="built_in">chr</span>( each^<span class="built_in">ord</span>(key[num]) ) )</span><br><span class="line">        num+=<span class="number">1</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">&quot;&quot;</span>.join(secret)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">encryptfile</span>(<span class="params">infile,outfile</span>):</span></span><br><span class="line">    <span class="keyword">if</span> (os.path.splitext(outfile)[<span class="number">1</span>] != <span class="string">&quot;.ab&quot;</span>):</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    fo = <span class="built_in">open</span>(infile, <span class="string">&quot;rb&quot;</span>)</span><br><span class="line">    file = fo.read()</span><br><span class="line">    fo.close()</span><br><span class="line">    <span class="keyword">if</span>(file[<span class="number">0</span>:<span class="number">7</span>]!= <span class="string">b&quot;UnityFS&quot;</span>):</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    fw = <span class="built_in">open</span>(outfile, <span class="string">&quot;wb&quot;</span>)</span><br><span class="line">    fw.write(<span class="string">b&quot;AAAAAAA&quot;</span>)</span><br><span class="line">    enc = xor_encrypt(file[<span class="number">7</span>:],key)</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> enc:</span><br><span class="line">        a = struct.pack(<span class="string">&quot;B&quot;</span>,<span class="built_in">ord</span>(i))</span><br><span class="line">        fw.write(a)</span><br><span class="line">    fw.close</span><br></pre></td></tr></table></figure>
+
+<h4 id="3-解密（旧版）"><a href="#3-解密（旧版）" class="headerlink" title="3. 解密（旧版）"></a>3. 解密（旧版）</h4><h5 id="3-1-解密代码"><a href="#3-1-解密代码" class="headerlink" title="3.1 解密代码"></a>3.1 解密代码</h5><p>通过 hook libc 中的read函数 实现 ，过程如下：</p>
+<ol>
+<li>通过文件名判断文件是否为ab包</li>
+<li>记录此时文件读取的偏移，读取文件头</li>
+<li>根据文件头判断文件是否需要解密</li>
+<li>解密文件内容，并返回</li>
+</ol>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> *   通过读取文件开头的7位来判断文件是否加密</span></span><br><span class="line"><span class="comment"> * */</span></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">is_encryptfile</span><span class="params">(<span class="keyword">int</span> fd)</span></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> ret  = <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">off_t</span> offset = <span class="built_in">lseek</span>(fd,<span class="number">0</span>,SEEK_CUR);</span><br><span class="line">    <span class="built_in">lseek</span>(fd, <span class="number">0</span>, SEEK_SET);</span><br><span class="line">    <span class="keyword">char</span> buff[<span class="number">10</span>];</span><br><span class="line">    <span class="keyword">if</span>(<span class="built_in">old_read</span>(fd,buff,<span class="number">7</span>))&#123;</span><br><span class="line">        buff[<span class="number">7</span>] = <span class="string">&#x27;\0&#x27;</span>;</span><br><span class="line">        <span class="keyword">if</span>(<span class="built_in">strstr</span>(buff,<span class="string">&quot;AAAAAAA&quot;</span>) != <span class="literal">NULL</span>)&#123;</span><br><span class="line">            ret =  <span class="literal">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">        <span class="keyword">char</span> str[<span class="number">1024</span>] = &#123;<span class="string">&#x27;\0&#x27;</span>&#125;;</span><br><span class="line">        <span class="keyword">char</span> file_path[<span class="number">1024</span>] = &#123;<span class="string">&#x27;\0&#x27;</span>&#125;;</span><br><span class="line">        <span class="built_in">sprintf</span>(str, <span class="string">&quot;/proc/self/fd/%d&quot;</span>, fd);</span><br><span class="line">        <span class="built_in">readlink</span>(str,file_path,<span class="built_in"><span class="keyword">sizeof</span></span>(file_path)<span class="number">-1</span>);</span><br><span class="line">        <span class="built_in">MLOGE</span>(<span class="string">&quot;read fd %d  name %s faild err %s&quot;</span>,fd,file_path,<span class="built_in">strerror</span>(errno));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">lseek</span>(fd, offset, SEEK_SET);</span><br><span class="line">    <span class="keyword">return</span> ret;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in"><span class="keyword">int</span></span> (*old_read)(<span class="keyword">int</span> fd, <span class="keyword">void</span> *buf, <span class="keyword">int</span> count);</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">new_read</span><span class="params">(<span class="keyword">int</span> fd, <span class="keyword">void</span> *buf, <span class="keyword">int</span> count)</span></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">off_t</span> offset = <span class="built_in">lseek</span>(fd,<span class="number">0</span>,SEEK_CUR);</span><br><span class="line">    <span class="keyword">if</span>(<span class="built_in">is_encryptfile</span>(fd))&#123;</span><br><span class="line">        <span class="keyword">if</span>(offset&lt;<span class="number">7</span> &amp;&amp; count+offset&lt;=<span class="number">7</span>)&#123;</span><br><span class="line">            <span class="keyword">char</span> *head = <span class="string">&quot;UnityFS&quot;</span>;</span><br><span class="line">            <span class="built_in">memcpy</span>(buf,head+offset,count);</span><br><span class="line">            <span class="built_in">lseek</span>(fd, offset+<span class="number">1</span>, SEEK_SET);</span><br><span class="line">            <span class="built_in">MLOGD</span>(<span class="string">&quot;read buf1 %s&quot;</span>,buf);</span><br><span class="line">            <span class="keyword">return</span> count;</span><br><span class="line">        &#125; <span class="keyword">else</span>&#123;</span><br><span class="line">            <span class="keyword">char</span> *filedata = (<span class="keyword">char</span> *)<span class="built_in">malloc</span>(count* <span class="built_in"><span class="keyword">sizeof</span></span>(<span class="keyword">char</span>));</span><br><span class="line">            <span class="keyword">char</span> key[<span class="number">5</span>] = <span class="string">&quot;OOOK&quot;</span>;</span><br><span class="line">            <span class="built_in">lseek</span>(fd, offset, SEEK_SET);</span><br><span class="line">            <span class="keyword">int</span> readlen = <span class="built_in">old_read</span>(fd,filedata,count);</span><br><span class="line">            <span class="keyword">if</span>(count == readlen)&#123;</span><br><span class="line">                <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>;i&lt;count;i++)&#123;</span><br><span class="line">                    <span class="built_in">MLOGD</span>(<span class="string">&quot;read buf[%d] 0x%x  &quot;</span>,offset+i,filedata[i]);</span><br><span class="line">                    filedata[i] = filedata[i] ^ key[(offset<span class="number">-7</span> +i)%<span class="number">4</span>];</span><br><span class="line">                    <span class="built_in">MLOGD</span>(<span class="string">&quot;read buf[%d] 0x%x  %c  0x%x&quot;</span>,offset+i,filedata[i],key[(offset<span class="number">-7</span>+i)%<span class="number">4</span>],key[(offset<span class="number">-7</span>+i)%<span class="number">4</span>]);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="built_in">memcpy</span>(buf,filedata,count);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="built_in"><span class="keyword">delete</span></span>(filedata);</span><br><span class="line">            <span class="built_in">lseek</span>(fd, offset+count, SEEK_SET);</span><br><span class="line">            <span class="keyword">return</span> readlen;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">old_read</span>(fd,buf,count);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="3-2-注意事项"><a href="#3-2-注意事项" class="headerlink" title="3.2 注意事项"></a>3.2 注意事项</h5><ol>
+<li><p>解密后的文件长度必须和加载时的文件长度一致，不然会因为长度不一致导致C#报错文件流以外终止</p>
+</li>
+<li><p>key可以随意设置，不限内容长度。</p>
+</li>
+<li><p>ab包加载调用read函数时count 与lua 加载 count是文件长度不同，ad包加载，根据文件格式读取8位4位或者1位。</p>
+</li>
+</ol>
+<h4 id="5-解密（新版）"><a href="#5-解密（新版）" class="headerlink" title="5. 解密（新版）"></a>5. 解密（新版）</h4><h5 id="5-1-加载概述"><a href="#5-1-加载概述" class="headerlink" title="5.1 加载概述"></a>5.1 加载概述</h5><p>旧版加载ab包是直接使用read读取文件，而新版是通过解压base.apk来获取ab包文件。</p>
+<p>主要函数包括：ZipFile::inflateRead、ZipFile::read、ZipFile::seek，其中read、seek都通过调用inflateread来实现，inflateread函数通过循环inflate函数实现，读取文件内容是通过ZipFile::read。</p>
+<h5 id="5-2-解密代码"><a href="#5-2-解密代码" class="headerlink" title="5.2 解密代码"></a>5.2 解密代码</h5><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> *readbuf;</span><br><span class="line">uLong offset_start = <span class="number">0</span>;</span><br><span class="line">uLong offset_end = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">int</span> now_count = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">char</span> key[<span class="number">11</span>] = <span class="string">&quot;jjmatch123&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="built_in">HOOK_DEF</span>(<span class="keyword">int</span>,read,<span class="keyword">int</span> fd,<span class="keyword">void</span> *buf,<span class="keyword">int</span> count)&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">off_t</span> offset = <span class="built_in">lseek</span>(fd,<span class="number">0</span>,SEEK_CUR);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(offset_end!=<span class="number">0</span>&amp;&amp;offset_start!=<span class="number">0</span>)&#123; <span class="comment">//  读取目标文件解压前内容，并记录</span></span><br><span class="line">        <span class="keyword">if</span>(offset&lt;=offset_end&amp;&amp;offset&gt;=offset_start)&#123;</span><br><span class="line">            readbuf = buf;</span><br><span class="line">            now_count = count;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> ret = <span class="built_in">orig_read</span>(fd,buf,count);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">InitZIPfileInfo</span>(fd,count,buf,offset); <span class="comment">// 新版</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> ret;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">InitZIPfileInfo</span><span class="params">(<span class="keyword">int</span> fd,<span class="keyword">int</span> count,<span class="keyword">void</span> *buf,uLong offset)</span></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(fd == <span class="number">0</span> || count != <span class="number">30</span>)&#123;  <span class="comment">//频繁调用，不宜使用log</span></span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(<span class="built_in"><span class="keyword">sizeof</span></span>(ZIPfile) != <span class="number">30</span>)&#123;</span><br><span class="line">        <span class="built_in">LOGE</span>(<span class="string">&quot;[AssetBundleDecryptor::InitZIPfileInfo] sizeof(ZIPfile) is not 30!&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    ZIPfile *ziphead = <span class="keyword">static_cast</span>&lt;ZIPfile *&gt;(buf);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(ziphead-&gt;frSignature[<span class="number">0</span>] == <span class="number">0x50</span> &amp;&amp;</span><br><span class="line">       ziphead-&gt;frSignature[<span class="number">1</span>] == <span class="number">0x4b</span> &amp;&amp;</span><br><span class="line">       ziphead-&gt;frSignature[<span class="number">2</span>] == <span class="number">0x03</span> &amp;&amp;</span><br><span class="line">       ziphead-&gt;frSignature[<span class="number">3</span>] == <span class="number">0x04</span></span><br><span class="line">            )&#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        <span class="keyword">char</span> *filename= (<span class="keyword">char</span> *)<span class="built_in">malloc</span>(<span class="built_in"><span class="keyword">sizeof</span></span>(<span class="keyword">char</span>)*ziphead-&gt;frFileNameLength+<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> off = <span class="built_in">lseek</span>(fd,<span class="number">0</span>,SEEK_CUR);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> ret = <span class="built_in">orig_read</span>(fd,filename,ziphead-&gt;frFileNameLength);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>(ret == <span class="number">-1</span>)&#123;</span><br><span class="line">            <span class="built_in">LOGE</span>(<span class="string">&quot;[AssetBundleDecryptor::InitZIPfileInfo] read error %s&quot;</span>,<span class="built_in">strerror</span>(errno));</span><br><span class="line">            <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="built_in">LOGD</span>(<span class="string">&quot;[AssetBundleDecryptor::InitZIPfileInfo] FileName %*s&quot;</span>,ziphead-&gt;frFileNameLength,filename);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>(<span class="built_in">strstr</span>(filename,<span class="string">&quot;mod.ab&quot;</span>) != <span class="literal">NULL</span>)&#123;  <span class="comment">// 判断文件是否需要解密</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">            <span class="built_in">LOGD</span>(<span class="string">&quot;[AssetBundleDecryptor::InitZIPfileInfo] zipfile info UncompressedSize:0x%x,compressedSize:0x%x,ExtraFieldLength:0x%x,FileNameLength:0x%x&quot;</span>,</span><br><span class="line">                 ziphead-&gt;frUncompressedSize,ziphead-&gt;frCompressedSize,ziphead-&gt;frExtraFieldLength,ziphead-&gt;frFileNameLength);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">            offset_start = offset+count+ziphead-&gt;frExtraFieldLength+ziphead-&gt;frFileNameLength;</span><br><span class="line">            offset_end = offset_start + ziphead-&gt;frCompressedSize;</span><br><span class="line"></span><br><span class="line">            <span class="built_in">LOGD</span>(<span class="string">&quot;[AssetBundleDecryptor::InitZIPfileInfo] init success !\n offset_start %d ,offset_end %d&quot;</span>,offset_start,offset_end);</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="built_in">lseek</span>(fd, off, SEEK_SET);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>(filename!=<span class="literal">NULL</span>)</span><br><span class="line">            <span class="built_in">free</span>(filename);</span><br><span class="line"></span><br><span class="line">    &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">        <span class="built_in">LOGD</span>(<span class="string">&quot;[AssetBundleDecryptor::InitZIPfileInfo] is not ziphead&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* inflate 调用很频繁，打log会严重影响加载速度</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="built_in">HOOK_DEF</span>(<span class="keyword">int</span>,inflate,z_streamp strm, <span class="keyword">int</span> flush)&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">void</span> *input = strm-&gt;next_in;</span><br><span class="line">    Bytef *output = strm-&gt;next_out;</span><br><span class="line">    u_long outlen = strm-&gt;avail_out;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> ret = <span class="built_in">orig_inflate</span>(strm,flush);</span><br><span class="line"></span><br><span class="line">    outlen = outlen - strm-&gt;avail_out;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(input&gt;=readbuf&amp;&amp;input&lt;=((<span class="keyword">int</span> *)readbuf+now_count ))&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>(readbuf == input)&#123;</span><br><span class="line"></span><br><span class="line">			<span class="keyword">if</span>(<span class="built_in">strstr</span>((<span class="keyword">char</span> *)output,<span class="string">&quot;AAAAAAA&quot;</span>) != <span class="literal">NULL</span>)&#123;</span><br><span class="line"></span><br><span class="line">                    <span class="comment">//解密</span></span><br><span class="line">                    &#125;</span><br><span class="line"></span><br><span class="line">                    <span class="keyword">return</span> ret;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"><span class="comment">//                LOGD(&quot;[inflate - before ] output [%p][%p] 0x%x,0x%x，0x%x，0x%x total_out 0x%x, outlen %d %d&quot;</span></span><br><span class="line"><span class="comment">//                        ,output,strm-&gt;next_out,output[0],output[1],output[2],output[3],strm-&gt;total_out,outlen,strm-&gt;avail_out);</span></span><br><span class="line">        <span class="keyword">int</span> num = strm-&gt;total_out - outlen <span class="number">-7</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//len =  1024 时是偏移，修改内容不影响加载,为了节省时间不解密</span></span><br><span class="line">        <span class="keyword">if</span>(outlen == <span class="number">1024</span>)</span><br><span class="line">            <span class="keyword">return</span> ret;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i&lt;outlen;i++)&#123;</span><br><span class="line">            output[i] = output[i] ^ key[(num +i)%<span class="number">10</span>];</span><br><span class="line"><span class="comment">//          LOGD(&quot;[inflate] key[%d] 0x%x,output[%d] 0x%x&quot;,(num +i)%10,key[(num +i)%10],i,output[i]);</span></span><br><span class="line">         &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> ret;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">AssetBundleDecryptor::registerHook</span><span class="params">()</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">LOGD</span>(<span class="string">&quot;in registerHook  pid %d&quot;</span>,<span class="built_in">getpid</span>());</span><br><span class="line"></span><br><span class="line">    std::string libpath = <span class="built_in">get_libpath</span>();</span><br><span class="line">    libpath.<span class="built_in">append</span>(<span class="string">&quot;libunity.so&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">LOGD</span>(<span class="string">&quot;libunity : %s&quot;</span>,libpath.<span class="built_in">data</span>());</span><br><span class="line"></span><br><span class="line">    <span class="keyword">void</span> *handle = <span class="built_in">dlopen</span>(libpath.<span class="built_in">data</span>(),RTLD_LAZY);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">xhook_register</span>(libpath.<span class="built_in">data</span>(),<span class="string">&quot;inflate&quot;</span>,(<span class="keyword">void</span>*)new_inflate,(<span class="keyword">void</span> **)&amp;orig_inflate);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">xhook_register</span>(<span class="string">&quot;libc.so&quot;</span>,<span class="string">&quot;read&quot;</span>,(<span class="keyword">void</span>*)new_read,(<span class="keyword">void</span> **)&amp;orig_read);</span><br><span class="line"><span class="comment">//    //关于 加载 ab 包 不在unity.so 里</span></span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/protect/" rel="tag"># protect</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/07/03/Unity%E4%BF%9D%E6%8A%A4%E4%B9%8Bil2cpp/" rel="prev" title="Unity保护之il2cpp">
+      <i class="fa fa-chevron-left"></i> Unity保护之il2cpp
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/08/27/SO%E5%8A%A0%E5%AF%86/" rel="next" title="SO加密">
+      SO加密 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#AssetBundle%E5%8A%A0%E5%AF%86"><span class="nav-number">1.</span> <span class="nav-text">AssetBundle加密</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E7%AE%80%E4%BB%8B"><span class="nav-number">1.0.0.1.</span> <span class="nav-text">1.简介</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-1-%E4%BB%80%E4%B9%88%E6%98%AFAssetBundle"><span class="nav-number">1.0.0.1.1.</span> <span class="nav-text">1.1 什么是AssetBundle</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#1-2-AssetBundle%E7%9A%84%E7%89%B9%E7%82%B9"><span class="nav-number">1.0.0.1.2.</span> <span class="nav-text">1.2 AssetBundle的特点</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#1-3-AssetBundle-%E4%BD%BF%E7%94%A8%EF%BC%88%E5%BC%80%E5%8F%91%E8%A7%86%E8%A7%92%EF%BC%89"><span class="nav-number">1.0.0.1.3.</span> <span class="nav-text">1.3 AssetBundle 使用（开发视角）</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E5%8A%A0%E5%AF%86"><span class="nav-number">1.0.0.2.</span> <span class="nav-text">2.加密</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#2-1-%E6%96%87%E4%BB%B6%E5%8A%A0%E5%AF%86%E6%A0%BC%E5%BC%8F"><span class="nav-number">1.0.0.2.1.</span> <span class="nav-text">2.1  文件加密格式</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-2-%E5%8A%A0%E5%AF%86%E4%BB%A3%E7%A0%81"><span class="nav-number">1.0.0.2.2.</span> <span class="nav-text">2.2 加密代码</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E8%A7%A3%E5%AF%86%EF%BC%88%E6%97%A7%E7%89%88%EF%BC%89"><span class="nav-number">1.0.0.3.</span> <span class="nav-text">3. 解密（旧版）</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#3-1-%E8%A7%A3%E5%AF%86%E4%BB%A3%E7%A0%81"><span class="nav-number">1.0.0.3.1.</span> <span class="nav-text">3.1 解密代码</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-2-%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="nav-number">1.0.0.3.2.</span> <span class="nav-text">3.2 注意事项</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-%E8%A7%A3%E5%AF%86%EF%BC%88%E6%96%B0%E7%89%88%EF%BC%89"><span class="nav-number">1.0.0.4.</span> <span class="nav-text">5. 解密（新版）</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#5-1-%E5%8A%A0%E8%BD%BD%E6%A6%82%E8%BF%B0"><span class="nav-number">1.0.0.4.1.</span> <span class="nav-text">5.1 加载概述</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#5-2-%E8%A7%A3%E5%AF%86%E4%BB%A3%E7%A0%81"><span class="nav-number">1.0.0.4.2.</span> <span class="nav-text">5.2 解密代码</span></a></li></ol></li></ol></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">newbiemiao</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">11</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">newbiemiao</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '',
+      clientSecret: '',
+      repo        : 'nszdhd1.github.io',
+      owner       : '',
+      admin       : [''],
+      id          : '6f24b7928ff7e27d5583d2ad61e13e7a',
+        language: '',
+      distractionFreeMode: 
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>
