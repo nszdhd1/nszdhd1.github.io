@@ -1,0 +1,1397 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <!-- title -->
+
+
+    
+
+<!-- keywords -->
+
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="author" content="newbiemiao">
+    <meta name="renderer" content="webkit">
+    <meta name="copyright" content="newbiemiao">
+    
+        <meta name="keywords" content="hexo,hexo-theme,hexo-blog">
+    
+    <meta name="description" content="">
+    <meta property="og:type" content="website">
+<meta property="og:title" content="喵喵的blog">
+<meta property="og:url" content="http://example.com/index.html">
+<meta property="og:site_name" content="喵喵的blog">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:author" content="newbiemiao">
+<meta name="twitter:card" content="summary">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <link rel="icon" href="/assets/favicon.ico">
+    
+    <title>nszdhd1&#39;s blog</title>
+    <!-- /*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
+/* This file is meant as a standalone workflow for
+- testing support for link[rel=preload]
+- enabling async CSS loading in browsers that do not support rel=preload
+- applying rel preload css once loaded, whether supported or not.
+*/ -->
+<script>
+    (function (w) {
+        'use strict'
+        // rel=preload support test
+        if (!w.loadCSS) {
+            w.loadCSS = function () {}
+        }
+        // define on the loadCSS obj
+        var rp = (loadCSS.relpreload = {})
+        // rel=preload feature support test
+        // runs once and returns a function for compat purposes
+        rp.support = (function () {
+            var ret
+            try {
+                ret = w.document.createElement('link').relList.supports('preload')
+            } catch (e) {
+                ret = false
+            }
+            return function () {
+                return ret
+            }
+        })()
+
+        // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+        // then change that media back to its intended value on load
+        rp.bindMediaToggle = function (link) {
+            // remember existing media attr for ultimate state, or default to 'all'
+            var finalMedia = link.media || 'all'
+
+            function enableStylesheet() {
+                link.media = finalMedia
+            }
+
+            // bind load handlers to enable media
+            if (link.addEventListener) {
+                link.addEventListener('load', enableStylesheet)
+            } else if (link.attachEvent) {
+                link.attachEvent('onload', enableStylesheet)
+            }
+
+            // Set rel and non-applicable media type to start an async request
+            // note: timeout allows this to happen async to let rendering continue in IE
+            setTimeout(function () {
+                link.rel = 'stylesheet'
+                link.media = 'only x'
+            })
+            // also enable media after 3 seconds,
+            // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+            setTimeout(enableStylesheet, 3000)
+        }
+
+        // loop through link elements in DOM
+        rp.poly = function () {
+            // double check this to prevent external calls from running
+            if (rp.support()) {
+                return
+            }
+            var links = w.document.getElementsByTagName('link')
+            for (var i = 0; i < links.length; i++) {
+                var link = links[i]
+                // qualify links to those with rel=preload and as=style attrs
+                if (
+                    link.rel === 'preload' &&
+                    link.getAttribute('as') === 'style' &&
+                    !link.getAttribute('data-loadcss')
+                ) {
+                    // prevent rerunning on link
+                    link.setAttribute('data-loadcss', true)
+                    // bind listeners to toggle media back
+                    rp.bindMediaToggle(link)
+                }
+            }
+        }
+
+        // if unsupported, run the polyfill
+        if (!rp.support()) {
+            // run once at least
+            rp.poly()
+
+            // rerun poly on an interval until onload
+            var run = w.setInterval(rp.poly, 500)
+            if (w.addEventListener) {
+                w.addEventListener('load', function () {
+                    rp.poly()
+                    w.clearInterval(run)
+                })
+            } else if (w.attachEvent) {
+                w.attachEvent('onload', function () {
+                    rp.poly()
+                    w.clearInterval(run)
+                })
+            }
+        }
+
+        // commonjs
+        if (typeof exports !== 'undefined') {
+            exports.loadCSS = loadCSS
+        } else {
+            w.loadCSS = loadCSS
+        }
+    })(typeof global !== 'undefined' ? global : this)
+</script>
+
+    <style type="text/css">
+    @font-face {
+        font-family: 'Oswald-Regular';
+        src: url("/font/Oswald-Regular.ttf");
+    }
+
+    body {
+        margin: 0;
+    }
+
+    header,
+    footer,
+    .back-top,
+    .sidebar,
+    .container,
+    .site-intro-meta,
+    .toc-wrapper {
+        display: none;
+    }
+
+    .site-intro {
+        position: relative;
+        z-index: 3;
+        width: 100%;
+        /* height: 50vh; */
+        overflow: hidden;
+    }
+
+    .site-intro-placeholder {
+        position: absolute;
+        z-index: -2;
+        top: 0;
+        left: 0;
+        width: calc(100% + 300px);
+        height: 100%;
+        background: repeating-linear-gradient(-45deg, #444 0, #444 80px, #333 80px, #333 160px);
+        background-position: center center;
+        transform: translate3d(-226px, 0, 0);
+        animation: gradient-move 2.5s ease-out 0s infinite;
+    }
+
+    @keyframes gradient-move {
+        0% {
+            transform: translate3d(-226px, 0, 0);
+        }
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+    }
+</style>
+
+    <link rel="preload" href="/css/style.css?v=20211217" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="/css/dark.css?v=20211217" as="style">
+    <link rel="stylesheet" href="/css/dark.css">
+    <link rel="stylesheet" href="/css/mobile.css?v=20211217" media="(max-width: 960px)">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" as="script">
+    <link rel="preload" href="/scripts/main.js?v=20211217" as="script">
+    <link rel="preload" href="/scripts/dark.js?v=20211217" as="script">
+    <link rel="preload" href="/font/Oswald-Regular.ttf" as="font" crossorigin>
+    <link rel="preload" href="https://at.alicdn.com/t/font_327081_1dta1rlogw17zaor.woff" as="font" crossorigin>
+    <!-- algolia -->
+    
+    <!-- 百度统计  -->
+    
+    <!-- Google tag (gtag.js) -->
+    
+
+<meta name="generator" content="Hexo 7.0.0"></head>
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script type="text/javascript">
+        if (typeof window.$ == undefined) {
+            console.warn('jquery load from jsdelivr failed, will load local script')
+            document.write('<script src="/lib/jquery.min.js" />')
+        }
+    </script>
+    
+        <body class="home-body">
+    
+        <!-- header -->
+        <header class="header header-mobile index-header">
+    <!-- top read progress line -->
+    <div class="header-element">
+        <div class="read-progress"></div>
+    </div>
+    <!-- sidebar menu button -->
+    <div class="header-element">
+        
+            <div class="header-sidebar-menu">
+        
+            
+                <div style="padding-left: 1px;">&#xe775;</div>
+            
+        </div>
+    </div>
+    <!-- header actions -->
+    <div class="header-actions">
+        <!-- theme mode switch button -->
+        <span class="header-theme-btn header-element">
+            <i class="fas fa-adjust"></i>
+        </span>
+        <!-- back to home page text -->
+        <span class="home-link header-element">
+            <a href=/>nszdhd1's blog.</a>
+        </span>
+    </div>
+    <!-- toggle banner for post layout -->
+    
+</header>
+
+        <!-- fixed footer -->
+        <footer class="footer-fixed index-footer-fixed">
+    <!-- back to top button -->
+    <div class="footer-fixed-element">
+        
+            <div class="back-top back-top-hidden">
+        
+        
+            <div>&#xe639;</div>
+        
+        </div>
+    </div>
+</footer>
+
+        <!-- wrapper -->
+        <div class="wrapper">
+            <div class="site-intro" style="
+
+
+
+
+
+
+
+    height:50vh;
+
+">
+    
+    <!-- 主页  -->
+    
+        
+    <!-- 文章页  -->
+    
+    <div class="site-intro-placeholder"></div>
+    <div class="site-intro-img" style="background-image: url(/intro/index-bg.jpg)"></div>
+    <div class="site-intro-meta">
+        <!-- 标题  -->
+        <h1 class="intro-title">
+            <!-- 主页  -->
+            
+                nszdhd1's blog.
+            <!-- 文章页  -->
+            
+        </h1>
+        <!-- 副标题 -->
+        <p class="intro-subtitle">
+            <!-- 主页副标题  -->
+            
+                
+                    🌱 又是努力逆向的一天呀 ~
+                
+            <!-- 文章页  -->
+            
+        </p>
+        <!-- 文章页 meta -->
+        
+    </div>
+</div>
+
+            <script>
+  // get user agent
+  function getBrowserVersions() {
+    var u = window.navigator.userAgent
+    return {
+      userAgent: u,
+      trident: u.indexOf('Trident') > -1, //IE内核
+      presto: u.indexOf('Presto') > -1, //opera内核
+      webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+      gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+      mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+      ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+      android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+      iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者安卓QQ浏览器
+      iPad: u.indexOf('iPad') > -1, //是否为iPad
+      webApp: u.indexOf('Safari') == -1, //是否为web应用程序，没有头部与底部
+      weixin: u.indexOf('MicroMessenger') == -1, //是否为微信浏览器
+      uc: u.indexOf('UCBrowser') > -1, //是否为android下的UC浏览器
+    }
+  }
+  var browser = {
+    versions: getBrowserVersions(),
+  }
+  console.log('userAgent: ' + browser.versions.userAgent)
+
+  // callback
+  function fontLoaded() {
+    console.log('font loaded')
+    if (document.getElementsByClassName('site-intro-meta')) {
+      document
+        .getElementsByClassName('intro-title')[0]
+        .classList.add('intro-fade-in')
+      document
+        .getElementsByClassName('intro-subtitle')[0]
+        .classList.add('intro-fade-in')
+      var postIntros = document.getElementsByClassName('post-intros')[0]
+      if (postIntros) {
+        postIntros.classList.add('post-fade-in')
+      }
+    }
+  }
+
+  // UC不支持跨域，所以直接显示
+  function asyncCb() {
+    if (browser.versions.uc) {
+      console.log('UCBrowser')
+      fontLoaded()
+    } else {
+      WebFont.load({
+        custom: {
+          families: ['Oswald-Regular'],
+        },
+        loading: function () {
+          // 所有字体开始加载
+          // console.log('font loading');
+        },
+        active: function () {
+          // 所有字体已渲染
+          fontLoaded()
+        },
+        inactive: function () {
+          // 字体预加载失败，无效字体或浏览器不支持加载
+          console.log('inactive: timeout')
+          fontLoaded()
+        },
+        timeout: 5000, // Set the timeout to two seconds
+      })
+    }
+  }
+
+  function asyncErr() {
+    console.warn('script load from CDN failed, will load local script')
+  }
+
+  // load webfont-loader async, and add callback function
+  function async(u, cb, err) {
+    var d = document,
+      t = 'script',
+      o = d.createElement(t),
+      s = d.getElementsByTagName(t)[0]
+    o.src = u
+    if (cb) {
+      o.addEventListener(
+        'load',
+        function (e) {
+          cb(null, e)
+        },
+        false
+      )
+    }
+    if (err) {
+      o.addEventListener(
+        'error',
+        function (e) {
+          err(null, e)
+        },
+        false
+      )
+    }
+    s.parentNode.insertBefore(o, s)
+  }
+
+  var asyncLoadWithFallBack = function (arr, success, reject) {
+    var currReject = function () {
+      reject()
+      arr.shift()
+      if (arr.length) async(arr[0], success, currReject)
+    }
+
+    async(arr[0], success, currReject)
+  }
+
+  asyncLoadWithFallBack(
+    [
+      'https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js',
+      'https://cdn.bootcss.com/webfont/1.6.28/webfontloader.js',
+      "/lib/webfontloader.min.js",
+    ],
+    asyncCb,
+    asyncErr
+  )
+</script>
+
+            <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
+            <div class="container container-unloaded">
+                <main class="main index-page">
+    
+        
+        
+        
+        
+            
+            
+        
+        <article class="index-post">
+            <a class="abstract-title" href="/2022/12/22/%E5%A6%82%E4%BD%95%E4%BF%AE%E6%94%B9unityHybridCLR%E7%83%AD%E6%9B%B4dll/">
+                
+                <span class="abstract-title-text">如何修改unity HybridCLR 热更dll</span>
+            </a>
+            <div class="abstract-content">
+                <h1 id="如何修改unity-HybridCLR-热更dll"><a href="#如何修改unity-HybridCLR-热更dll" class="headerlink" title="如何修改unity HybridCLR 热更dll"></a>如何修改unity HybridCLR 热更dll</h1><h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>由于很多原因比如修bug、减小包体积、迅速更新，游戏需要使用到热更。</p>
+<p>目前比较热门的热更方法，一种是使用lua，比如xlua、tolua之类的，还有一种是使用热更框架，比如HybridCLR、ILRuntime。</p>
+<p>如何修改lua，已经有很多文章了，证明了使用lua被篡改是很简单的一件事。那么，热更框架就安全了吗？</p>
+            </div>
+            <!-- read more -->
+            
+            <div class="abstract-post-meta">
+                <!-- date -->
+                <div class="abstract-date" title="Last updated: 2023/11/15">
+                    <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2022/12/22</span>
+                </div>
+                <!-- tags -->
+                
+                    <div class= abstract-tags >
+    
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="protect">protect</a>
+    
+</div>
+
+                
+            </div>
+        </article>
+        <div class="index-post-divider"></div>
+    
+        
+        
+        
+        
+            
+            
+        
+        <article class="index-post">
+            <a class="abstract-title" href="/2022/11/14/Genshin-IL2CPP-RunTime-Dump/">
+                
+                <span class="abstract-title-text">Genshin IL2CPP RunTime Dump</span>
+            </a>
+            <div class="abstract-content">
+                <p>版本：3.2</p>
+<p>该游戏的保护又升级了，围观一下安全性怎么样。</p>
+<h2 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h2><p>一些il2cpp导出函数被隐藏掉了，现在只有两个</p>
+<p><img src="/Genshin-IL2CPP-RunTime-Dump/image-20221108195110137.png" alt="image-20221108195110137"></p>
+            </div>
+            <!-- read more -->
+            
+            <div class="abstract-post-meta">
+                <!-- date -->
+                <div class="abstract-date" title="Last updated: 2023/11/15">
+                    <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2022/11/14</span>
+                </div>
+                <!-- tags -->
+                
+                    <div class= abstract-tags >
+    
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="game">game</a>
+    
+</div>
+
+                
+            </div>
+        </article>
+        <div class="index-post-divider"></div>
+    
+        
+        
+        
+        
+            
+            
+        
+        <article class="index-post">
+            <a class="abstract-title" href="/2022/09/08/GameGuardian%E7%9A%84Lua%E8%84%9A%E6%9C%AC%E6%B7%B7%E6%B7%86%E5%88%86%E6%9E%90/">
+                
+                <span class="abstract-title-text">GameGuardian的Lua脚本混淆分析</span>
+            </a>
+            <div class="abstract-content">
+                <h1 id="GG-lua脚本分析"><a href="#GG-lua脚本分析" class="headerlink" title="GG lua脚本分析"></a>GG lua脚本分析</h1><p>起因：碰到一个GG脚本，需要知道这个脚本做了什么。</p>
+<p><img src="/GameGuardian%E7%9A%84Lua%E8%84%9A%E6%9C%AC%E6%B7%B7%E6%B7%86%E5%88%86%E6%9E%90/image-20220908151017308.png" alt="image-20220908151017308"></p>
+<p>使用unluac反编译，lua脚本已被混淆，完全不可读：</p>
+            </div>
+            <!-- read more -->
+            
+            <div class="abstract-post-meta">
+                <!-- date -->
+                <div class="abstract-date" title="Last updated: 2023/11/15">
+                    <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2022/09/08</span>
+                </div>
+                <!-- tags -->
+                
+                    <div class= abstract-tags >
+    
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="Analytics">Analytics</a>
+    
+</div>
+
+                
+            </div>
+        </article>
+        <div class="index-post-divider"></div>
+    
+        
+        
+        
+        
+            
+            
+        
+        <article class="index-post">
+            <a class="abstract-title" href="/2022/03/21/%E5%88%A9%E7%94%A8Frida%E5%AE%9E%E7%8E%B0lua%E7%83%AD%E6%9B%B4%E6%96%B0/">
+                
+                <span class="abstract-title-text">利用Frida实现lua热更新</span>
+            </a>
+            <div class="abstract-content">
+                <h1 id="利用Frida实现lua热更新"><a href="#利用Frida实现lua热更新" class="headerlink" title="利用Frida实现lua热更新"></a>利用Frida实现lua热更新</h1><h2 id="背景与需求"><a href="#背景与需求" class="headerlink" title="背景与需求"></a>背景与需求</h2><p>对游戏进行修改时，尤其是代码逻辑在lua中，经常重启是一件很低效的事。所以考虑能不能有一款工具，<strong>不需要重启游戏就能让lua文件改动后立刻生效</strong></p>
+<p>非游戏开发，所以只有apk作为目标，无工程代码。</p>
+<h2 id="设计原理与实现"><a href="#设计原理与实现" class="headerlink" title="设计原理与实现"></a>设计原理与实现</h2><p>主要分为两个模块：</p>
+<ul>
+<li><strong>LuaFileWatcher</strong>，检测lua文件发生变化，当发生变化时调用Hotfix.lua进行重载模块的操作。</li>
+<li><strong>Hotfix</strong>，重载lua模块</li>
+</ul>
+<h3 id="LuaFileWatcher"><a href="#LuaFileWatcher" class="headerlink" title="LuaFileWatcher"></a>LuaFileWatcher</h3><p>此处分享两种方法，一种使用Android的FileObserver（虽然本质上还是用的inotify），另一种直接使用 linux inotify。</p>
+            </div>
+            <!-- read more -->
+            
+            <div class="abstract-post-meta">
+                <!-- date -->
+                <div class="abstract-date" title="Last updated: 2023/11/15">
+                    <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2022/03/21</span>
+                </div>
+                <!-- tags -->
+                
+                    <div class= abstract-tags >
+    
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="game">game</a>
+    
+</div>
+
+                
+            </div>
+        </article>
+        <div class="index-post-divider"></div>
+    
+        
+        
+        
+        
+            
+            
+        
+        <article class="index-post">
+            <a class="abstract-title" href="/2022/01/14/%E4%BD%BF%E7%94%A8unidbg%E8%BF%87%E4%BF%9D%E6%8A%A4/">
+                
+                <span class="abstract-title-text">使用unidbg过保护</span>
+            </a>
+            <div class="abstract-content">
+                <h1 id="虚拟执行使用笔记"><a href="#虚拟执行使用笔记" class="headerlink" title="虚拟执行使用笔记"></a>虚拟执行使用笔记</h1><p>起因是遇到一个可执行文件被加壳了，运行时间很短，无法在运行时dump。因为是商业的免费壳，带上了反调试，使用ida脱壳过程也比较麻烦。想尝试一种方便简单易上手的脱壳方式。</p>
+<p>这种情况，模拟执行是最好的解决方式。所以优先尝试了AndroidNativeEmu。</p>
+            </div>
+            <!-- read more -->
+            
+            <div class="abstract-post-meta">
+                <!-- date -->
+                <div class="abstract-date" title="Last updated: 2023/11/15">
+                    <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2022/01/14</span>
+                </div>
+                <!-- tags -->
+                
+            </div>
+        </article>
+        <div class="index-post-divider"></div>
+    
+        
+        
+        
+        
+            
+            
+        
+        <article class="index-post">
+            <a class="abstract-title" href="/2021/06/15/%E9%9D%9Eroot%E7%8E%AF%E5%A2%83%E4%B8%8Bfrida%E7%9A%84%E4%B8%A4%E7%A7%8D%E4%BD%BF%E7%94%A8%E6%96%B9%E5%BC%8F/">
+                
+                <span class="abstract-title-text">非root环境下frida的两种使用方式</span>
+            </a>
+            <div class="abstract-content">
+                <h1 id="非root环境下frida持久化的两种方式及脚本"><a href="#非root环境下frida持久化的两种方式及脚本" class="headerlink" title="非root环境下frida持久化的两种方式及脚本"></a>非root环境下frida持久化的两种方式及脚本</h1><p>frida是一个非常好用的hook框架，但使用中有两个问题，一是非root手机使用挺麻烦的，二是frida相较于其他HOOK框架没那么持久。网上的持久化大多基于xposed、刷ROM或者是virtualapp，前面两个是比较重量级，不够轻便。虚拟化技术本身就自带风险，很容易被检测到。</p>
+<p>在Android端，网上教程里大部分都是使用frida server来进行hook，其实还有一种使用方法为 frida gadget，此方法需要将frida-gadget.so注入到apk中，纯手动的话过于麻烦，所以这里实现两个脚本，分别用修改smali、修改so来注入目标。</p>
+<p><strong>我使用的frida-gadget版本为14.2.18。有其他版本的需求，需要替换tools下的so文件</strong></p>
+<h2 id="方法一-调试apk中含有so"><a href="#方法一-调试apk中含有so" class="headerlink" title="方法一 调试apk中含有so"></a>方法一 调试apk中含有so</h2><p>此方法相对简单。原理来自于古早的静态注入方式：<a target="_blank" rel="noopener" href="https://gslab.qq.com/portal.php?mod=view&aid=163">Android平台感染ELF文件实现模块注入</a></p>
+<p>而这种注入方式有工具可以快速实现：<a target="_blank" rel="noopener" href="https://lief.quarkslab.com//doc/latest/tutorials/09_frida_lief.html">How to use frida on a non-rooted device</a></p>
+<p>该方法优点在于可以让gadget是第一个启动的，缺点是没有so的apk不能用</p>
+            </div>
+            <!-- read more -->
+            
+            <div class="abstract-post-meta">
+                <!-- date -->
+                <div class="abstract-date" title="Last updated: 2023/11/15">
+                    <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2021/06/15</span>
+                </div>
+                <!-- tags -->
+                
+                    <div class= abstract-tags >
+    
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="Hook">Hook</a>
+    
+</div>
+
+                
+            </div>
+        </article>
+        <div class="index-post-divider"></div>
+    
+        
+        
+        
+        
+            
+        
+        <article class="index-post">
+            <a class="abstract-title" href="/2021/06/15/%E4%BD%BF%E7%94%A8LIEF%E6%89%93%E9%80%A0MTP%E5%8A%A0%E5%9B%BA/">
+                
+                <span class="abstract-title-text">使用LIEF打造MTP加固</span>
+            </a>
+            <div class="abstract-content">
+                使用LIEF打造MTP加固blog迁移时将这篇文章的Markdown搞丢了，只能贴看雪链接：https://bbs.pediy.com/thread-266762.htm
+
+            </div>
+            <!-- read more -->
+            
+            <div class="abstract-post-meta">
+                <!-- date -->
+                <div class="abstract-date" title="Last updated: 2023/11/15">
+                    <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2021/06/15</span>
+                </div>
+                <!-- tags -->
+                
+                    <div class= abstract-tags >
+    
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="other">other</a>
+    
+</div>
+
+                
+            </div>
+        </article>
+        <div class="index-post-divider"></div>
+    
+        
+        
+        
+        
+            
+            
+        
+        <article class="index-post">
+            <a class="abstract-title" href="/2021/01/15/%E6%8A%96%E9%9F%B3%E8%AF%84%E8%AE%BA%E7%88%AC%E5%8F%96/">
+                
+                <span class="abstract-title-text">抖音评论爬取</span>
+            </a>
+            <div class="abstract-content">
+                <h1 id="爬取抖音评论"><a href="#爬取抖音评论" class="headerlink" title="爬取抖音评论"></a>爬取抖音评论</h1><h2 id="一、使用burp抓包安卓模拟器"><a href="#一、使用burp抓包安卓模拟器" class="headerlink" title="一、使用burp抓包安卓模拟器"></a>一、使用burp抓包安卓模拟器</h2><p>随着android版本的更新，在真机上抓包越来越难，总是遇到格式各样的问题，导致抓不了包。所以选择模拟器可以避免很多没必要的坑。</p>
+<p>我抓包使用burp，同理你可以使用Charles、Fiddler，模拟器我使用夜神，你可以用任意的模拟器。</p>
+<p>下载、安装之类的默认已完成，快速的配置代理信息。</p>
+            </div>
+            <!-- read more -->
+            
+            <div class="abstract-post-meta">
+                <!-- date -->
+                <div class="abstract-date" title="Last updated: 2023/11/15">
+                    <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2021/01/15</span>
+                </div>
+                <!-- tags -->
+                
+                    <div class= abstract-tags >
+    
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="Misc">Misc</a>
+    
+</div>
+
+                
+            </div>
+        </article>
+        <div class="index-post-divider"></div>
+    
+        
+        
+        
+        
+            
+            
+        
+        <article class="index-post">
+            <a class="abstract-title" href="/2020/12/04/%E4%BD%BF%E7%94%A8frida%E8%8E%B7%E5%8F%96il2cpp%E7%AC%A6%E5%8F%B7%E4%BF%A1%E6%81%AF/">
+                
+                <span class="abstract-title-text">使用frida获取il2cpp符号信息</span>
+            </a>
+            <div class="abstract-content">
+                <h1 id="使用frida获取unity-il2cpp符号信息"><a href="#使用frida获取unity-il2cpp符号信息" class="headerlink" title="使用frida获取unity il2cpp符号信息"></a>使用frida获取unity il2cpp符号信息</h1><p>本次主角是米哈游的《原神》，起因还是在网上看到了一篇关于崩3的符号信息还原的文章，就想看看原神上有没有变化。</p>
+<h2 id="0x1-背景"><a href="#0x1-背景" class="headerlink" title="0x1 背景"></a>0x1 背景</h2><p>本次分析选取的是android平台的，游戏采用unity开发，使用il2cpp模式编译。</p>
+<p>使用 IL2CPP 模式编译，游戏中使用的字符串都被保存在了一个global-metadata.dat的资源文件里，只有在动态运行时才会将这些字符串读入内存。一般使用Il2CppDumper就可以读取global-metadata.dat文件中的信息，帮助反编译。</p>
+<p>有破解就有保护，可能会遇到无法dump或者global-metadata.dat文件结构被修改的情况，无法使用Il2CppDumper，这个时候就需要自己动手了。</p>
+            </div>
+            <!-- read more -->
+            
+            <div class="abstract-post-meta">
+                <!-- date -->
+                <div class="abstract-date" title="Last updated: 2023/11/15">
+                    <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2020/12/04</span>
+                </div>
+                <!-- tags -->
+                
+                    <div class= abstract-tags >
+    
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="game">game</a>
+    
+</div>
+
+                
+            </div>
+        </article>
+        <div class="index-post-divider"></div>
+    
+        
+        
+        
+        
+            
+            
+        
+        <article class="index-post">
+            <a class="abstract-title" href="/2020/08/27/SO%E5%8A%A0%E5%AF%86/">
+                
+                <span class="abstract-title-text">SO加密</span>
+            </a>
+            <div class="abstract-content">
+                <h1 id="so加密笔记"><a href="#so加密笔记" class="headerlink" title="so加密笔记"></a>so加密笔记</h1><h2 id="基础知识"><a href="#基础知识" class="headerlink" title="基础知识"></a>基础知识</h2><h3 id="一、ELF文件"><a href="#一、ELF文件" class="headerlink" title="一、ELF文件"></a>一、ELF文件</h3><p>（更详细可看 <a target="_blank" rel="noopener" href="https://blog.csdn.net/jinking01/article/details/105387253">elf讲解</a>）</p>
+<p>ELF是Linux下的可执行连接格式文件，类似于windows下的PE文件。</p>
+<p>ELF文件（目标文件）格式主要三种：</p>
+<ol>
+<li><p>可重定向文件(Relocatable file)：文件保存着代码和适当的数据，用来和其他的目标文件一起来创建一个可执行文件或者是一个共享目标文件。（目标文件或者静态库文件，即linux通常后缀为.a和.o的文件）这是由汇编器汇编生成的 .o 文件。后面的链接器(link editor)拿一个或一些 Relocatable object files 作为输入，经链接处理后，生成一个可执行的对象文件 (Executable file) 或者一个可被共享的对象文件(Shared object file)，内核可加载模块 .ko 文件也是 Relocatable object file</p>
+</li>
+<li><p>可执行文件(Executable file)：文件保存着一个用来执行的程序。（例如bash，gcc等）</p>
+</li>
+<li><p>共享目标文件：即 .so 文件。如果拿前面的静态库来生成可执行程序，那每个生成的可执行程序中都会有一份库代码的拷贝。如果在磁盘中存储这些可执行程序，那就会占用额外的磁盘空 间；另外如果拿它们放到Linux系统上一起运行，也会浪费掉宝贵的物理内存。如果将静态库换成动态库，那么这些问题都不会出现</p>
+</li>
+</ol>
+<h4 id="1-1-ELF-文件结构"><a href="#1-1-ELF-文件结构" class="headerlink" title="1.1 ELF 文件结构"></a>1.1 ELF 文件结构</h4><p>elf文件主要有两种格式，一是链接状态、二是运行状态。</p>
+<p><img src="/SO%E5%8A%A0%E5%AF%86/image-20200722200900804.png" alt="image-20200722200900804"></p>
+<p>这里再放一张 32位数据类型，方便理解。</p>
+<p><img src="/SO%E5%8A%A0%E5%AF%86/image-20200722202815692.png" alt="image-20200722202815692"></p>
+            </div>
+            <!-- read more -->
+            
+            <div class="abstract-post-meta">
+                <!-- date -->
+                <div class="abstract-date" title="Last updated: 2023/11/15">
+                    <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2020/08/27</span>
+                </div>
+                <!-- tags -->
+                
+                    <div class= abstract-tags >
+    
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="protect">protect</a>
+    
+</div>
+
+                
+            </div>
+        </article>
+        <div class="index-post-divider"></div>
+    
+    <!-- paginator  -->
+    
+        <nav class="page-nav">
+            <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/">NEXT &gt;</a>
+        </nav>
+    
+</main>
+
+                <!-- profile -->
+                
+                    <div class="profile">
+    <img class="profile-avatar" alt="avatar" src= /avatar/dog.jpg />
+    <div class="profile-name">nszdhd1</div>
+    
+        <div class="profile-signature">
+            🌱 又是努力逆向的一天呀 ~
+        </div>
+    
+    
+        <div class="profile-social">
+            
+    
+        
+            
+                <a href="mailto:673304120@qq.com" class="iconfont-archer email" title=email ></a>
+            
+        
+    
+        
+            
+                <a href="//github.com/nszdhd1" class="iconfont-archer github" target="_blank" title=github></a>
+            
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+
+        </div>
+    
+    
+    
+    
+    
+</div>
+
+                
+            </div>
+            <footer class="footer footer-unloaded">
+    <!-- social  -->
+    
+        <div class="social">
+            
+    
+        
+            
+                <a href="mailto:673304120@qq.com" class="iconfont-archer email" title=email ></a>
+            
+        
+    
+        
+            
+                <a href="//github.com/nszdhd1" class="iconfont-archer github" target="_blank" title=github></a>
+            
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+
+        </div>
+    
+    <!-- powered by Hexo  -->
+    <div class="copyright">
+        <span id="hexo-power">Powered by <a href="https://hexo.io/" target="_blank">Hexo</a></span><span class="iconfont-archer power">&#xe635;</span><span id="theme-info">theme <a href="https://github.com/fi3ework/hexo-theme-archer" target="_blank">Archer</a></span>
+    </div>
+    <!-- website approve for Chinese user -->
+    
+    <!-- 不蒜子  -->
+    
+        <div class="busuanzi-container">
+            
+             
+                <span id="busuanzi_container_site_pv">PV: <span id="busuanzi_value_site_pv"></span> :)</span>
+            
+        </div>
+    	
+</footer>
+
+        </div>
+        <!-- toc -->
+        
+        <!-- sidebar -->
+        <div class="sidebar sidebar-hide">
+    <ul class="sidebar-tabs sidebar-tabs-active-0">
+        <li class="sidebar-tab-archives"><span class="iconfont-archer">&#xe67d;</span><span class="tab-name">Archive</span></li>
+        <li class="sidebar-tab-tags"><span class="iconfont-archer">&#xe61b;</span><span class="tab-name">Tag</span></li>
+        <li class="sidebar-tab-categories"><span class="iconfont-archer">&#xe666;</span><span class="tab-name">Cate</span></li>
+    </ul>
+    <div class="sidebar-content sidebar-content-show-archive">
+        <div class="sidebar-panel-archives">
+    <!-- 在 ejs 中将 archive 按照时间排序 -->
+    
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    
+    
+    
+    
+    <div class="total-and-search">
+        <div class="total-archive">
+        Total : 16
+        </div>
+        <!-- search  -->
+        
+    </div>
+    
+    <div class="post-archive">
+    
+        
+            
+            
+            <div class="archive-year"> 2022 </div>
+            <ul class="year-list">
+            
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/22</span>
+            <a class="archive-post-title" href="/2022/12/22/%E5%A6%82%E4%BD%95%E4%BF%AE%E6%94%B9unityHybridCLR%E7%83%AD%E6%9B%B4dll/">如何修改unity HybridCLR 热更dll</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/14</span>
+            <a class="archive-post-title" href="/2022/11/14/Genshin-IL2CPP-RunTime-Dump/">Genshin IL2CPP RunTime Dump</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/08</span>
+            <a class="archive-post-title" href="/2022/09/08/GameGuardian%E7%9A%84Lua%E8%84%9A%E6%9C%AC%E6%B7%B7%E6%B7%86%E5%88%86%E6%9E%90/">GameGuardian的Lua脚本混淆分析</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/21</span>
+            <a class="archive-post-title" href="/2022/03/21/%E5%88%A9%E7%94%A8Frida%E5%AE%9E%E7%8E%B0lua%E7%83%AD%E6%9B%B4%E6%96%B0/">利用Frida实现lua热更新</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">01/14</span>
+            <a class="archive-post-title" href="/2022/01/14/%E4%BD%BF%E7%94%A8unidbg%E8%BF%87%E4%BF%9D%E6%8A%A4/">使用unidbg过保护</a>
+        </li>
+    
+        
+            
+            
+                
+                </ul>
+            
+            <div class="archive-year"> 2021 </div>
+            <ul class="year-list">
+            
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">06/15</span>
+            <a class="archive-post-title" href="/2021/06/15/%E9%9D%9Eroot%E7%8E%AF%E5%A2%83%E4%B8%8Bfrida%E7%9A%84%E4%B8%A4%E7%A7%8D%E4%BD%BF%E7%94%A8%E6%96%B9%E5%BC%8F/">非root环境下frida的两种使用方式</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">06/15</span>
+            <a class="archive-post-title" href="/2021/06/15/%E4%BD%BF%E7%94%A8LIEF%E6%89%93%E9%80%A0MTP%E5%8A%A0%E5%9B%BA/">使用LIEF打造MTP加固</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">01/15</span>
+            <a class="archive-post-title" href="/2021/01/15/%E6%8A%96%E9%9F%B3%E8%AF%84%E8%AE%BA%E7%88%AC%E5%8F%96/">抖音评论爬取</a>
+        </li>
+    
+        
+            
+            
+                
+                </ul>
+            
+            <div class="archive-year"> 2020 </div>
+            <ul class="year-list">
+            
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/04</span>
+            <a class="archive-post-title" href="/2020/12/04/%E4%BD%BF%E7%94%A8frida%E8%8E%B7%E5%8F%96il2cpp%E7%AC%A6%E5%8F%B7%E4%BF%A1%E6%81%AF/">使用frida获取il2cpp符号信息</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">08/27</span>
+            <a class="archive-post-title" href="/2020/08/27/SO%E5%8A%A0%E5%AF%86/">SO加密</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">07/03</span>
+            <a class="archive-post-title" href="/2020/07/03/Unity%E4%BF%9D%E6%8A%A4%E4%B9%8Bassetbundle/">Unity保护之assetbundle</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">07/03</span>
+            <a class="archive-post-title" href="/2020/07/03/Unity%E4%BF%9D%E6%8A%A4%E4%B9%8Bil2cpp/">Unity保护之il2cpp</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">07/03</span>
+            <a class="archive-post-title" href="/2020/07/03/%E5%9F%BA%E4%BA%8Eva%E7%9A%84luajit-hook/">基于va的luajit hook</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">07/03</span>
+            <a class="archive-post-title" href="/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/">网易保护分析</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/07</span>
+            <a class="archive-post-title" href="/2020/04/07/magisk-riru/">magisk-riru 使用</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/09</span>
+            <a class="archive-post-title" href="/2020/03/09/Magisk%E6%A3%80%E6%B5%8B/">Magisk检测</a>
+        </li>
+    
+    </div>
+</div>
+
+        <div class="sidebar-panel-tags">
+    <div class="sidebar-tags-name">
+        
+            <span class="sidebar-tag-name" data-tags="Analytics">
+                <span class="iconfont-archer">&#xe606;</span>
+                Analytics
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="game">
+                <span class="iconfont-archer">&#xe606;</span>
+                game
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="other">
+                <span class="iconfont-archer">&#xe606;</span>
+                other
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="protect">
+                <span class="iconfont-archer">&#xe606;</span>
+                protect
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="tools">
+                <span class="iconfont-archer">&#xe606;</span>
+                tools
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="Misc">
+                <span class="iconfont-archer">&#xe606;</span>
+                Misc
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="Hook">
+                <span class="iconfont-archer">&#xe606;</span>
+                Hook
+            </span>
+        
+    </div>
+    <div class="iconfont-archer sidebar-tags-empty">&#xe678;</div>
+    <div class="tag-load-fail" style="display: none; color: #ccc; font-size: 0.6rem;">
+        缺失模块，请参考主题文档进行安装配置：https://github.com/fi3ework/hexo-theme-archer#%E5%AE%89%E8%A3%85%E4%B8%BB%E9%A2%98
+    </div> 
+    <div class="sidebar-tags-list"></div>
+</div>
+
+        <div class="sidebar-panel-categories">
+    <div class="sidebar-categories-name">
+    
+    </div>
+    <div class="iconfont-archer sidebar-categories-empty">&#xe678;</div>
+    <div class="sidebar-categories-list"></div>
+</div>
+
+    </div>
+</div>
+
+        <!-- site-meta -->
+        <script>
+    var siteMetaRoot = "/"
+    if (siteMetaRoot === "undefined") {
+        siteMetaRoot = '/'
+    }
+    var siteMeta = {
+        url: "http://example.com",
+        root: siteMetaRoot,
+        author: "newbiemiao"
+    }
+</script>
+
+        <!-- import experimental options here -->
+        <!-- Custom Font -->
+
+
+        <!-- main func -->
+        <script src="/scripts/main.js?v=20211217"></script>
+        <!-- dark mode -->
+        <script src="/scripts/dark.js?v=20211217"></script>
+        <!-- fancybox -->
+        <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" defer></script>
+        <!-- algolia -->
+        
+        <!-- busuanzi -->
+        
+            <script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" async></script>
+        
+        <!-- CNZZ -->
+        
+        <!-- async load share.js -->
+        
+        <!-- mermaid -->
+        
+    </body>
+</html>

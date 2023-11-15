@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <!-- title -->
+
+
+    
+
+<!-- keywords -->
+
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="author" content="newbiemiao">
+    <meta name="renderer" content="webkit">
+    <meta name="copyright" content="newbiemiao">
+    
+        <meta name="keywords" content="hexo,hexo-theme,hexo-blog">
+    
+    <meta name="description" content="">
+    <meta name="description" content="利用Frida实现lua热更新背景与需求对游戏进行修改时，尤其是代码逻辑在lua中，经常重启是一件很低效的事。所以考虑能不能有一款工具，不需要重启游戏就能让lua文件改动后立刻生效 非游戏开发，所以只有apk作为目标，无工程代码。 设计原理与实现主要分为两个模块：  LuaFileWatcher，检测lua文件发生变化，当发生变化时调用Hotfix.lua进行重载模块的操作。 Hotfix，重载l">
+<meta property="og:type" content="article">
+<meta property="og:title" content="利用Frida实现lua热更新">
+<meta property="og:url" content="http://example.com/2022/03/21/%E5%88%A9%E7%94%A8Frida%E5%AE%9E%E7%8E%B0lua%E7%83%AD%E6%9B%B4%E6%96%B0/index.html">
+<meta property="og:site_name" content="喵喵的blog">
+<meta property="og:description" content="利用Frida实现lua热更新背景与需求对游戏进行修改时，尤其是代码逻辑在lua中，经常重启是一件很低效的事。所以考虑能不能有一款工具，不需要重启游戏就能让lua文件改动后立刻生效 非游戏开发，所以只有apk作为目标，无工程代码。 设计原理与实现主要分为两个模块：  LuaFileWatcher，检测lua文件发生变化，当发生变化时调用Hotfix.lua进行重载模块的操作。 Hotfix，重载l">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-03-21T07:32:47.000Z">
+<meta property="article:modified_time" content="2023-11-15T02:39:53.872Z">
+<meta property="article:author" content="newbiemiao">
+<meta property="article:tag" content="game">
+<meta name="twitter:card" content="summary">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <link rel="icon" href="/assets/favicon.ico">
+    
+    <title>利用Frida实现lua热更新 · nszdhd1&#39;s blog</title>
+    <!-- /*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
+/* This file is meant as a standalone workflow for
+- testing support for link[rel=preload]
+- enabling async CSS loading in browsers that do not support rel=preload
+- applying rel preload css once loaded, whether supported or not.
+*/ -->
+<script>
+    (function (w) {
+        'use strict'
+        // rel=preload support test
+        if (!w.loadCSS) {
+            w.loadCSS = function () {}
+        }
+        // define on the loadCSS obj
+        var rp = (loadCSS.relpreload = {})
+        // rel=preload feature support test
+        // runs once and returns a function for compat purposes
+        rp.support = (function () {
+            var ret
+            try {
+                ret = w.document.createElement('link').relList.supports('preload')
+            } catch (e) {
+                ret = false
+            }
+            return function () {
+                return ret
+            }
+        })()
+
+        // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+        // then change that media back to its intended value on load
+        rp.bindMediaToggle = function (link) {
+            // remember existing media attr for ultimate state, or default to 'all'
+            var finalMedia = link.media || 'all'
+
+            function enableStylesheet() {
+                link.media = finalMedia
+            }
+
+            // bind load handlers to enable media
+            if (link.addEventListener) {
+                link.addEventListener('load', enableStylesheet)
+            } else if (link.attachEvent) {
+                link.attachEvent('onload', enableStylesheet)
+            }
+
+            // Set rel and non-applicable media type to start an async request
+            // note: timeout allows this to happen async to let rendering continue in IE
+            setTimeout(function () {
+                link.rel = 'stylesheet'
+                link.media = 'only x'
+            })
+            // also enable media after 3 seconds,
+            // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+            setTimeout(enableStylesheet, 3000)
+        }
+
+        // loop through link elements in DOM
+        rp.poly = function () {
+            // double check this to prevent external calls from running
+            if (rp.support()) {
+                return
+            }
+            var links = w.document.getElementsByTagName('link')
+            for (var i = 0; i < links.length; i++) {
+                var link = links[i]
+                // qualify links to those with rel=preload and as=style attrs
+                if (
+                    link.rel === 'preload' &&
+                    link.getAttribute('as') === 'style' &&
+                    !link.getAttribute('data-loadcss')
+                ) {
+                    // prevent rerunning on link
+                    link.setAttribute('data-loadcss', true)
+                    // bind listeners to toggle media back
+                    rp.bindMediaToggle(link)
+                }
+            }
+        }
+
+        // if unsupported, run the polyfill
+        if (!rp.support()) {
+            // run once at least
+            rp.poly()
+
+            // rerun poly on an interval until onload
+            var run = w.setInterval(rp.poly, 500)
+            if (w.addEventListener) {
+                w.addEventListener('load', function () {
+                    rp.poly()
+                    w.clearInterval(run)
+                })
+            } else if (w.attachEvent) {
+                w.attachEvent('onload', function () {
+                    rp.poly()
+                    w.clearInterval(run)
+                })
+            }
+        }
+
+        // commonjs
+        if (typeof exports !== 'undefined') {
+            exports.loadCSS = loadCSS
+        } else {
+            w.loadCSS = loadCSS
+        }
+    })(typeof global !== 'undefined' ? global : this)
+</script>
+
+    <style type="text/css">
+    @font-face {
+        font-family: 'Oswald-Regular';
+        src: url("/font/Oswald-Regular.ttf");
+    }
+
+    body {
+        margin: 0;
+    }
+
+    header,
+    footer,
+    .back-top,
+    .sidebar,
+    .container,
+    .site-intro-meta,
+    .toc-wrapper {
+        display: none;
+    }
+
+    .site-intro {
+        position: relative;
+        z-index: 3;
+        width: 100%;
+        /* height: 50vh; */
+        overflow: hidden;
+    }
+
+    .site-intro-placeholder {
+        position: absolute;
+        z-index: -2;
+        top: 0;
+        left: 0;
+        width: calc(100% + 300px);
+        height: 100%;
+        background: repeating-linear-gradient(-45deg, #444 0, #444 80px, #333 80px, #333 160px);
+        background-position: center center;
+        transform: translate3d(-226px, 0, 0);
+        animation: gradient-move 2.5s ease-out 0s infinite;
+    }
+
+    @keyframes gradient-move {
+        0% {
+            transform: translate3d(-226px, 0, 0);
+        }
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+    }
+</style>
+
+    <link rel="preload" href="/css/style.css?v=20211217" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="/css/dark.css?v=20211217" as="style">
+    <link rel="stylesheet" href="/css/dark.css">
+    <link rel="stylesheet" href="/css/mobile.css?v=20211217" media="(max-width: 960px)">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" as="script">
+    <link rel="preload" href="/scripts/main.js?v=20211217" as="script">
+    <link rel="preload" href="/scripts/dark.js?v=20211217" as="script">
+    <link rel="preload" href="/font/Oswald-Regular.ttf" as="font" crossorigin>
+    <link rel="preload" href="https://at.alicdn.com/t/font_327081_1dta1rlogw17zaor.woff" as="font" crossorigin>
+    <!-- algolia -->
+    
+    <!-- 百度统计  -->
+    
+    <!-- Google tag (gtag.js) -->
+    
+
+<meta name="generator" content="Hexo 7.0.0"></head>
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script type="text/javascript">
+        if (typeof window.$ == undefined) {
+            console.warn('jquery load from jsdelivr failed, will load local script')
+            document.write('<script src="/lib/jquery.min.js" />')
+        }
+    </script>
+    
+        <body class="post-body">
+    
+        <!-- header -->
+        <header class="header header-mobile">
+    <!-- top read progress line -->
+    <div class="header-element">
+        <div class="read-progress"></div>
+    </div>
+    <!-- sidebar menu button -->
+    <div class="header-element">
+        
+            <div class="header-sidebar-menu">
+        
+            
+                <div style="padding-left: 1px;">&#xe775;</div>
+            
+        </div>
+    </div>
+    <!-- header actions -->
+    <div class="header-actions">
+        <!-- theme mode switch button -->
+        <span class="header-theme-btn header-element">
+            <i class="fas fa-adjust"></i>
+        </span>
+        <!-- back to home page text -->
+        <span class="home-link header-element">
+            <a href=/>nszdhd1's blog.</a>
+        </span>
+    </div>
+    <!-- toggle banner for post layout -->
+    
+        
+            <div class="banner">
+        
+            <div class="blog-title header-element">
+                <a href="/">nszdhd1&#39;s blog.</a>
+            </div>
+            <div class="post-title header-element">
+                <a href="#" class="post-name">利用Frida实现lua热更新</a>
+            </div>
+        </div>
+    
+</header>
+
+        <!-- fixed footer -->
+        <footer class="footer-fixed">
+    <!-- back to top button -->
+    <div class="footer-fixed-element">
+        
+            <div class="back-top back-top-hidden">
+        
+        
+            <div>&#xe639;</div>
+        
+        </div>
+    </div>
+</footer>
+
+        <!-- wrapper -->
+        <div class="wrapper">
+            <div class="site-intro" style="
+
+
+
+
+
+
+
+    height:50vh;
+
+">
+    
+    <!-- 主页  -->
+    
+        
+    <!-- 404页  -->
+    
+    <div class="site-intro-placeholder"></div>
+    <div class="site-intro-img" style="background-image: url(/intro/post-bg.jpg)"></div>
+    <div class="site-intro-meta">
+        <!-- 标题  -->
+        <h1 class="intro-title">
+            <!-- 主页  -->
+            
+                利用Frida实现lua热更新
+            <!-- 404 -->
+            
+        </h1>
+        <!-- 副标题 -->
+        <p class="intro-subtitle">
+            <!-- 主页副标题  -->
+            
+                
+            <!-- 404 -->
+            
+        </p>
+        <!-- 文章页 meta -->
+        
+            <div class="post-intros">
+                <!-- 文章页标签  -->
+                
+                    <div class= post-intro-tags >
+    
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="game">game</a>
+    
+</div>
+
+                
+                <!-- 文章字数统计 -->
+                
+                <div class="post-intro-meta">
+                    <!-- 撰写日期 -->
+                    <span class="iconfont-archer post-intro-calander">&#xe676;</span>
+                    <span class="post-intro-time">2022/03/21</span>
+                    <!-- busuanzi -->
+                    
+                        <span id="busuanzi_container_page_pv" class="busuanzi-pv">
+                            <span class="iconfont-archer post-intro-busuanzi">&#xe602;</span>
+                            <span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    
+                    <!-- 文章分享 -->
+                    <span class="share-wrapper">
+                        <span class="iconfont-archer share-icon">&#xe71d;</span>
+                        <span class="share-text">Share</span>
+                        <ul class="share-list">
+                            <li class="iconfont-archer share-qr" data-type="qr">&#xe75b;
+                                <div class="share-qrcode"></div>
+                            </li>
+                            <li class="iconfont-archer" data-type="weibo">&#xe619;</li>
+                            <li class="iconfont-archer" data-type="qzone">&#xe62e;</li>
+                            <li class="iconfont-archer" data-type="twitter">&#xe634;</li>
+                            <li class="iconfont-archer" data-type="facebook">&#xe67a;</li>
+                        </ul>
+                    </span>
+                </div>
+            </div>
+        
+    </div>
+</div>
+
+            <script>
+  // get user agent
+  function getBrowserVersions() {
+    var u = window.navigator.userAgent
+    return {
+      userAgent: u,
+      trident: u.indexOf('Trident') > -1, //IE内核
+      presto: u.indexOf('Presto') > -1, //opera内核
+      webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+      gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+      mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+      ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+      android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+      iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者安卓QQ浏览器
+      iPad: u.indexOf('iPad') > -1, //是否为iPad
+      webApp: u.indexOf('Safari') == -1, //是否为web应用程序，没有头部与底部
+      weixin: u.indexOf('MicroMessenger') == -1, //是否为微信浏览器
+      uc: u.indexOf('UCBrowser') > -1, //是否为android下的UC浏览器
+    }
+  }
+  var browser = {
+    versions: getBrowserVersions(),
+  }
+  console.log('userAgent: ' + browser.versions.userAgent)
+
+  // callback
+  function fontLoaded() {
+    console.log('font loaded')
+    if (document.getElementsByClassName('site-intro-meta')) {
+      document
+        .getElementsByClassName('intro-title')[0]
+        .classList.add('intro-fade-in')
+      document
+        .getElementsByClassName('intro-subtitle')[0]
+        .classList.add('intro-fade-in')
+      var postIntros = document.getElementsByClassName('post-intros')[0]
+      if (postIntros) {
+        postIntros.classList.add('post-fade-in')
+      }
+    }
+  }
+
+  // UC不支持跨域，所以直接显示
+  function asyncCb() {
+    if (browser.versions.uc) {
+      console.log('UCBrowser')
+      fontLoaded()
+    } else {
+      WebFont.load({
+        custom: {
+          families: ['Oswald-Regular'],
+        },
+        loading: function () {
+          // 所有字体开始加载
+          // console.log('font loading');
+        },
+        active: function () {
+          // 所有字体已渲染
+          fontLoaded()
+        },
+        inactive: function () {
+          // 字体预加载失败，无效字体或浏览器不支持加载
+          console.log('inactive: timeout')
+          fontLoaded()
+        },
+        timeout: 5000, // Set the timeout to two seconds
+      })
+    }
+  }
+
+  function asyncErr() {
+    console.warn('script load from CDN failed, will load local script')
+  }
+
+  // load webfont-loader async, and add callback function
+  function async(u, cb, err) {
+    var d = document,
+      t = 'script',
+      o = d.createElement(t),
+      s = d.getElementsByTagName(t)[0]
+    o.src = u
+    if (cb) {
+      o.addEventListener(
+        'load',
+        function (e) {
+          cb(null, e)
+        },
+        false
+      )
+    }
+    if (err) {
+      o.addEventListener(
+        'error',
+        function (e) {
+          err(null, e)
+        },
+        false
+      )
+    }
+    s.parentNode.insertBefore(o, s)
+  }
+
+  var asyncLoadWithFallBack = function (arr, success, reject) {
+    var currReject = function () {
+      reject()
+      arr.shift()
+      if (arr.length) async(arr[0], success, currReject)
+    }
+
+    async(arr[0], success, currReject)
+  }
+
+  asyncLoadWithFallBack(
+    [
+      'https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js',
+      'https://cdn.bootcss.com/webfont/1.6.28/webfontloader.js',
+      "/lib/webfontloader.min.js",
+    ],
+    asyncCb,
+    asyncErr
+  )
+</script>
+
+            <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
+            <div class="container container-unloaded">
+                <main class="main post-page">
+    <article class="article-entry">
+        <h1 id="利用Frida实现lua热更新"><a href="#利用Frida实现lua热更新" class="headerlink" title="利用Frida实现lua热更新"></a>利用Frida实现lua热更新</h1><h2 id="背景与需求"><a href="#背景与需求" class="headerlink" title="背景与需求"></a>背景与需求</h2><p>对游戏进行修改时，尤其是代码逻辑在lua中，经常重启是一件很低效的事。所以考虑能不能有一款工具，<strong>不需要重启游戏就能让lua文件改动后立刻生效</strong></p>
+<p>非游戏开发，所以只有apk作为目标，无工程代码。</p>
+<h2 id="设计原理与实现"><a href="#设计原理与实现" class="headerlink" title="设计原理与实现"></a>设计原理与实现</h2><p>主要分为两个模块：</p>
+<ul>
+<li><strong>LuaFileWatcher</strong>，检测lua文件发生变化，当发生变化时调用Hotfix.lua进行重载模块的操作。</li>
+<li><strong>Hotfix</strong>，重载lua模块</li>
+</ul>
+<h3 id="LuaFileWatcher"><a href="#LuaFileWatcher" class="headerlink" title="LuaFileWatcher"></a>LuaFileWatcher</h3><p>此处分享两种方法，一种使用Android的FileObserver（虽然本质上还是用的inotify），另一种直接使用 linux inotify。</p>
+<span id="more"></span>
+
+<h4 id="android-os-FileObserver"><a href="#android-os-FileObserver" class="headerlink" title="android.os.FileObserver"></a>android.os.FileObserver</h4><p>关于该类的介绍，可以优先阅读：<a target="_blank" rel="noopener" href="https://developer.android.com/reference/android/os/FileObserver">https://developer.android.com/reference/android/os/FileObserver</a></p>
+<p>主要是通过frida js 实现 创建一个继承FileObserver的类，用于监控LUA_PATH下有哪些文件被打开了。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="variable constant_">LUA_PATH</span> = <span class="string">&quot;文件监控路径&quot;</span></span><br><span class="line"><span class="title class_">Java</span>.<span class="title function_">performNow</span>(<span class="keyword">function</span> (<span class="params"></span>)&#123;</span><br><span class="line">    <span class="keyword">var</span> <span class="title class_">FileObserver</span> = <span class="title class_">Java</span>.<span class="title function_">use</span>(<span class="string">&quot;android.os.FileObserver&quot;</span>);</span><br><span class="line">    <span class="keyword">var</span> <span class="title class_">LuaFileObserver</span> = <span class="title class_">Java</span>.<span class="title function_">registerClass</span>(&#123;</span><br><span class="line">        <span class="attr">name</span>:<span class="string">&#x27;com.hotfix.LuaFileObserver&#x27;</span>,</span><br><span class="line">        <span class="attr">superClass</span>:<span class="title class_">FileObserver</span>,</span><br><span class="line">        <span class="attr">implements</span>: [<span class="title class_">FileObserver</span>],</span><br><span class="line">        <span class="attr">methods</span>:&#123;</span><br><span class="line">            <span class="attr">$init</span>:[&#123;</span><br><span class="line">                <span class="attr">returnType</span>: <span class="string">&#x27;void&#x27;</span>,</span><br><span class="line">                <span class="attr">arguments</span>:[<span class="string">&#x27;java.lang.String&#x27;</span>],</span><br><span class="line">                <span class="attr">implementation</span>:<span class="keyword">function</span> (<span class="params">p</span>)&#123;</span><br><span class="line">                    <span class="variable language_">this</span>.<span class="property">$super</span>.$init(p)</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;, &#123;</span><br><span class="line">                    <span class="attr">returnType</span>: <span class="string">&#x27;void&#x27;</span>,</span><br><span class="line">                    <span class="attr">arguments</span>:[<span class="string">&#x27;&#x27;</span>],</span><br><span class="line">                    <span class="attr">implementation</span>:<span class="keyword">function</span> (<span class="params"></span>)&#123;</span><br><span class="line">                        <span class="variable language_">this</span>.<span class="property">$super</span>.$init()</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;],</span><br><span class="line">            <span class="attr">$new</span>:&#123;</span><br><span class="line">                <span class="attr">returnType</span>: <span class="string">&#x27;void&#x27;</span>,</span><br><span class="line">                <span class="attr">arguments</span>:[<span class="string">&#x27;java.lang.String&#x27;</span>],</span><br><span class="line">                <span class="attr">implementation</span>:<span class="keyword">function</span> (<span class="params">p</span>)&#123;</span><br><span class="line">                    <span class="variable language_">this</span>.<span class="property">$super</span>.$new(p)</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;,</span><br><span class="line">            <span class="attr">stopWatching</span>:&#123;</span><br><span class="line">                <span class="attr">returnType</span>: <span class="string">&#x27;void&#x27;</span>,</span><br><span class="line">                <span class="attr">arguments</span>:[<span class="string">&#x27;&#x27;</span>],</span><br><span class="line">                <span class="attr">implementation</span>:<span class="keyword">function</span> (<span class="params"></span>)&#123;</span><br><span class="line">                    <span class="variable language_">this</span>.<span class="property">$super</span>.<span class="title function_">stopWatching</span>()</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;,</span><br><span class="line">            <span class="attr">startWatching</span>:&#123;</span><br><span class="line">                <span class="attr">returnType</span>: <span class="string">&#x27;void&#x27;</span>,</span><br><span class="line">                <span class="attr">arguments</span>:[<span class="string">&#x27;&#x27;</span>],</span><br><span class="line">                <span class="attr">implementation</span>:<span class="keyword">function</span> (<span class="params"></span>)&#123;</span><br><span class="line">                    <span class="variable language_">this</span>.<span class="property">$super</span>.<span class="title function_">stopWatching</span>()</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;,</span><br><span class="line">            <span class="attr">finalize</span>:&#123;</span><br><span class="line">                <span class="attr">returnType</span>: <span class="string">&#x27;void&#x27;</span>,</span><br><span class="line">                <span class="attr">arguments</span>:[<span class="string">&#x27;&#x27;</span>],</span><br><span class="line">                <span class="attr">implementation</span>:<span class="keyword">function</span> (<span class="params"></span>)&#123;</span><br><span class="line">                    <span class="variable language_">this</span>.<span class="property">$super</span>.<span class="title function_">stopWatching</span>()</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;,</span><br><span class="line">            <span class="attr">onEvent</span>:<span class="keyword">function</span>(<span class="params">event,path</span>)&#123;</span><br><span class="line">               <span class="comment">// console.log(&quot;event :&quot;+event)</span></span><br><span class="line">                <span class="comment">//console.log(&quot;path :&quot;+path)</span></span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="keyword">var</span> <span class="title class_">FileWatcher</span> = <span class="title class_">LuaFileObserver</span>.$new(<span class="variable constant_">LUA_PATH</span>)</span><br><span class="line">    <span class="title class_">FileObserver</span>.<span class="property">onEvent</span>.<span class="property">implementation</span> = <span class="keyword">function</span> (<span class="params">event,path</span>)&#123;</span><br><span class="line">        <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;event :&quot;</span>+event)</span><br><span class="line">        <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;path :&quot;</span>+path)</span><br><span class="line">        <span class="keyword">if</span>(event == <span class="number">32</span>)</span><br><span class="line">            <span class="title function_">doHotfix</span>(path)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="title class_">FileWatcher</span>.<span class="title function_">startWatching</span>()</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>优点：简单</p>
+<p>缺点：不稳定，很多机型会提示ClassNotFound。</p>
+<h4 id="inotify"><a href="#inotify" class="headerlink" title="inotify"></a>inotify</h4><p>需要先了解inotify是什么，有什么用，怎么使用：<a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man7/inotify.7.html">https://man7.org/linux/man-pages/man7/inotify.7.html</a></p>
+<p>该功能主要是创建一个线程，不停的监控LUA_PATH下文件打开的情况。如果有文件被打开，则加载一段lua代码。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="variable constant_">LUA_PATH</span> = <span class="string">&quot;文件监控路径&quot;</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">LuaFileWatcher</span>(<span class="params"></span>)&#123;</span><br><span class="line">    <span class="keyword">var</span> inotify_init = <span class="keyword">new</span> <span class="title class_">NativeFunction</span>(<span class="title class_">Module</span>.<span class="title function_">findExportByName</span>(<span class="literal">null</span>,<span class="string">&quot;inotify_init&quot;</span>),<span class="string">&#x27;int&#x27;</span>,[])</span><br><span class="line">    <span class="keyword">var</span> inotify_add_watch = <span class="keyword">new</span> <span class="title class_">NativeFunction</span>(<span class="title class_">Module</span>.<span class="title function_">findExportByName</span>(<span class="literal">null</span>,<span class="string">&quot;inotify_add_watch&quot;</span>),<span class="string">&#x27;int&#x27;</span>,[<span class="string">&#x27;int&#x27;</span>,<span class="string">&#x27;pointer&#x27;</span>,<span class="string">&#x27;int&#x27;</span>])</span><br><span class="line">    <span class="keyword">const</span> read = <span class="keyword">new</span> <span class="title class_">NativeFunction</span>(<span class="title class_">Module</span>.<span class="title function_">findExportByName</span>(<span class="literal">null</span>,<span class="string">&quot;read&quot;</span>),<span class="string">&#x27;int&#x27;</span>,[<span class="string">&#x27;int&#x27;</span>,<span class="string">&#x27;pointer&#x27;</span>,<span class="string">&#x27;int&#x27;</span>]);</span><br><span class="line">    <span class="keyword">var</span> fd = <span class="title function_">inotify_init</span>()</span><br><span class="line">    <span class="keyword">var</span> wd = <span class="title function_">inotify_add_watch</span>(fd,<span class="title class_">Memory</span>.<span class="title function_">allocUtf8String</span>(<span class="variable constant_">LUA_PATH</span>),<span class="number">256</span>) <span class="comment">//ALL_EVENTS = 4095,OPEN=32</span></span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;fd &quot;</span>+fd+<span class="string">&quot;,wd &quot;</span>+wd)</span><br><span class="line">    <span class="keyword">const</span> inotify_event_len = <span class="number">0x10</span></span><br><span class="line">    <span class="keyword">var</span> data = <span class="title class_">Memory</span>.<span class="title function_">alloc</span>(inotify_event_len*<span class="number">10</span>);</span><br><span class="line">    <span class="keyword">while</span> (<span class="number">1</span>)&#123;</span><br><span class="line">        <span class="keyword">let</span> readlen = <span class="title function_">read</span>(fd,data,inotify_event_len*<span class="number">10</span>-<span class="number">1</span>)</span><br><span class="line">        <span class="keyword">if</span>( readlen&lt;<span class="number">0</span>)&#123;</span><br><span class="line">            <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;[+] Unable to read  [!] &#x27;</span>);</span><br><span class="line">            <span class="keyword">continue</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="variable language_">console</span>.<span class="title function_">log</span>(readlen,data)</span><br><span class="line"></span><br><span class="line">        <span class="comment">// struct inotify_event &#123;</span></span><br><span class="line">        <span class="comment">//     __s32 wd;</span></span><br><span class="line">        <span class="comment">//     __u32 ;</span></span><br><span class="line">        <span class="comment">//     __u32 cookie;</span></span><br><span class="line">        <span class="comment">//     __u32 len;</span></span><br><span class="line">        <span class="comment">//     char name[0];</span></span><br><span class="line">        <span class="comment">// &#125;;</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; (readlen/<span class="number">0x10</span>) ; i++) &#123;</span><br><span class="line">            <span class="keyword">let</span> readData = data.<span class="title function_">add</span>(i*<span class="number">0x10</span>)</span><br><span class="line">            <span class="keyword">let</span> envent = []</span><br><span class="line">            envent.<span class="property">wd</span> = readData.<span class="title function_">readS32</span>();</span><br><span class="line">            envent.<span class="property">mask</span> = readData.<span class="title function_">add</span>(<span class="number">4</span>).<span class="title function_">readU32</span>();</span><br><span class="line">            envent.<span class="property">cookie</span> = readData.<span class="title function_">add</span>(<span class="number">8</span>).<span class="title function_">readU32</span>();</span><br><span class="line">            envent.<span class="property">len</span> = readData.<span class="title function_">add</span>(<span class="number">12</span>).<span class="title function_">readU32</span>();</span><br><span class="line">            envent.<span class="property">name</span> = readData.<span class="title function_">add</span>(<span class="number">16</span>).<span class="title function_">readCString</span>();</span><br><span class="line">            <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;open file : &#x27;</span>,envent.<span class="property">name</span>,envent.<span class="property">mask</span>)</span><br><span class="line">            <span class="keyword">if</span>(envent.<span class="property">mask</span>!=<span class="number">256</span>)</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            <span class="keyword">try</span>&#123;</span><br><span class="line">                <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;----------------------&#x27;</span>)</span><br><span class="line">                <span class="keyword">let</span> luaname = envent.<span class="property">name</span>.<span class="title function_">replaceAll</span>(<span class="string">&quot;_&quot;</span>,<span class="string">&quot;.&quot;</span>)</span><br><span class="line">                <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;luaname&quot;</span>+luaname)</span><br><span class="line">                <span class="keyword">var</span> scr =<span class="string">&#x27;if string.find(package.path,\&quot;&#x27;</span>+ <span class="variable constant_">LUA_PATH</span>+<span class="string">&#x27;\&quot;) == nil then\n&#x27;</span> +</span><br><span class="line">                    <span class="string">&#x27;    package.path = package.path .. \&quot;;&#x27;</span>+<span class="variable constant_">LUA_PATH</span>+<span class="string">&#x27;/?\&quot;\n&#x27;</span> +</span><br><span class="line">                    <span class="string">&#x27;end\n&#x27;</span>+</span><br><span class="line">                    <span class="string">&#x27;require(\&quot;HotFixOOOK\&quot;)\n&#x27;</span>+</span><br><span class="line">                    <span class="string">&#x27;hotfix(\&quot;&#x27;</span>+luaname+<span class="string">&#x27;\&quot;)&#x27;</span></span><br><span class="line">                <span class="keyword">var</span> luaL_loadstring_ret = <span class="title function_">luaL_loadstring</span>(lua_State,<span class="title class_">Memory</span>.<span class="title function_">allocUtf8String</span>(scr))</span><br><span class="line">                <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;luaL_loadstring_ret  : &quot;</span>+luaL_loadstring_ret)</span><br><span class="line">                <span class="title function_">send</span>(<span class="string">&quot;load lua init ret &quot;</span>+ <span class="title function_">lua_pcall</span>(lua_State,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>) + <span class="string">&quot;  str:&quot;</span>+<span class="title function_">lua_tolstring</span>(lua_State, -<span class="number">1</span>).<span class="title function_">readCString</span>())</span><br><span class="line"></span><br><span class="line">            &#125;<span class="keyword">catch</span> (e) &#123;</span><br><span class="line">                <span class="title function_">send</span>(<span class="string">&quot;err:&quot;</span>+e.<span class="title function_">toString</span>())</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span>  pthread_create = <span class="keyword">new</span> <span class="title class_">NativeFunction</span>(<span class="title class_">Module</span>.<span class="title function_">findExportByName</span>(<span class="literal">null</span>,<span class="string">&quot;pthread_create&quot;</span>),<span class="string">&#x27;int&#x27;</span>,[<span class="string">&#x27;pointer&#x27;</span>,<span class="string">&#x27;pointer&#x27;</span>,<span class="string">&#x27;pointer&#x27;</span>,<span class="string">&#x27;pointer&#x27;</span>])</span><br><span class="line"><span class="keyword">var</span> <span class="title class_">LuaFileWatcherNative</span> = <span class="keyword">new</span> <span class="title class_">NativeCallback</span>(<span class="title class_">LuaFileWatcher</span>,<span class="string">&#x27;void&#x27;</span>,[<span class="string">&#x27;void&#x27;</span>])</span><br><span class="line"></span><br><span class="line"><span class="comment">//启动新线程对目标目录进行文件监控。</span></span><br><span class="line"><span class="title function_">pthread_create</span>(<span class="title class_">Memory</span>.<span class="title function_">alloc</span>(<span class="number">16</span>),<span class="keyword">new</span> <span class="title class_">NativePointer</span>(<span class="number">0</span>),<span class="title class_">LuaFileWatcherNative</span>,<span class="keyword">new</span> <span class="title class_">NativePointer</span>(<span class="number">0</span>))</span><br></pre></td></tr></table></figure>
+
+<p> package.path &#x3D; package.path .. “;LUA_PATH&#x2F;?”,这句的主要作用是将LUA_PATH添加到luaenv加载路径里面。不加会require不到用于热更的lua代码HotFixOOOK。</p>
+<p><strong>lua_State</strong> 通过hook libxlua.so的luaL_openlibs函数获取。</p>
+<h3 id="Hotfix"><a href="#Hotfix" class="headerlink" title="Hotfix"></a>Hotfix</h3><p>根据<a target="_blank" rel="noopener" href="https://github.com/756915370/LuaRuntimeHotfix">LuaRuntimeHotfix</a>中的热更代码修改了一下。（默认apk使用的是xlua，如果不是xlua，删掉打印日志即可）</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">hotfix</span><span class="params">(filename)</span></span></span><br><span class="line">    CS.UnityEngine.Debug.LogError(<span class="string">&quot;start hotfix: &quot;</span>..filename)</span><br><span class="line">    <span class="keyword">local</span> dumpname = <span class="built_in">string</span>.<span class="built_in">gsub</span>(filename,<span class="string">&quot;%.&quot;</span>,<span class="string">&quot;_&quot;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">local</span> oldModule</span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">package</span>.<span class="built_in">loaded</span>[filename] <span class="keyword">then</span></span><br><span class="line">        oldModule = <span class="built_in">package</span>.<span class="built_in">loaded</span>[filename]</span><br><span class="line">    <span class="keyword">elseif</span> <span class="built_in">package</span>.<span class="built_in">loaded</span>[dumpname] <span class="keyword">then</span></span><br><span class="line">        oldModule = <span class="built_in">package</span>.<span class="built_in">loaded</span>[dumpname]</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        CS.UnityEngine.Debug.LogError(<span class="string">&#x27;this file nevev loaded: &#x27;</span>..filename)</span><br><span class="line">        <span class="built_in">require</span>(filename)</span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">package</span>.<span class="built_in">loaded</span>[filename] = <span class="literal">nil</span></span><br><span class="line">    <span class="built_in">package</span>.<span class="built_in">loaded</span>[dumpname] = <span class="literal">nil</span></span><br><span class="line"></span><br><span class="line">    CS.UnityEngine.Debug.LogError(<span class="string">&#x27;loaded newMpdule &#x27;</span>..dumpname..<span class="string">&#x27; ,oldModule: &#x27;</span>..filename)</span><br><span class="line">    <span class="keyword">local</span> newModule = <span class="built_in">package</span>.<span class="built_in">loaded</span>[dumpname]</span><br><span class="line">    <span class="keyword">if</span> newModule == <span class="literal">nil</span> <span class="keyword">then</span></span><br><span class="line">        <span class="comment">-- try again</span></span><br><span class="line">        <span class="built_in">require</span>(dumpname)</span><br><span class="line">        newModule = <span class="built_in">package</span>.<span class="built_in">loaded</span>[dumpname]</span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">    CS.UnityEngine.Debug.LogError(<span class="string">&#x27;oldModule: &#x27;</span>.. <span class="built_in">tostring</span>(oldModule)..<span class="string">&#x27; ,newModule: &#x27;</span>..<span class="built_in">tostring</span>(newModule))</span><br><span class="line">    <span class="comment">-- 注释掉就只能修改函数</span></span><br><span class="line">    update_table(newModule, oldModule,updated_tables)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> newModule == <span class="literal">nil</span> <span class="keyword">then</span></span><br><span class="line">        <span class="built_in">package</span>.<span class="built_in">loaded</span>[filename] = oldModule</span><br><span class="line">        CS.UnityEngine.Debug.LogError(<span class="string">&#x27;replaced faild !! &#x27;</span>)</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line">    <span class="built_in">package</span>.<span class="built_in">loaded</span>[filename] = newModule</span><br><span class="line"></span><br><span class="line">    CS.UnityEngine.Debug.LogError(<span class="string">&#x27;replaced succeed&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">update_func</span><span class="params">(new_func, old_func)</span></span></span><br><span class="line">    <span class="built_in">assert</span>(<span class="string">&quot;function&quot;</span> == <span class="built_in">type</span>(new_func))</span><br><span class="line">    <span class="built_in">assert</span>(<span class="string">&quot;function&quot;</span> == <span class="built_in">type</span>(old_func))</span><br><span class="line"></span><br><span class="line">    <span class="comment">-- Get upvalues of old function.</span></span><br><span class="line">    <span class="keyword">local</span> old_upvalue_map = &#123;&#125;</span><br><span class="line">    <span class="keyword">local</span> OldExistName = &#123;&#125;</span><br><span class="line">    <span class="keyword">for</span> i = <span class="number">1</span>, <span class="built_in">math</span>.<span class="built_in">huge</span> <span class="keyword">do</span></span><br><span class="line">        <span class="keyword">local</span> name, value = <span class="built_in">debug</span>.<span class="built_in">getupvalue</span>(old_func, i)</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> name <span class="keyword">then</span> <span class="keyword">break</span> <span class="keyword">end</span></span><br><span class="line">        old_upvalue_map[name] = value</span><br><span class="line">        OldExistName[name] = <span class="literal">true</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">-- Update new upvalues with old.</span></span><br><span class="line">    <span class="keyword">for</span> i = <span class="number">1</span>, <span class="built_in">math</span>.<span class="built_in">huge</span> <span class="keyword">do</span></span><br><span class="line">        <span class="keyword">local</span> name, value = <span class="built_in">debug</span>.<span class="built_in">getupvalue</span>(new_func, i)</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> name <span class="keyword">then</span> <span class="keyword">break</span> <span class="keyword">end</span></span><br><span class="line">        <span class="comment">--CS.UnityEngine.Debug.LogError(&#x27;set up value: name:&#x27;..name..&#x27; typeof &#x27;.. type(value))</span></span><br><span class="line">        <span class="keyword">if</span> OldExistName[name] <span class="keyword">then</span></span><br><span class="line">            <span class="keyword">local</span> old_value = old_upvalue_map[name]</span><br><span class="line">            <span class="keyword">if</span> <span class="built_in">type</span>(old_value) == <span class="string">&quot;function&quot;</span> <span class="keyword">then</span></span><br><span class="line">                <span class="built_in">setfenv</span>(new_func, <span class="built_in">getfenv</span>(old_func))</span><br><span class="line">                <span class="built_in">debug</span>.<span class="built_in">setupvalue</span>(new_func, i, old_value)</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">                <span class="built_in">debug</span>.<span class="built_in">setupvalue</span>(new_func, i, old_value)</span><br><span class="line">            <span class="keyword">end</span></span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">             <span class="comment">-- 对新添加的upvalue设置正确的环境表</span></span><br><span class="line">            ResetENV(value,name)</span><br><span class="line">        <span class="keyword">end</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">update_table</span><span class="params">(new_table, old_table, updated_tables)</span></span></span><br><span class="line">    <span class="built_in">assert</span>(<span class="string">&quot;table&quot;</span> == <span class="built_in">type</span>(new_table))</span><br><span class="line">    <span class="built_in">assert</span>(<span class="string">&quot;table&quot;</span> == <span class="built_in">type</span>(old_table))</span><br><span class="line"></span><br><span class="line">    <span class="comment">-- Compare 2 tables, and update old table.</span></span><br><span class="line">    <span class="keyword">for</span> key, value <span class="keyword">in</span> <span class="built_in">pairs</span>(new_table) <span class="keyword">do</span></span><br><span class="line">        <span class="keyword">local</span> old_value = old_table[key]</span><br><span class="line">        <span class="keyword">local</span> type_value = <span class="built_in">type</span>(value)</span><br><span class="line">        <span class="keyword">if</span> type_value == <span class="string">&quot;function&quot;</span> <span class="keyword">then</span></span><br><span class="line">            update_func(value, old_value)</span><br><span class="line">            old_table[key] = value</span><br><span class="line"></span><br><span class="line">        <span class="keyword">elseif</span> type_value == <span class="string">&quot;table&quot;</span> <span class="keyword">then</span></span><br><span class="line">            <span class="keyword">if</span> ( updated_tables[value] == <span class="literal">nil</span> ) <span class="keyword">then</span></span><br><span class="line">                updated_tables[value] = <span class="literal">true</span></span><br><span class="line">                update_table(value, old_value,updated_tables)</span><br><span class="line">            <span class="keyword">end</span></span><br><span class="line">        <span class="keyword">end</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">---- Update metatable.</span></span><br><span class="line">    <span class="keyword">local</span> old_meta = <span class="built_in">debug</span>.<span class="built_in">getmetatable</span>(old_table)</span><br><span class="line">    <span class="keyword">local</span> new_meta = <span class="built_in">debug</span>.<span class="built_in">getmetatable</span>(new_table)</span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">type</span>(old_meta) == <span class="string">&quot;table&quot;</span> <span class="keyword">and</span> <span class="built_in">type</span>(new_meta) == <span class="string">&quot;table&quot;</span> <span class="keyword">then</span></span><br><span class="line">        update_table(new_meta, old_meta,updated_tables)</span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h4><p>游戏开发视角实现的lua热更：<a target="_blank" rel="noopener" href="https://github.com/756915370/LuaRuntimeHotfix">LuaRuntimeHotfix</a></p>
+
+    </article>
+    <!-- license -->
+    
+        <div class="license-wrapper">
+            <p>原文作者：<a href="http://example.com">newbiemiao</a>
+            <p>原文链接：<a href="http://example.com/2022/03/21/%E5%88%A9%E7%94%A8Frida%E5%AE%9E%E7%8E%B0lua%E7%83%AD%E6%9B%B4%E6%96%B0/">http://example.com/2022/03/21/%E5%88%A9%E7%94%A8Frida%E5%AE%9E%E7%8E%B0lua%E7%83%AD%E6%9B%B4%E6%96%B0/</a>
+            <p>发表日期：<a href="http://example.com/2022/03/21/%E5%88%A9%E7%94%A8Frida%E5%AE%9E%E7%8E%B0lua%E7%83%AD%E6%9B%B4%E6%96%B0/">March 21st 2022, 3:32:47 pm</a>
+            <p>更新日期：<a href="http://example.com/2022/03/21/%E5%88%A9%E7%94%A8Frida%E5%AE%9E%E7%8E%B0lua%E7%83%AD%E6%9B%B4%E6%96%B0/">November 15th 2023, 10:39:53 am</a>
+            <p>版权声明：本文采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+        </div>
+    
+    <!-- paginator -->
+    <ul class="post-paginator">
+        <li class="next">
+            
+                <div class="nextSlogan">Next Post</div>
+                <a href="/2022/09/08/GameGuardian%E7%9A%84Lua%E8%84%9A%E6%9C%AC%E6%B7%B7%E6%B7%86%E5%88%86%E6%9E%90/" title="GameGuardian的Lua脚本混淆分析">
+                    <div class="nextTitle">GameGuardian的Lua脚本混淆分析</div>
+                </a>
+            
+        </li>
+        <li class="previous">
+            
+                <div class="prevSlogan">Previous Post</div>
+                <a href="/2022/01/14/%E4%BD%BF%E7%94%A8unidbg%E8%BF%87%E4%BF%9D%E6%8A%A4/" title="使用unidbg过保护">
+                    <div class="prevTitle">使用unidbg过保护</div>
+                </a>
+            
+        </li>
+    </ul>
+    <!-- comment -->
+    
+        <div class="post-comment">
+            <!-- 来必力 City 版安装代码 -->
+
+
+            
+
+            
+
+            
+
+            <!-- utteranc评论 -->
+
+
+            <!-- partial('_partial/comment/changyan') -->
+            <!--PC版-->
+
+
+            
+            
+
+            
+
+        </div>
+    
+    <!-- timeliness note -->
+    <!-- idea from: https://hexo.fluid-dev.com/posts/hexo-injector/#%E6%96%87%E7%AB%A0%E6%97%B6%E6%95%88%E6%80%A7%E6%8F%90%E7%A4%BA -->
+    
+    <!-- Mathjax -->
+    
+</main>
+
+                <!-- profile -->
+                
+            </div>
+            <footer class="footer footer-unloaded">
+    <!-- social  -->
+    
+        <div class="social">
+            
+    
+        
+            
+                <a href="mailto:673304120@qq.com" class="iconfont-archer email" title=email ></a>
+            
+        
+    
+        
+            
+                <a href="//github.com/nszdhd1" class="iconfont-archer github" target="_blank" title=github></a>
+            
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+
+        </div>
+    
+    <!-- powered by Hexo  -->
+    <div class="copyright">
+        <span id="hexo-power">Powered by <a href="https://hexo.io/" target="_blank">Hexo</a></span><span class="iconfont-archer power">&#xe635;</span><span id="theme-info">theme <a href="https://github.com/fi3ework/hexo-theme-archer" target="_blank">Archer</a></span>
+    </div>
+    <!-- website approve for Chinese user -->
+    
+    <!-- 不蒜子  -->
+    
+        <div class="busuanzi-container">
+            
+             
+                <span id="busuanzi_container_site_pv">PV: <span id="busuanzi_value_site_pv"></span> :)</span>
+            
+        </div>
+    	
+</footer>
+
+        </div>
+        <!-- toc -->
+        
+            <div class="toc-wrapper toc-wrapper-loding" style=
+
+
+
+
+
+
+
+    top:50vh;
+
+>
+                <div class="toc-catalog">
+                    <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+                </div>
+                <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%88%A9%E7%94%A8Frida%E5%AE%9E%E7%8E%B0lua%E7%83%AD%E6%9B%B4%E6%96%B0"><span class="toc-number">1.</span> <span class="toc-text">利用Frida实现lua热更新</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%83%8C%E6%99%AF%E4%B8%8E%E9%9C%80%E6%B1%82"><span class="toc-number">1.1.</span> <span class="toc-text">背景与需求</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AE%BE%E8%AE%A1%E5%8E%9F%E7%90%86%E4%B8%8E%E5%AE%9E%E7%8E%B0"><span class="toc-number">1.2.</span> <span class="toc-text">设计原理与实现</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#LuaFileWatcher"><span class="toc-number">1.2.1.</span> <span class="toc-text">LuaFileWatcher</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#android-os-FileObserver"><span class="toc-number">1.2.1.1.</span> <span class="toc-text">android.os.FileObserver</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#inotify"><span class="toc-number">1.2.1.2.</span> <span class="toc-text">inotify</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Hotfix"><span class="toc-number">1.2.2.</span> <span class="toc-text">Hotfix</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8F%82%E8%80%83"><span class="toc-number">1.2.2.1.</span> <span class="toc-text">参考</span></a></li></ol></li></ol></li></ol></li></ol>
+            </div>
+        
+        <!-- sidebar -->
+        <div class="sidebar sidebar-hide">
+    <ul class="sidebar-tabs sidebar-tabs-active-0">
+        <li class="sidebar-tab-archives"><span class="iconfont-archer">&#xe67d;</span><span class="tab-name">Archive</span></li>
+        <li class="sidebar-tab-tags"><span class="iconfont-archer">&#xe61b;</span><span class="tab-name">Tag</span></li>
+        <li class="sidebar-tab-categories"><span class="iconfont-archer">&#xe666;</span><span class="tab-name">Cate</span></li>
+    </ul>
+    <div class="sidebar-content sidebar-content-show-archive">
+        <div class="sidebar-panel-archives">
+    <!-- 在 ejs 中将 archive 按照时间排序 -->
+    
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    
+    
+    
+    
+    <div class="total-and-search">
+        <div class="total-archive">
+        Total : 16
+        </div>
+        <!-- search  -->
+        
+    </div>
+    
+    <div class="post-archive">
+    
+        
+            
+            
+            <div class="archive-year"> 2022 </div>
+            <ul class="year-list">
+            
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/22</span>
+            <a class="archive-post-title" href="/2022/12/22/%E5%A6%82%E4%BD%95%E4%BF%AE%E6%94%B9unityHybridCLR%E7%83%AD%E6%9B%B4dll/">如何修改unity HybridCLR 热更dll</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/14</span>
+            <a class="archive-post-title" href="/2022/11/14/Genshin-IL2CPP-RunTime-Dump/">Genshin IL2CPP RunTime Dump</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/08</span>
+            <a class="archive-post-title" href="/2022/09/08/GameGuardian%E7%9A%84Lua%E8%84%9A%E6%9C%AC%E6%B7%B7%E6%B7%86%E5%88%86%E6%9E%90/">GameGuardian的Lua脚本混淆分析</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/21</span>
+            <a class="archive-post-title" href="/2022/03/21/%E5%88%A9%E7%94%A8Frida%E5%AE%9E%E7%8E%B0lua%E7%83%AD%E6%9B%B4%E6%96%B0/">利用Frida实现lua热更新</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">01/14</span>
+            <a class="archive-post-title" href="/2022/01/14/%E4%BD%BF%E7%94%A8unidbg%E8%BF%87%E4%BF%9D%E6%8A%A4/">使用unidbg过保护</a>
+        </li>
+    
+        
+            
+            
+                
+                </ul>
+            
+            <div class="archive-year"> 2021 </div>
+            <ul class="year-list">
+            
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">06/15</span>
+            <a class="archive-post-title" href="/2021/06/15/%E9%9D%9Eroot%E7%8E%AF%E5%A2%83%E4%B8%8Bfrida%E7%9A%84%E4%B8%A4%E7%A7%8D%E4%BD%BF%E7%94%A8%E6%96%B9%E5%BC%8F/">非root环境下frida的两种使用方式</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">06/15</span>
+            <a class="archive-post-title" href="/2021/06/15/%E4%BD%BF%E7%94%A8LIEF%E6%89%93%E9%80%A0MTP%E5%8A%A0%E5%9B%BA/">使用LIEF打造MTP加固</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">01/15</span>
+            <a class="archive-post-title" href="/2021/01/15/%E6%8A%96%E9%9F%B3%E8%AF%84%E8%AE%BA%E7%88%AC%E5%8F%96/">抖音评论爬取</a>
+        </li>
+    
+        
+            
+            
+                
+                </ul>
+            
+            <div class="archive-year"> 2020 </div>
+            <ul class="year-list">
+            
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/04</span>
+            <a class="archive-post-title" href="/2020/12/04/%E4%BD%BF%E7%94%A8frida%E8%8E%B7%E5%8F%96il2cpp%E7%AC%A6%E5%8F%B7%E4%BF%A1%E6%81%AF/">使用frida获取il2cpp符号信息</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">08/27</span>
+            <a class="archive-post-title" href="/2020/08/27/SO%E5%8A%A0%E5%AF%86/">SO加密</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">07/03</span>
+            <a class="archive-post-title" href="/2020/07/03/Unity%E4%BF%9D%E6%8A%A4%E4%B9%8Bassetbundle/">Unity保护之assetbundle</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">07/03</span>
+            <a class="archive-post-title" href="/2020/07/03/Unity%E4%BF%9D%E6%8A%A4%E4%B9%8Bil2cpp/">Unity保护之il2cpp</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">07/03</span>
+            <a class="archive-post-title" href="/2020/07/03/%E5%9F%BA%E4%BA%8Eva%E7%9A%84luajit-hook/">基于va的luajit hook</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">07/03</span>
+            <a class="archive-post-title" href="/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/">网易保护分析</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/07</span>
+            <a class="archive-post-title" href="/2020/04/07/magisk-riru/">magisk-riru 使用</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/09</span>
+            <a class="archive-post-title" href="/2020/03/09/Magisk%E6%A3%80%E6%B5%8B/">Magisk检测</a>
+        </li>
+    
+    </div>
+</div>
+
+        <div class="sidebar-panel-tags">
+    <div class="sidebar-tags-name">
+        
+            <span class="sidebar-tag-name" data-tags="Analytics">
+                <span class="iconfont-archer">&#xe606;</span>
+                Analytics
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="game">
+                <span class="iconfont-archer">&#xe606;</span>
+                game
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="other">
+                <span class="iconfont-archer">&#xe606;</span>
+                other
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="protect">
+                <span class="iconfont-archer">&#xe606;</span>
+                protect
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="tools">
+                <span class="iconfont-archer">&#xe606;</span>
+                tools
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="Misc">
+                <span class="iconfont-archer">&#xe606;</span>
+                Misc
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="Hook">
+                <span class="iconfont-archer">&#xe606;</span>
+                Hook
+            </span>
+        
+    </div>
+    <div class="iconfont-archer sidebar-tags-empty">&#xe678;</div>
+    <div class="tag-load-fail" style="display: none; color: #ccc; font-size: 0.6rem;">
+        缺失模块，请参考主题文档进行安装配置：https://github.com/fi3ework/hexo-theme-archer#%E5%AE%89%E8%A3%85%E4%B8%BB%E9%A2%98
+    </div> 
+    <div class="sidebar-tags-list"></div>
+</div>
+
+        <div class="sidebar-panel-categories">
+    <div class="sidebar-categories-name">
+    
+    </div>
+    <div class="iconfont-archer sidebar-categories-empty">&#xe678;</div>
+    <div class="sidebar-categories-list"></div>
+</div>
+
+    </div>
+</div>
+
+        <!-- site-meta -->
+        <script>
+    var siteMetaRoot = "/"
+    if (siteMetaRoot === "undefined") {
+        siteMetaRoot = '/'
+    }
+    var siteMeta = {
+        url: "http://example.com",
+        root: siteMetaRoot,
+        author: "newbiemiao"
+    }
+</script>
+
+        <!-- import experimental options here -->
+        <!-- Custom Font -->
+
+
+        <!-- main func -->
+        <script src="/scripts/main.js?v=20211217"></script>
+        <!-- dark mode -->
+        <script src="/scripts/dark.js?v=20211217"></script>
+        <!-- fancybox -->
+        <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" defer></script>
+        <!-- algolia -->
+        
+        <!-- busuanzi -->
+        
+            <script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" async></script>
+        
+        <!-- CNZZ -->
+        
+        <!-- async load share.js -->
+        
+            <script src="/scripts/share.js?v=20211217" async></script>
+        
+        <!-- mermaid -->
+        
+    </body>
+</html>

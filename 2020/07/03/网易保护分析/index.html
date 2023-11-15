@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <!-- title -->
+
+
+    
+
+<!-- keywords -->
+
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="author" content="newbiemiao">
+    <meta name="renderer" content="webkit">
+    <meta name="copyright" content="newbiemiao">
+    
+        <meta name="keywords" content="hexo,hexo-theme,hexo-blog">
+    
+    <meta name="description" content="">
+    <meta name="description" content="网易保护研究目的分析网易游戏保护，提取可借鉴优点 分析思路我理解的功能范围：加壳、各个检测项、数据上报。所以我的两种思路：  收集当下流行工具、攻击方式对网易游戏进行测试（缺点：最多只能察觉哪些操作会触发检测，对于非敏感的检测点（不能直接判定为作弊者的点）意义不大，且反馈只有崩溃、正常、和部分模糊的提示，主观猜测成分太大。优点：简单，可用于所有厂商的保护分析）  过保护，拿到正常的so对源码进行逆">
+<meta property="og:type" content="article">
+<meta property="og:title" content="网易保护分析">
+<meta property="og:url" content="http://example.com/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/index.html">
+<meta property="og:site_name" content="喵喵的blog">
+<meta property="og:description" content="网易保护研究目的分析网易游戏保护，提取可借鉴优点 分析思路我理解的功能范围：加壳、各个检测项、数据上报。所以我的两种思路：  收集当下流行工具、攻击方式对网易游戏进行测试（缺点：最多只能察觉哪些操作会触发检测，对于非敏感的检测点（不能直接判定为作弊者的点）意义不大，且反馈只有崩溃、正常、和部分模糊的提示，主观猜测成分太大。优点：简单，可用于所有厂商的保护分析）  过保护，拿到正常的so对源码进行逆">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20191219150353652.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20191219150839657.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20191219152308695.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20191231110002483.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20191231110325677.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20191219153709772.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20191219154301411.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20191219171201819.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20191219172155364.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20191219201656654.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20191224211317668.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20191224211927793.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20191231160126869.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20200102144419934.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20200106150325309.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20200108103051403.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20200108211852458.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20200108174650943.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20200108204336620.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20191228104219675.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20191228104849063.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20191228112212942.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20191228112759167.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20200106151549009.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20200106154240364.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20200106153855163.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20200109204217508.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20200109204344874.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20200109152913179.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20200109152937116.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20200109153616599.png">
+<meta property="article:published_time" content="2020-07-03T03:53:28.000Z">
+<meta property="article:modified_time" content="2023-11-15T02:39:53.886Z">
+<meta property="article:author" content="newbiemiao">
+<meta property="article:tag" content="protect">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20191219150353652.png">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <link rel="icon" href="/assets/favicon.ico">
+    
+    <title>网易保护分析 · nszdhd1&#39;s blog</title>
+    <!-- /*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
+/* This file is meant as a standalone workflow for
+- testing support for link[rel=preload]
+- enabling async CSS loading in browsers that do not support rel=preload
+- applying rel preload css once loaded, whether supported or not.
+*/ -->
+<script>
+    (function (w) {
+        'use strict'
+        // rel=preload support test
+        if (!w.loadCSS) {
+            w.loadCSS = function () {}
+        }
+        // define on the loadCSS obj
+        var rp = (loadCSS.relpreload = {})
+        // rel=preload feature support test
+        // runs once and returns a function for compat purposes
+        rp.support = (function () {
+            var ret
+            try {
+                ret = w.document.createElement('link').relList.supports('preload')
+            } catch (e) {
+                ret = false
+            }
+            return function () {
+                return ret
+            }
+        })()
+
+        // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+        // then change that media back to its intended value on load
+        rp.bindMediaToggle = function (link) {
+            // remember existing media attr for ultimate state, or default to 'all'
+            var finalMedia = link.media || 'all'
+
+            function enableStylesheet() {
+                link.media = finalMedia
+            }
+
+            // bind load handlers to enable media
+            if (link.addEventListener) {
+                link.addEventListener('load', enableStylesheet)
+            } else if (link.attachEvent) {
+                link.attachEvent('onload', enableStylesheet)
+            }
+
+            // Set rel and non-applicable media type to start an async request
+            // note: timeout allows this to happen async to let rendering continue in IE
+            setTimeout(function () {
+                link.rel = 'stylesheet'
+                link.media = 'only x'
+            })
+            // also enable media after 3 seconds,
+            // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+            setTimeout(enableStylesheet, 3000)
+        }
+
+        // loop through link elements in DOM
+        rp.poly = function () {
+            // double check this to prevent external calls from running
+            if (rp.support()) {
+                return
+            }
+            var links = w.document.getElementsByTagName('link')
+            for (var i = 0; i < links.length; i++) {
+                var link = links[i]
+                // qualify links to those with rel=preload and as=style attrs
+                if (
+                    link.rel === 'preload' &&
+                    link.getAttribute('as') === 'style' &&
+                    !link.getAttribute('data-loadcss')
+                ) {
+                    // prevent rerunning on link
+                    link.setAttribute('data-loadcss', true)
+                    // bind listeners to toggle media back
+                    rp.bindMediaToggle(link)
+                }
+            }
+        }
+
+        // if unsupported, run the polyfill
+        if (!rp.support()) {
+            // run once at least
+            rp.poly()
+
+            // rerun poly on an interval until onload
+            var run = w.setInterval(rp.poly, 500)
+            if (w.addEventListener) {
+                w.addEventListener('load', function () {
+                    rp.poly()
+                    w.clearInterval(run)
+                })
+            } else if (w.attachEvent) {
+                w.attachEvent('onload', function () {
+                    rp.poly()
+                    w.clearInterval(run)
+                })
+            }
+        }
+
+        // commonjs
+        if (typeof exports !== 'undefined') {
+            exports.loadCSS = loadCSS
+        } else {
+            w.loadCSS = loadCSS
+        }
+    })(typeof global !== 'undefined' ? global : this)
+</script>
+
+    <style type="text/css">
+    @font-face {
+        font-family: 'Oswald-Regular';
+        src: url("/font/Oswald-Regular.ttf");
+    }
+
+    body {
+        margin: 0;
+    }
+
+    header,
+    footer,
+    .back-top,
+    .sidebar,
+    .container,
+    .site-intro-meta,
+    .toc-wrapper {
+        display: none;
+    }
+
+    .site-intro {
+        position: relative;
+        z-index: 3;
+        width: 100%;
+        /* height: 50vh; */
+        overflow: hidden;
+    }
+
+    .site-intro-placeholder {
+        position: absolute;
+        z-index: -2;
+        top: 0;
+        left: 0;
+        width: calc(100% + 300px);
+        height: 100%;
+        background: repeating-linear-gradient(-45deg, #444 0, #444 80px, #333 80px, #333 160px);
+        background-position: center center;
+        transform: translate3d(-226px, 0, 0);
+        animation: gradient-move 2.5s ease-out 0s infinite;
+    }
+
+    @keyframes gradient-move {
+        0% {
+            transform: translate3d(-226px, 0, 0);
+        }
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+    }
+</style>
+
+    <link rel="preload" href="/css/style.css?v=20211217" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="/css/dark.css?v=20211217" as="style">
+    <link rel="stylesheet" href="/css/dark.css">
+    <link rel="stylesheet" href="/css/mobile.css?v=20211217" media="(max-width: 960px)">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" as="script">
+    <link rel="preload" href="/scripts/main.js?v=20211217" as="script">
+    <link rel="preload" href="/scripts/dark.js?v=20211217" as="script">
+    <link rel="preload" href="/font/Oswald-Regular.ttf" as="font" crossorigin>
+    <link rel="preload" href="https://at.alicdn.com/t/font_327081_1dta1rlogw17zaor.woff" as="font" crossorigin>
+    <!-- algolia -->
+    
+    <!-- 百度统计  -->
+    
+    <!-- Google tag (gtag.js) -->
+    
+
+<meta name="generator" content="Hexo 7.0.0"></head>
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script type="text/javascript">
+        if (typeof window.$ == undefined) {
+            console.warn('jquery load from jsdelivr failed, will load local script')
+            document.write('<script src="/lib/jquery.min.js" />')
+        }
+    </script>
+    
+        <body class="post-body">
+    
+        <!-- header -->
+        <header class="header header-mobile">
+    <!-- top read progress line -->
+    <div class="header-element">
+        <div class="read-progress"></div>
+    </div>
+    <!-- sidebar menu button -->
+    <div class="header-element">
+        
+            <div class="header-sidebar-menu">
+        
+            
+                <div style="padding-left: 1px;">&#xe775;</div>
+            
+        </div>
+    </div>
+    <!-- header actions -->
+    <div class="header-actions">
+        <!-- theme mode switch button -->
+        <span class="header-theme-btn header-element">
+            <i class="fas fa-adjust"></i>
+        </span>
+        <!-- back to home page text -->
+        <span class="home-link header-element">
+            <a href=/>nszdhd1's blog.</a>
+        </span>
+    </div>
+    <!-- toggle banner for post layout -->
+    
+        
+            <div class="banner">
+        
+            <div class="blog-title header-element">
+                <a href="/">nszdhd1&#39;s blog.</a>
+            </div>
+            <div class="post-title header-element">
+                <a href="#" class="post-name">网易保护分析</a>
+            </div>
+        </div>
+    
+</header>
+
+        <!-- fixed footer -->
+        <footer class="footer-fixed">
+    <!-- back to top button -->
+    <div class="footer-fixed-element">
+        
+            <div class="back-top back-top-hidden">
+        
+        
+            <div>&#xe639;</div>
+        
+        </div>
+    </div>
+</footer>
+
+        <!-- wrapper -->
+        <div class="wrapper">
+            <div class="site-intro" style="
+
+
+
+
+
+
+
+    height:50vh;
+
+">
+    
+    <!-- 主页  -->
+    
+        
+    <!-- 404页  -->
+    
+    <div class="site-intro-placeholder"></div>
+    <div class="site-intro-img" style="background-image: url(/intro/post-bg.jpg)"></div>
+    <div class="site-intro-meta">
+        <!-- 标题  -->
+        <h1 class="intro-title">
+            <!-- 主页  -->
+            
+                网易保护分析
+            <!-- 404 -->
+            
+        </h1>
+        <!-- 副标题 -->
+        <p class="intro-subtitle">
+            <!-- 主页副标题  -->
+            
+                
+            <!-- 404 -->
+            
+        </p>
+        <!-- 文章页 meta -->
+        
+            <div class="post-intros">
+                <!-- 文章页标签  -->
+                
+                    <div class= post-intro-tags >
+    
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="protect">protect</a>
+    
+</div>
+
+                
+                <!-- 文章字数统计 -->
+                
+                <div class="post-intro-meta">
+                    <!-- 撰写日期 -->
+                    <span class="iconfont-archer post-intro-calander">&#xe676;</span>
+                    <span class="post-intro-time">2020/07/03</span>
+                    <!-- busuanzi -->
+                    
+                        <span id="busuanzi_container_page_pv" class="busuanzi-pv">
+                            <span class="iconfont-archer post-intro-busuanzi">&#xe602;</span>
+                            <span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    
+                    <!-- 文章分享 -->
+                    <span class="share-wrapper">
+                        <span class="iconfont-archer share-icon">&#xe71d;</span>
+                        <span class="share-text">Share</span>
+                        <ul class="share-list">
+                            <li class="iconfont-archer share-qr" data-type="qr">&#xe75b;
+                                <div class="share-qrcode"></div>
+                            </li>
+                            <li class="iconfont-archer" data-type="weibo">&#xe619;</li>
+                            <li class="iconfont-archer" data-type="qzone">&#xe62e;</li>
+                            <li class="iconfont-archer" data-type="twitter">&#xe634;</li>
+                            <li class="iconfont-archer" data-type="facebook">&#xe67a;</li>
+                        </ul>
+                    </span>
+                </div>
+            </div>
+        
+    </div>
+</div>
+
+            <script>
+  // get user agent
+  function getBrowserVersions() {
+    var u = window.navigator.userAgent
+    return {
+      userAgent: u,
+      trident: u.indexOf('Trident') > -1, //IE内核
+      presto: u.indexOf('Presto') > -1, //opera内核
+      webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+      gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+      mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+      ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+      android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+      iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者安卓QQ浏览器
+      iPad: u.indexOf('iPad') > -1, //是否为iPad
+      webApp: u.indexOf('Safari') == -1, //是否为web应用程序，没有头部与底部
+      weixin: u.indexOf('MicroMessenger') == -1, //是否为微信浏览器
+      uc: u.indexOf('UCBrowser') > -1, //是否为android下的UC浏览器
+    }
+  }
+  var browser = {
+    versions: getBrowserVersions(),
+  }
+  console.log('userAgent: ' + browser.versions.userAgent)
+
+  // callback
+  function fontLoaded() {
+    console.log('font loaded')
+    if (document.getElementsByClassName('site-intro-meta')) {
+      document
+        .getElementsByClassName('intro-title')[0]
+        .classList.add('intro-fade-in')
+      document
+        .getElementsByClassName('intro-subtitle')[0]
+        .classList.add('intro-fade-in')
+      var postIntros = document.getElementsByClassName('post-intros')[0]
+      if (postIntros) {
+        postIntros.classList.add('post-fade-in')
+      }
+    }
+  }
+
+  // UC不支持跨域，所以直接显示
+  function asyncCb() {
+    if (browser.versions.uc) {
+      console.log('UCBrowser')
+      fontLoaded()
+    } else {
+      WebFont.load({
+        custom: {
+          families: ['Oswald-Regular'],
+        },
+        loading: function () {
+          // 所有字体开始加载
+          // console.log('font loading');
+        },
+        active: function () {
+          // 所有字体已渲染
+          fontLoaded()
+        },
+        inactive: function () {
+          // 字体预加载失败，无效字体或浏览器不支持加载
+          console.log('inactive: timeout')
+          fontLoaded()
+        },
+        timeout: 5000, // Set the timeout to two seconds
+      })
+    }
+  }
+
+  function asyncErr() {
+    console.warn('script load from CDN failed, will load local script')
+  }
+
+  // load webfont-loader async, and add callback function
+  function async(u, cb, err) {
+    var d = document,
+      t = 'script',
+      o = d.createElement(t),
+      s = d.getElementsByTagName(t)[0]
+    o.src = u
+    if (cb) {
+      o.addEventListener(
+        'load',
+        function (e) {
+          cb(null, e)
+        },
+        false
+      )
+    }
+    if (err) {
+      o.addEventListener(
+        'error',
+        function (e) {
+          err(null, e)
+        },
+        false
+      )
+    }
+    s.parentNode.insertBefore(o, s)
+  }
+
+  var asyncLoadWithFallBack = function (arr, success, reject) {
+    var currReject = function () {
+      reject()
+      arr.shift()
+      if (arr.length) async(arr[0], success, currReject)
+    }
+
+    async(arr[0], success, currReject)
+  }
+
+  asyncLoadWithFallBack(
+    [
+      'https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js',
+      'https://cdn.bootcss.com/webfont/1.6.28/webfontloader.js',
+      "/lib/webfontloader.min.js",
+    ],
+    asyncCb,
+    asyncErr
+  )
+</script>
+
+            <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
+            <div class="container container-unloaded">
+                <main class="main post-page">
+    <article class="article-entry">
+        <h1 id="网易保护研究"><a href="#网易保护研究" class="headerlink" title="网易保护研究"></a>网易保护研究</h1><h3 id="目的"><a href="#目的" class="headerlink" title="目的"></a>目的</h3><p>分析网易游戏保护，提取可借鉴优点</p>
+<h3 id="分析思路"><a href="#分析思路" class="headerlink" title="分析思路"></a>分析思路</h3><p>我理解的功能范围：加壳、各个检测项、数据上报。<br>所以我的两种思路：</p>
+<ol>
+<li><p>收集当下流行工具、攻击方式对网易游戏进行测试（缺点：最多只能察觉哪些操作会触发检测，对于非敏感的检测点（不能直接判定为作弊者的点）意义不大，且反馈只有崩溃、正常、和部分模糊的提示，主观猜测成分太大。优点：简单，可用于所有厂商的保护分析）</p>
+</li>
+<li><p>过保护，拿到正常的so对源码进行逆向分析（缺点：难度大，只针对网易）</p>
+</li>
+</ol>
+<span id="more"></span>
+
+<h3 id="分析过程"><a href="#分析过程" class="headerlink" title="分析过程"></a>分析过程</h3><h4 id="1-根据思路一分析"><a href="#1-根据思路一分析" class="headerlink" title="1. 根据思路一分析"></a>1. 根据思路一分析</h4><p>安装游戏《创造与魔法》，打开提示  如下：</p>
+<p><img src="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20191219150353652.png" alt="image-20191219150353652"></p>
+<p>检测到修改器后，立刻退出。想检测是否安装了外挂辅助应用，必定需要读取安装应用权限，关闭该权限，查看是否可绕过：</p>
+<p><img src="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20191219150839657.png" alt="image-20191219150839657"></p>
+<p>获取权限失败，然后退出应用。没想到是这种强买强卖的操作。</p>
+<p>此时手机内安装的敏感应用如下：ourplay(vpn、虚拟环境、谷歌服务一体的应用)、平行空间、virtualXposed、GG、游戏蜂窝、葫芦侠、virtualapp。</p>
+<p>经过测试，以上被检查的应用，有且仅有：游戏蜂窝</p>
+<p>此检测项让我发现思路一的不合理性，数据采集并不会单纯的检测某一项，一定是多项一起检测，并且网易是检测到危险应用并不会立即崩溃，大大的增加了猜测的难度。遂放弃思路一。</p>
+<h4 id="2-思路二之静态分析"><a href="#2-思路二之静态分析" class="headerlink" title="2. 思路二之静态分析"></a>2. 思路二之静态分析</h4><p>打开压缩包，查看lib，可以很明显的看到是mono的游戏，并且保护也很明显是libNetHTProtect：</p>
+<p><img src="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20191219152308695.png" alt="image-20191219152308695"></p>
+<p>使用ida打开libmono.so ， 发现so被加壳了，全部是空函数。</p>
+<p><img src="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20191231110002483.png" alt="image-20191231110002483"></p>
+<p><code>linker是Android系统动态库so的加载器/链接器，并且linker本身就是一个动态链接库。当linker加载so时，会先执行so文件中的.init段代码，然后执行.init_array段中所指向的函数。当linker加载完返回到位于：art/runtime/java_vm_ext.cc的LoadNativeLibrary()函数，此函数继续检测并执行so库中的JNI_Onload()方法。</code></p>
+<p>所以在整个so加载过程中函数执行的顺序如下：</p>
+<p>.init段 -&gt; .init_array段指向的函数 -&gt; JNI_Onload() -&gt; java_com_XXX</p>
+<p>一般加壳会在so的init_array或者jni_onload处进行操作，由图可见，关键函数应该在init_array里</p>
+<p><img src="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20191231110325677.png" alt="image-20191231110325677"></p>
+<p><img src="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20191219153709772.png" alt="image-20191219153709772"></p>
+<p>同时发现网易自己实现了一些系统函数：</p>
+<p><img src="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20191219154301411.png" alt="image-20191219154301411"></p>
+<p>因为按道理来讲，当linker执行完init加载so成功，进入JNI_Onload时，此时的so应该是在正常状态（已解密），此时从内存中dump下来，稍微修复一下代码就可以看到全部函数。</p>
+<p>但实际上：</p>
+<ol>
+<li><p>使用VA直接dump  &#x2F;proc&#x2F;pid&#x2F;maps 中 libmono 的地址，失败，原因：bad address ，部分内存无法访问。</p>
+</li>
+<li><p>使用VA将应用在libmono的 jniload处停住，使用GG将内存在中的libmono dump 下来。dump虽然成功了，但so依旧不太正常。证明此时GG内存读取检测、VA检测还未被拉起。多次试验，结果相同。使用readelf读取结果如下：<img src="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20191219171201819.png" alt="image-20191219171201819"></p>
+</li>
+<li><p>我怀疑是GG不够智能，换个姿势再dump一次。看linker加载过程可知，so的所有信息其实保存在一个soinfo结构的链表里。<img src="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20191219172155364.png" alt="image-20191219172155364"></p>
+</li>
+</ol>
+<p>但soinfo* do_dlopen(const char* name, int flags)已经是android5之前的事情了，现在do_dlopen返回的是soinfo的handle。</p>
+<p>用ida打开&#x2F;system&#x2F;bin&#x2F;linker，并未发现tatic soinfo* soinfo_from_handle(void* handle)，又通过阅读源码可知，调用find_containing_library，传入一个地址，就能查找包含该地址的soinfo。</p>
+<p><img src="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20191219201656654.png" alt="image-20191219201656654"></p>
+<p>打开va运行，然后依旧失败。GG和soinfo dump 下来的东西一样，并且都不是已经解密的so，排除dump工具的问题，那么一定是时机不对。</p>
+<p>观察log，发现dlopen打开了一个奇怪的so，拿到caller的地址，用上面的函数发现是libmono.so调用的，此时肯定恢复了函数。dump下来。需要记一下基地址，此时函数的地址是 基址+偏移</p>
+<p><img src="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20191224211317668.png" alt="image-20191224211317668"></p>
+<p>本以为网易会做很难的东西，结果就是把elf头抹去了，使用偷懒的办法把加壳的mono头粘贴到dump下来的so，稍微修复一下，就可以看到完整的代码了。</p>
+<p><img src="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20191224211927793.png" alt="image-20191224211927793"></p>
+<p>跟踪加载dll.so 的加载地址，稍微向上跟踪一下，会发现是mono中</p>
+<p><img src="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20191231160126869.png" alt="image-20191231160126869"></p>
+<p>mono_profiler_load函数会根据命令行参数加载 profiler 的初始化函数，默认的 profiler 名字是是 <code>log</code>， 那么会找到 <code>mono_profiler_startup_log</code> 。如果找不到函数会尝试加载一个叫 <code>mono-profiler-XXX</code> 的动态链接库，然后尝试在动态链接库里面找一个叫 <code>mono_profiler_startup</code> 的初始化函数。</p>
+<p>回到  mono_image_open_from_data_with_name 开始分析，此函数被libNetProtect hook了，最终会调用下图的函数，很明显，这个函数就是未加固的libmono的mono_image_open_from_data_with_name函数。</p>
+<p><img src="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20200102144419934.png" alt="image-20200102144419934"></p>
+<p>稍微跟踪一下此函数，并未发现有任何异常的函数，hook一下此函数，发现程序并不能正确运行，猜测该函数应该已经被hook，选择hook do_mono_image_load，把加载的dll dump下来，dnspy打开如下：</p>
+<p><img src="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20200106150325309.png" alt="image-20200106150325309"></p>
+<p>与未解密的dll进行对比：</p>
+<p><img src="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20200108103051403.png" alt="image-20200108103051403"></p>
+<p>到此就可以实现对游戏的测试、外挂开发了。</p>
+<p>因为目的是研究保护，看了一圈，libmono.so并没发现有价值的东西，还是开始分析libNetHTProtect。搜索 SVC 0 找到自己实现的系统调用，发现了open、read、ptrace等等,hook open 函数，并且打印调用栈，信息如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">c6fa8000   c6e0a000     <span class="number">19E000</span> </span><br><span class="line">[libNetHTProtect.so] module-&gt;startAddress <span class="number">0xc6fa8000</span> ,module-&gt;endAddress  <span class="number">0xc71e2000</span>  </span><br><span class="line"></span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-27</span> <span class="number">16</span>:<span class="number">12</span>:<span class="number">18.134</span> <span class="number">28422</span><span class="number">-28574</span>/com.hero.sm.android.hero D/OOOK_LOG:  libNetHTProtect open  /proc/self/status</span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-27</span> <span class="number">16</span>:<span class="number">12</span>:<span class="number">18.134</span> <span class="number">28422</span><span class="number">-28574</span>/com.hero.sm.android.hero D/OOOK_LOG: TAG:libNetHTProtect  --&gt; </span><br><span class="line">       # <span class="number">0</span>: <span class="number">0xd256983a</span>  _Z16captureBacktracePPvj</span><br><span class="line">      # <span class="number">1</span>: <span class="number">0xd2569b3c</span>  _Z17backtraceToLogcatPcPh</span><br><span class="line">      # <span class="number">2</span>: <span class="number">0xd2560a46</span>  _Z12new_openhookPvPcS_S_</span><br><span class="line">      # <span class="number">3</span>: <span class="number">0xc70427d2</span>  --&gt;<span class="number">0x0009a7d2</span></span><br><span class="line">      # <span class="number">4</span>: <span class="number">0xc6fc7d3e</span>  --&gt;<span class="number">0x0001fd3e</span></span><br><span class="line">      # <span class="number">5</span>: <span class="number">0xc6fc7d3e</span>  --&gt;<span class="number">0x0001fd3e</span></span><br><span class="line"></span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-27</span> <span class="number">16</span>:<span class="number">12</span>:<span class="number">19.739</span> <span class="number">28422</span><span class="number">-28785</span>/com.hero.sm.android.hero D/OOOK_LOG:  libNetHTProtect open  /data/user/<span class="number">0</span>/io.virtualapp.ex/virtual/data/user/<span class="number">0</span>/com.hero.sm.android.hero/files/gamePicServ</span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-27</span> <span class="number">16</span>:<span class="number">12</span>:<span class="number">19.744</span> <span class="number">28422</span><span class="number">-28785</span>/com.hero.sm.android.hero D/OOOK_LOG: TAG:libNetHTProtect  --&gt; </span><br><span class="line">       # <span class="number">0</span>: <span class="number">0xd256983a</span>  _Z16captureBacktracePPvj</span><br><span class="line">      # <span class="number">1</span>: <span class="number">0xd2569b3c</span>  _Z17backtraceToLogcatPcPh</span><br><span class="line">      # <span class="number">2</span>: <span class="number">0xd2560a46</span>  _Z12new_openhookPvPcS_S_</span><br><span class="line">      # <span class="number">3</span>: <span class="number">0xc70427d2</span>  --&gt;<span class="number">0x0009a7d2</span></span><br><span class="line">      # <span class="number">4</span>: <span class="number">0xc70579da</span>  --&gt;<span class="number">0x000af9da</span></span><br><span class="line">      # <span class="number">5</span>: <span class="number">0xc70579da</span>  --&gt;<span class="number">0x000af9da</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-27</span> <span class="number">16</span>:<span class="number">12</span>:<span class="number">19.865</span> <span class="number">28422</span><span class="number">-28787</span>/com.hero.sm.android.hero D/OOOK_LOG:  libNetHTProtect open  /proc/<span class="number">28787</span>/pagemap</span><br><span class="line"><span class="number">2019</span><span class="number">-12</span><span class="number">-27</span> <span class="number">16</span>:<span class="number">12</span>:<span class="number">19.866</span> <span class="number">28422</span><span class="number">-28787</span>/com.hero.sm.android.hero D/OOOK_LOG: TAG:libNetHTProtect  --&gt; </span><br><span class="line">       # <span class="number">0</span>: <span class="number">0xd256983a</span>  _Z16captureBacktracePPvj</span><br><span class="line">      # <span class="number">1</span>: <span class="number">0xd2569b3c</span>  _Z17backtraceToLogcatPcPh</span><br><span class="line">      # <span class="number">2</span>: <span class="number">0xd2560a46</span>  _Z12new_openhookPvPcS_S_</span><br><span class="line">      # <span class="number">3</span>: <span class="number">0xc70427d2</span>  --&gt;<span class="number">0x0009a7d2</span>（openfile）</span><br><span class="line">      # <span class="number">4</span>: <span class="number">0xc70d4928</span>  --&gt;<span class="number">0x0012c928</span> </span><br><span class="line">      # <span class="number">5</span>: <span class="number">0xc70d4928</span>  --&gt;<span class="number">0x0012c928</span></span><br></pre></td></tr></table></figure>
+
+
+
+<p>检测收集了一下内容：</p>
+<p>&#x2F;proc&#x2F;self&#x2F;status  读取失败会陷入死循环<br>&#x2F;system&#x2F;build.prop<br>&#x2F;system&#x2F;bin&#x2F;linker<br>&#x2F;proc&#x2F;self&#x2F;maps<br>&#x2F;proc&#x2F;29532&#x2F;pagemap<br>&#x2F;proc&#x2F;net&#x2F;arp<br>&#x2F;proc&#x2F;net&#x2F;unix<br>&#x2F;proc&#x2F;29153&#x2F;task&#x2F;29153&#x2F;status<br>&#x2F;proc&#x2F;bus&#x2F;input&#x2F;devices<br>&#x2F;proc&#x2F;mounts<br>&#x2F;proc&#x2F;sys&#x2F;fs&#x2F;inotify</p>
+<p>常规的反调试检查调用位置很近都在偏移0x6A560附近，但此处有混淆，看起来很费力，流程图缩小如下：</p>
+<p><img src="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20200108211852458.png" alt="image-20200108211852458"></p>
+<p>每次主动退出会打开下面文件<br>&#x2F;data&#x2F;user&#x2F;0&#x2F;io.virtualapp.ex&#x2F;virtual&#x2F;data&#x2F;user&#x2F;0&#x2F;com.hero.sm.android.hero&#x2F;files&#x2F;idymdyt_game_settings.xml</p>
+<p><img src="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20200108174650943.png" alt="image-20200108174650943"></p>
+<p>自定义文件都不是明文，内容后期还需要分析。</p>
+<p>libNetProtect.so还收集了很多电池信息：</p>
+<p><img src="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20200108204336620.png" alt="image-20200108204336620"></p>
+<p>在init_array时，初始化了一个类，里面注册了很多自己实现和导入的系统函数。（openfile）</p>
+<p><img src="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20191228104219675.png" alt="image-20191228104219675"></p>
+<p>0xc70d4928处多次打开文件，两次自己实现的open打开失败，则调用系统的open函数</p>
+<p><img src="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20191228104849063.png" alt="image-20191228104849063"></p>
+<p>该应用使用了腾讯bugly，最近几次报错：</p>
+<p><img src="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20191228112212942.png" alt="image-20191228112212942"></p>
+<p><img src="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20191228112759167.png" alt="image-20191228112759167"></p>
+<h3 id="分析结果"><a href="#分析结果" class="headerlink" title="分析结果"></a>分析结果</h3><h4 id="1-需要加强对蜂窝游戏的检测"><a href="#1-需要加强对蜂窝游戏的检测" class="headerlink" title="1. 需要加强对蜂窝游戏的检测"></a>1. 需要加强对蜂窝游戏的检测</h4><p> 原因： 游戏蜂窝辅助脚本丰富、上手难度几乎没有、甚至包含云挂机（付费项目未体验）。游戏蜂窝的危害远大于普通多开软件（平行空间、双开精灵等）<br> 检测方法： 读取已安装应用，查看游戏蜂窝是否安装。（因为不在一个uid下无法通过检测VA的方式检测，未体验云挂机没办法分析如何检测）</p>
+<h4 id="2-系统调用使用中断实现"><a href="#2-系统调用使用中断实现" class="headerlink" title="2. 系统调用使用中断实现"></a>2. 系统调用使用中断实现</h4><p>原因： 通常调用的系统函数如open、read之类的都是导入libc中的函数，libc帮我们实现了从用户态到内核态，所以使用libc的open、read很容易就能被分析出来。自己实现系统调用可以增加反编译后的分析难度。</p>
+<p><strong>举例</strong>：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;private/bionic_asm.h&gt;</span></span></span><br><span class="line"></span><br><span class="line">ENTRY(__getpid)</span><br><span class="line">    mov     ip, r7</span><br><span class="line">    ldr     r7, =__NR_getpid</span><br><span class="line">    swi     #<span class="number">0</span></span><br><span class="line">    mov     r7, ip</span><br><span class="line">    cmn     r0, #(MAX_ERRNO + <span class="number">1</span>)</span><br><span class="line">    bxls    lr</span><br><span class="line">    neg     r0, r0</span><br><span class="line">    b       __set_errno_internal</span><br><span class="line">END(__getpid）</span><br></pre></td></tr></table></figure>
+
+<h4 id="3-网易dll加载过程"><a href="#3-网易dll加载过程" class="headerlink" title="3. 网易dll加载过程"></a>3. 网易dll加载过程</h4><p>正常的mono dll 加载过程 ：</p>
+<p><img src="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20200106151549009.png" alt="image-20200106151549009"></p>
+<p>网易的mono dll 加载过程（此点存疑，也可能是因为反编译错误）：</p>
+<p><img src="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20200106154240364.png" alt="image-20200106154240364"></p>
+<p><img src="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20200106153855163.png" alt="image-20200106153855163"></p>
+<p>这样做我能想到的优点：</p>
+<ol>
+<li>dll加载的时机提前</li>
+<li>具有迷惑性，所有函数都是mono正常加载需要使用的函数</li>
+<li>实现简单</li>
+</ol>
+<p>我认为的缺点：</p>
+<ol>
+<li>致命的profiler初始化机制，找不到参数对应的函数，会打开参数对应的so。dlopen是很敏感的操作，并且使用的还不是自己实现的dlopen，hook linker中的dlopen一眼就能看到奇怪的dll.so</li>
+<li>脱壳后ida打开一目了然</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">2020-01-09 20:37:43.538 30033-30198/com.hero.sm.android.hero D/OOOK_LOG: libmono.so in do_mono_image_load </span><br><span class="line">2020-01-09 20:37:43.538 30033-30198/com.hero.sm.android.hero D/OOOK_LOG:  name:/data/app/com.hero.sm.android.hero-LE9REnGocufmcpQN2JDQog==/base.apk/assets/bin/Data/Managed/Assembly-CSharp.dll  len:4472832  datac:MZ�</span><br><span class="line">2020-01-09 20:37:43.538 30033-30198/com.hero.sm.android.hero D/OOOK_LOG: TAG:libmono.so  --&gt; </span><br><span class="line">       # 0: 0xcec2acaa  _Z16captureBacktracePPvj</span><br><span class="line">      # 1: 0xcec2afac  _Z17backtraceToLogcatPcPh</span><br><span class="line">      # 2: 0xcec21e44  _Z22new_do_mono_image_loadiPiii</span><br><span class="line">      # 3: 0xc58a7d1c  --&gt;0x00190d1c</span><br><span class="line">      </span><br><span class="line">      2020-01-09 20:37:43.779 30033-30198/com.hero.sm.android.hero D/OOOK_LOG: libmono.so in do_mono_image_load </span><br><span class="line">2020-01-09 20:37:43.779 30033-30198/com.hero.sm.android.hero D/OOOK_LOG:  name:/data/app/com.hero.sm.android.hero-LE9REnGocufmcpQN2JDQog==/base.apk/assets/bin/Data/Managed/System.Core.dll  len:265728  datac:MZ�</span><br><span class="line">2020-01-09 20:37:43.780 30033-30198/com.hero.sm.android.hero D/OOOK_LOG: TAG:libmono.so  --&gt; </span><br><span class="line">       # 0: 0xcec2acaa  _Z16captureBacktracePPvj</span><br><span class="line">      # 1: 0xcec2afac  _Z17backtraceToLogcatPcPh</span><br><span class="line">      # 2: 0xcec21e44  _Z22new_do_mono_image_loadiPiii</span><br><span class="line">      # 3: 0xc58a7420  --&gt;0x00190420</span><br><span class="line">      # 4: 0xc58a8080  --&gt;0x00191080（mono_image_open_full）</span><br><span class="line">      # 5: 0xc584b8dc  --&gt;0x001348dc</span><br><span class="line">      # 6: 0xc584ebcc  --&gt;0x00137bcc</span><br><span class="line">      # 7: 0xc584ecd8  --&gt;0x00137cd8</span><br><span class="line">      # 8: 0xc584ed38  --&gt;0x00137d38（mono_assembly_load）</span><br><span class="line">      # 9: 0xc584a52c  --&gt;0x0013352c</span><br><span class="line">      #10: 0xc585206c  --&gt;0x0013b06c</span><br><span class="line">      #11: 0xc5863bfc  --&gt;0x0014cbfc</span><br><span class="line">      #12: 0xc5863ea4  --&gt;0x0014cea4（mono_class_get_full）</span><br><span class="line">      #13: 0xc58d97f4  --&gt;0x001c27f4</span><br><span class="line">      #14: 0xc58d6b54  --&gt;0x001bfb54</span><br><span class="line">      #15: 0xc58d6cf4  --&gt;0x001bfcf4</span><br><span class="line">      #16: 0xc58d93a4  --&gt;0x001c23a4</span><br><span class="line">      #17: 0xc58d99e8  --&gt;0x001c29e8</span><br><span class="line">      #18: 0xc58d6b54  --&gt;0x001bfb54（mono_metadata_parse_type_full）</span><br><span class="line">      #19: 0xc58d75dc  --&gt;0x001c05dc</span><br><span class="line">      #20: 0xc58afcd0  --&gt;0x00198cd0</span><br><span class="line">      #21: 0xc585c8f4  --&gt;0x001458f4</span><br><span class="line">      #22: 0xc585b19c  --&gt;0x0014419c</span><br><span class="line">      #23: 0xc585ecf4  --&gt;0x00147cf4</span><br><span class="line">      #24: 0xc5864c74  --&gt;0x0014dc74（mono_class_init）</span><br><span class="line">      #25: 0xc46c53f8  --&gt;0xfefae3f8</span><br><span class="line">      #26: 0xc46b6c28  --&gt;0xfef9fc28</span><br><span class="line">      #27: 0xc46b2014  --&gt;0xfef9b014</span><br><span class="line">      #28: 0xc46b5698  --&gt;0xfef9e698</span><br><span class="line">      #</span><br></pre></td></tr></table></figure>
+
+<p>加载Assembly-CSharp.dll 的调用栈只能跟踪到</p>
+<p><img src="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20200109204217508.png" alt="image-20200109204217508"></p>
+<p>而System.Core.dll与上边的dll路径不同，</p>
+<p><img src="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20200109204344874.png" alt="image-20200109204344874"></p>
+<h4 id="3-信息保存"><a href="#3-信息保存" class="headerlink" title="3.信息保存"></a>3.信息保存</h4><p>保存信息文件名为：com.hero.sm.android.hero&#x2F;files&#x2F;idymdyt_game_settings.xml</p>
+<p>策略：每次libNetProtect进入JNI_onload函数并调用初始化函数时，会检测com.hero.sm.android.hero&#x2F;files&#x2F;文件夹下是否有该文件，有则读取内容，进行操作（暂未找到上传接口），并且清空文件内容。如果没有则正常进行。当检测到风险主动退出时，会打开或创建该文件，写入内容后，退出应用。</p>
+<h4 id="4-电池信息的作用"><a href="#4-电池信息的作用" class="headerlink" title="4. 电池信息的作用"></a>4. 电池信息的作用</h4><p>Linux标准的 Power Supply驱动程序 所使用的文件系统路径为:&#x2F;sys&#x2F;class&#x2F;power_supply ,其中的每个子目录表示一种能源供应设备的名称。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">#define AC_ONLINE_PATH &quot;/sys/class/power_supply/ac/online&quot; AC 电源连接状态 </span><br><span class="line">#define USB_ONLINE_PATH &quot;/sys/class/power_supply/usb/online&quot; USB电源连接状态 </span><br><span class="line">#define BATTERY_STATUS_PATH &quot;/sys/class/power_supply/battery/status&quot;充电状态 </span><br><span class="line">#define BATTERY_HEALTH_PATH &quot;/sys/class/power_supply/battery/health&quot;电池状态 </span><br><span class="line">#define BATTERY_PRESENT_PATH &quot;/sys/class/power_supply/battery/present&quot;使用状态 </span><br><span class="line">#define BATTERY_CAPACITY_PATH &quot;/sys/class/power_supply/battery/capacity&quot;电池 level </span><br><span class="line">#define BATTERY_VOLTAGE_PATH &quot;/sys/class/power_supply/battery/batt_vol&quot;电池电压 </span><br><span class="line">#define BATTERY_TEMPERATURE_PATH &quot;/sys/class/power_supply/battery/batt_temp&quot;电池温度 </span><br><span class="line">#define BATTERY_TECHNOLOGY_PATH &quot;/sys/class/power_supply/battery/technology&quot;电池技术 当电池状态发生变化时,driver 会更新这些文件。传送信息到java</span><br></pre></td></tr></table></figure>
+
+<p>电池主要作用为模拟器检测，一般模拟器的电池温度为0和电量始终为50%（不变或很少变化）</p>
+<p>同理，通过检测android系统层特征检测模拟器的点：</p>
+<ul>
+<li>wifi,GPS，蓝牙，温度传感器的信息与真机不同</li>
+<li>Android模拟器不支持呼叫和接听实际来电，但可以通过控制台模拟电话呼叫（呼入和呼出）；</li>
+<li>Android模拟器不支持USB连接。</li>
+<li>Android模拟器不支持音频输入（捕捉），但支持输出（重放）。</li>
+<li>Android模拟器不支持扩展耳机。</li>
+<li>Android模拟器不能确定SD卡的插入&#x2F;弹出。</li>
+</ul>
+<h4 id="5-函数表"><a href="#5-函数表" class="headerlink" title="5. 函数表"></a>5. 函数表</h4><p>在 libmono.so 和 libNetProtect.so的 init_array段的第一个函数中，都初始化了两个C++ 的对象，其中包含了很多导入的系统函数和自己实现的系统函数：</p>
+<p><img src="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20200109152913179.png" alt="image-20200109152913179"></p>
+<p><img src="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20200109152937116.png" alt="image-20200109152937116"></p>
+<p>调用这些函数时，ida反编译如下：</p>
+<p><img src="https://raw.githubusercontent.com/nszdhd1/nszdhd1.github.io/master/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/image-20200109153616599.png" alt="image-20200109153616599"></p>
+<p>这样做的优点：</p>
+<ol>
+<li>ida 反编译是 变量 + 偏移，隐藏了函数名、函数调用等信息，增加了分析的难度</li>
+<li>所有系统函数（包括自己实现的）放在一个类里，便于开发和维护。</li>
+</ol>
+
+    </article>
+    <!-- license -->
+    
+        <div class="license-wrapper">
+            <p>原文作者：<a href="http://example.com">newbiemiao</a>
+            <p>原文链接：<a href="http://example.com/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/">http://example.com/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/</a>
+            <p>发表日期：<a href="http://example.com/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/">July 3rd 2020, 11:53:28 am</a>
+            <p>更新日期：<a href="http://example.com/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/">November 15th 2023, 10:39:53 am</a>
+            <p>版权声明：本文采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+        </div>
+    
+    <!-- paginator -->
+    <ul class="post-paginator">
+        <li class="next">
+            
+                <div class="nextSlogan">Next Post</div>
+                <a href="/2020/07/03/%E5%9F%BA%E4%BA%8Eva%E7%9A%84luajit-hook/" title="基于va的luajit hook">
+                    <div class="nextTitle">基于va的luajit hook</div>
+                </a>
+            
+        </li>
+        <li class="previous">
+            
+                <div class="prevSlogan">Previous Post</div>
+                <a href="/2020/04/07/magisk-riru/" title="magisk-riru 使用">
+                    <div class="prevTitle">magisk-riru 使用</div>
+                </a>
+            
+        </li>
+    </ul>
+    <!-- comment -->
+    
+        <div class="post-comment">
+            <!-- 来必力 City 版安装代码 -->
+
+
+            
+
+            
+
+            
+
+            <!-- utteranc评论 -->
+
+
+            <!-- partial('_partial/comment/changyan') -->
+            <!--PC版-->
+
+
+            
+            
+
+            
+
+        </div>
+    
+    <!-- timeliness note -->
+    <!-- idea from: https://hexo.fluid-dev.com/posts/hexo-injector/#%E6%96%87%E7%AB%A0%E6%97%B6%E6%95%88%E6%80%A7%E6%8F%90%E7%A4%BA -->
+    
+    <!-- Mathjax -->
+    
+</main>
+
+                <!-- profile -->
+                
+            </div>
+            <footer class="footer footer-unloaded">
+    <!-- social  -->
+    
+        <div class="social">
+            
+    
+        
+            
+                <a href="mailto:673304120@qq.com" class="iconfont-archer email" title=email ></a>
+            
+        
+    
+        
+            
+                <a href="//github.com/nszdhd1" class="iconfont-archer github" target="_blank" title=github></a>
+            
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+
+        </div>
+    
+    <!-- powered by Hexo  -->
+    <div class="copyright">
+        <span id="hexo-power">Powered by <a href="https://hexo.io/" target="_blank">Hexo</a></span><span class="iconfont-archer power">&#xe635;</span><span id="theme-info">theme <a href="https://github.com/fi3ework/hexo-theme-archer" target="_blank">Archer</a></span>
+    </div>
+    <!-- website approve for Chinese user -->
+    
+    <!-- 不蒜子  -->
+    
+        <div class="busuanzi-container">
+            
+             
+                <span id="busuanzi_container_site_pv">PV: <span id="busuanzi_value_site_pv"></span> :)</span>
+            
+        </div>
+    	
+</footer>
+
+        </div>
+        <!-- toc -->
+        
+            <div class="toc-wrapper toc-wrapper-loding" style=
+
+
+
+
+
+
+
+    top:50vh;
+
+>
+                <div class="toc-catalog">
+                    <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+                </div>
+                <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E7%A0%94%E7%A9%B6"><span class="toc-number">1.</span> <span class="toc-text">网易保护研究</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%9B%AE%E7%9A%84"><span class="toc-number">1.0.1.</span> <span class="toc-text">目的</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%86%E6%9E%90%E6%80%9D%E8%B7%AF"><span class="toc-number">1.0.2.</span> <span class="toc-text">分析思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%86%E6%9E%90%E8%BF%87%E7%A8%8B"><span class="toc-number">1.0.3.</span> <span class="toc-text">分析过程</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E6%A0%B9%E6%8D%AE%E6%80%9D%E8%B7%AF%E4%B8%80%E5%88%86%E6%9E%90"><span class="toc-number">1.0.3.1.</span> <span class="toc-text">1. 根据思路一分析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E6%80%9D%E8%B7%AF%E4%BA%8C%E4%B9%8B%E9%9D%99%E6%80%81%E5%88%86%E6%9E%90"><span class="toc-number">1.0.3.2.</span> <span class="toc-text">2. 思路二之静态分析</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%86%E6%9E%90%E7%BB%93%E6%9E%9C"><span class="toc-number">1.0.4.</span> <span class="toc-text">分析结果</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E9%9C%80%E8%A6%81%E5%8A%A0%E5%BC%BA%E5%AF%B9%E8%9C%82%E7%AA%9D%E6%B8%B8%E6%88%8F%E7%9A%84%E6%A3%80%E6%B5%8B"><span class="toc-number">1.0.4.1.</span> <span class="toc-text">1. 需要加强对蜂窝游戏的检测</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8%E4%BD%BF%E7%94%A8%E4%B8%AD%E6%96%AD%E5%AE%9E%E7%8E%B0"><span class="toc-number">1.0.4.2.</span> <span class="toc-text">2. 系统调用使用中断实现</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-%E7%BD%91%E6%98%93dll%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B"><span class="toc-number">1.0.4.3.</span> <span class="toc-text">3. 网易dll加载过程</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-%E4%BF%A1%E6%81%AF%E4%BF%9D%E5%AD%98"><span class="toc-number">1.0.4.4.</span> <span class="toc-text">3.信息保存</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-%E7%94%B5%E6%B1%A0%E4%BF%A1%E6%81%AF%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="toc-number">1.0.4.5.</span> <span class="toc-text">4. 电池信息的作用</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-%E5%87%BD%E6%95%B0%E8%A1%A8"><span class="toc-number">1.0.4.6.</span> <span class="toc-text">5. 函数表</span></a></li></ol></li></ol></li></ol></li></ol>
+            </div>
+        
+        <!-- sidebar -->
+        <div class="sidebar sidebar-hide">
+    <ul class="sidebar-tabs sidebar-tabs-active-0">
+        <li class="sidebar-tab-archives"><span class="iconfont-archer">&#xe67d;</span><span class="tab-name">Archive</span></li>
+        <li class="sidebar-tab-tags"><span class="iconfont-archer">&#xe61b;</span><span class="tab-name">Tag</span></li>
+        <li class="sidebar-tab-categories"><span class="iconfont-archer">&#xe666;</span><span class="tab-name">Cate</span></li>
+    </ul>
+    <div class="sidebar-content sidebar-content-show-archive">
+        <div class="sidebar-panel-archives">
+    <!-- 在 ejs 中将 archive 按照时间排序 -->
+    
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    
+    
+    
+    
+    <div class="total-and-search">
+        <div class="total-archive">
+        Total : 16
+        </div>
+        <!-- search  -->
+        
+    </div>
+    
+    <div class="post-archive">
+    
+        
+            
+            
+            <div class="archive-year"> 2022 </div>
+            <ul class="year-list">
+            
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/22</span>
+            <a class="archive-post-title" href="/2022/12/22/%E5%A6%82%E4%BD%95%E4%BF%AE%E6%94%B9unityHybridCLR%E7%83%AD%E6%9B%B4dll/">如何修改unity HybridCLR 热更dll</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/14</span>
+            <a class="archive-post-title" href="/2022/11/14/Genshin-IL2CPP-RunTime-Dump/">Genshin IL2CPP RunTime Dump</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/08</span>
+            <a class="archive-post-title" href="/2022/09/08/GameGuardian%E7%9A%84Lua%E8%84%9A%E6%9C%AC%E6%B7%B7%E6%B7%86%E5%88%86%E6%9E%90/">GameGuardian的Lua脚本混淆分析</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/21</span>
+            <a class="archive-post-title" href="/2022/03/21/%E5%88%A9%E7%94%A8Frida%E5%AE%9E%E7%8E%B0lua%E7%83%AD%E6%9B%B4%E6%96%B0/">利用Frida实现lua热更新</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">01/14</span>
+            <a class="archive-post-title" href="/2022/01/14/%E4%BD%BF%E7%94%A8unidbg%E8%BF%87%E4%BF%9D%E6%8A%A4/">使用unidbg过保护</a>
+        </li>
+    
+        
+            
+            
+                
+                </ul>
+            
+            <div class="archive-year"> 2021 </div>
+            <ul class="year-list">
+            
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">06/15</span>
+            <a class="archive-post-title" href="/2021/06/15/%E9%9D%9Eroot%E7%8E%AF%E5%A2%83%E4%B8%8Bfrida%E7%9A%84%E4%B8%A4%E7%A7%8D%E4%BD%BF%E7%94%A8%E6%96%B9%E5%BC%8F/">非root环境下frida的两种使用方式</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">06/15</span>
+            <a class="archive-post-title" href="/2021/06/15/%E4%BD%BF%E7%94%A8LIEF%E6%89%93%E9%80%A0MTP%E5%8A%A0%E5%9B%BA/">使用LIEF打造MTP加固</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">01/15</span>
+            <a class="archive-post-title" href="/2021/01/15/%E6%8A%96%E9%9F%B3%E8%AF%84%E8%AE%BA%E7%88%AC%E5%8F%96/">抖音评论爬取</a>
+        </li>
+    
+        
+            
+            
+                
+                </ul>
+            
+            <div class="archive-year"> 2020 </div>
+            <ul class="year-list">
+            
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/04</span>
+            <a class="archive-post-title" href="/2020/12/04/%E4%BD%BF%E7%94%A8frida%E8%8E%B7%E5%8F%96il2cpp%E7%AC%A6%E5%8F%B7%E4%BF%A1%E6%81%AF/">使用frida获取il2cpp符号信息</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">08/27</span>
+            <a class="archive-post-title" href="/2020/08/27/SO%E5%8A%A0%E5%AF%86/">SO加密</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">07/03</span>
+            <a class="archive-post-title" href="/2020/07/03/Unity%E4%BF%9D%E6%8A%A4%E4%B9%8Bassetbundle/">Unity保护之assetbundle</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">07/03</span>
+            <a class="archive-post-title" href="/2020/07/03/Unity%E4%BF%9D%E6%8A%A4%E4%B9%8Bil2cpp/">Unity保护之il2cpp</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">07/03</span>
+            <a class="archive-post-title" href="/2020/07/03/%E5%9F%BA%E4%BA%8Eva%E7%9A%84luajit-hook/">基于va的luajit hook</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">07/03</span>
+            <a class="archive-post-title" href="/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/">网易保护分析</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/07</span>
+            <a class="archive-post-title" href="/2020/04/07/magisk-riru/">magisk-riru 使用</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/09</span>
+            <a class="archive-post-title" href="/2020/03/09/Magisk%E6%A3%80%E6%B5%8B/">Magisk检测</a>
+        </li>
+    
+    </div>
+</div>
+
+        <div class="sidebar-panel-tags">
+    <div class="sidebar-tags-name">
+        
+            <span class="sidebar-tag-name" data-tags="Analytics">
+                <span class="iconfont-archer">&#xe606;</span>
+                Analytics
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="game">
+                <span class="iconfont-archer">&#xe606;</span>
+                game
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="other">
+                <span class="iconfont-archer">&#xe606;</span>
+                other
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="protect">
+                <span class="iconfont-archer">&#xe606;</span>
+                protect
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="tools">
+                <span class="iconfont-archer">&#xe606;</span>
+                tools
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="Misc">
+                <span class="iconfont-archer">&#xe606;</span>
+                Misc
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="Hook">
+                <span class="iconfont-archer">&#xe606;</span>
+                Hook
+            </span>
+        
+    </div>
+    <div class="iconfont-archer sidebar-tags-empty">&#xe678;</div>
+    <div class="tag-load-fail" style="display: none; color: #ccc; font-size: 0.6rem;">
+        缺失模块，请参考主题文档进行安装配置：https://github.com/fi3ework/hexo-theme-archer#%E5%AE%89%E8%A3%85%E4%B8%BB%E9%A2%98
+    </div> 
+    <div class="sidebar-tags-list"></div>
+</div>
+
+        <div class="sidebar-panel-categories">
+    <div class="sidebar-categories-name">
+    
+    </div>
+    <div class="iconfont-archer sidebar-categories-empty">&#xe678;</div>
+    <div class="sidebar-categories-list"></div>
+</div>
+
+    </div>
+</div>
+
+        <!-- site-meta -->
+        <script>
+    var siteMetaRoot = "/"
+    if (siteMetaRoot === "undefined") {
+        siteMetaRoot = '/'
+    }
+    var siteMeta = {
+        url: "http://example.com",
+        root: siteMetaRoot,
+        author: "newbiemiao"
+    }
+</script>
+
+        <!-- import experimental options here -->
+        <!-- Custom Font -->
+
+
+        <!-- main func -->
+        <script src="/scripts/main.js?v=20211217"></script>
+        <!-- dark mode -->
+        <script src="/scripts/dark.js?v=20211217"></script>
+        <!-- fancybox -->
+        <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" defer></script>
+        <!-- algolia -->
+        
+        <!-- busuanzi -->
+        
+            <script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" async></script>
+        
+        <!-- CNZZ -->
+        
+        <!-- async load share.js -->
+        
+            <script src="/scripts/share.js?v=20211217" async></script>
+        
+        <!-- mermaid -->
+        
+    </body>
+</html>

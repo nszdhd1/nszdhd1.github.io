@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <!-- title -->
+
+
+    
+
+<!-- keywords -->
+
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="author" content="newbiemiao">
+    <meta name="renderer" content="webkit">
+    <meta name="copyright" content="newbiemiao">
+    
+        <meta name="keywords" content="hexo,hexo-theme,hexo-blog">
+    
+    <meta name="description" content="">
+    <meta name="description" content="使用frida获取unity il2cpp符号信息本次主角是米哈游的《原神》，起因还是在网上看到了一篇关于崩3的符号信息还原的文章，就想看看原神上有没有变化。 0x1 背景本次分析选取的是android平台的，游戏采用unity开发，使用il2cpp模式编译。 使用 IL2CPP 模式编译，游戏中使用的字符串都被保存在了一个global-metadata.dat的资源文件里，只有在动态运行时才会将">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用frida获取il2cpp符号信息">
+<meta property="og:url" content="http://example.com/2020/12/04/%E4%BD%BF%E7%94%A8frida%E8%8E%B7%E5%8F%96il2cpp%E7%AC%A6%E5%8F%B7%E4%BF%A1%E6%81%AF/index.html">
+<meta property="og:site_name" content="喵喵的blog">
+<meta property="og:description" content="使用frida获取unity il2cpp符号信息本次主角是米哈游的《原神》，起因还是在网上看到了一篇关于崩3的符号信息还原的文章，就想看看原神上有没有变化。 0x1 背景本次分析选取的是android平台的，游戏采用unity开发，使用il2cpp模式编译。 使用 IL2CPP 模式编译，游戏中使用的字符串都被保存在了一个global-metadata.dat的资源文件里，只有在动态运行时才会将">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/%E4%BD%BF%E7%94%A8frida%E8%8E%B7%E5%8F%96il2cpp%E7%AC%A6%E5%8F%B7%E4%BF%A1%E6%81%AF/image-20201130152442279.png">
+<meta property="og:image" content="http://example.com/%E4%BD%BF%E7%94%A8frida%E8%8E%B7%E5%8F%96il2cpp%E7%AC%A6%E5%8F%B7%E4%BF%A1%E6%81%AF/image-20201201210928019.png">
+<meta property="og:image" content="http://example.com/%E4%BD%BF%E7%94%A8frida%E8%8E%B7%E5%8F%96il2cpp%E7%AC%A6%E5%8F%B7%E4%BF%A1%E6%81%AF/image-20201203142517555.png">
+<meta property="og:image" content="http://example.com/%E4%BD%BF%E7%94%A8frida%E8%8E%B7%E5%8F%96il2cpp%E7%AC%A6%E5%8F%B7%E4%BF%A1%E6%81%AF/image-20201207213554471.png">
+<meta property="article:published_time" content="2020-12-04T07:55:31.000Z">
+<meta property="article:modified_time" content="2023-11-15T02:39:53.851Z">
+<meta property="article:author" content="newbiemiao">
+<meta property="article:tag" content="game">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/%E4%BD%BF%E7%94%A8frida%E8%8E%B7%E5%8F%96il2cpp%E7%AC%A6%E5%8F%B7%E4%BF%A1%E6%81%AF/image-20201130152442279.png">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <link rel="icon" href="/assets/favicon.ico">
+    
+    <title>使用frida获取il2cpp符号信息 · nszdhd1&#39;s blog</title>
+    <!-- /*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
+/* This file is meant as a standalone workflow for
+- testing support for link[rel=preload]
+- enabling async CSS loading in browsers that do not support rel=preload
+- applying rel preload css once loaded, whether supported or not.
+*/ -->
+<script>
+    (function (w) {
+        'use strict'
+        // rel=preload support test
+        if (!w.loadCSS) {
+            w.loadCSS = function () {}
+        }
+        // define on the loadCSS obj
+        var rp = (loadCSS.relpreload = {})
+        // rel=preload feature support test
+        // runs once and returns a function for compat purposes
+        rp.support = (function () {
+            var ret
+            try {
+                ret = w.document.createElement('link').relList.supports('preload')
+            } catch (e) {
+                ret = false
+            }
+            return function () {
+                return ret
+            }
+        })()
+
+        // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+        // then change that media back to its intended value on load
+        rp.bindMediaToggle = function (link) {
+            // remember existing media attr for ultimate state, or default to 'all'
+            var finalMedia = link.media || 'all'
+
+            function enableStylesheet() {
+                link.media = finalMedia
+            }
+
+            // bind load handlers to enable media
+            if (link.addEventListener) {
+                link.addEventListener('load', enableStylesheet)
+            } else if (link.attachEvent) {
+                link.attachEvent('onload', enableStylesheet)
+            }
+
+            // Set rel and non-applicable media type to start an async request
+            // note: timeout allows this to happen async to let rendering continue in IE
+            setTimeout(function () {
+                link.rel = 'stylesheet'
+                link.media = 'only x'
+            })
+            // also enable media after 3 seconds,
+            // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+            setTimeout(enableStylesheet, 3000)
+        }
+
+        // loop through link elements in DOM
+        rp.poly = function () {
+            // double check this to prevent external calls from running
+            if (rp.support()) {
+                return
+            }
+            var links = w.document.getElementsByTagName('link')
+            for (var i = 0; i < links.length; i++) {
+                var link = links[i]
+                // qualify links to those with rel=preload and as=style attrs
+                if (
+                    link.rel === 'preload' &&
+                    link.getAttribute('as') === 'style' &&
+                    !link.getAttribute('data-loadcss')
+                ) {
+                    // prevent rerunning on link
+                    link.setAttribute('data-loadcss', true)
+                    // bind listeners to toggle media back
+                    rp.bindMediaToggle(link)
+                }
+            }
+        }
+
+        // if unsupported, run the polyfill
+        if (!rp.support()) {
+            // run once at least
+            rp.poly()
+
+            // rerun poly on an interval until onload
+            var run = w.setInterval(rp.poly, 500)
+            if (w.addEventListener) {
+                w.addEventListener('load', function () {
+                    rp.poly()
+                    w.clearInterval(run)
+                })
+            } else if (w.attachEvent) {
+                w.attachEvent('onload', function () {
+                    rp.poly()
+                    w.clearInterval(run)
+                })
+            }
+        }
+
+        // commonjs
+        if (typeof exports !== 'undefined') {
+            exports.loadCSS = loadCSS
+        } else {
+            w.loadCSS = loadCSS
+        }
+    })(typeof global !== 'undefined' ? global : this)
+</script>
+
+    <style type="text/css">
+    @font-face {
+        font-family: 'Oswald-Regular';
+        src: url("/font/Oswald-Regular.ttf");
+    }
+
+    body {
+        margin: 0;
+    }
+
+    header,
+    footer,
+    .back-top,
+    .sidebar,
+    .container,
+    .site-intro-meta,
+    .toc-wrapper {
+        display: none;
+    }
+
+    .site-intro {
+        position: relative;
+        z-index: 3;
+        width: 100%;
+        /* height: 50vh; */
+        overflow: hidden;
+    }
+
+    .site-intro-placeholder {
+        position: absolute;
+        z-index: -2;
+        top: 0;
+        left: 0;
+        width: calc(100% + 300px);
+        height: 100%;
+        background: repeating-linear-gradient(-45deg, #444 0, #444 80px, #333 80px, #333 160px);
+        background-position: center center;
+        transform: translate3d(-226px, 0, 0);
+        animation: gradient-move 2.5s ease-out 0s infinite;
+    }
+
+    @keyframes gradient-move {
+        0% {
+            transform: translate3d(-226px, 0, 0);
+        }
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+    }
+</style>
+
+    <link rel="preload" href="/css/style.css?v=20211217" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="/css/dark.css?v=20211217" as="style">
+    <link rel="stylesheet" href="/css/dark.css">
+    <link rel="stylesheet" href="/css/mobile.css?v=20211217" media="(max-width: 960px)">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" as="script">
+    <link rel="preload" href="/scripts/main.js?v=20211217" as="script">
+    <link rel="preload" href="/scripts/dark.js?v=20211217" as="script">
+    <link rel="preload" href="/font/Oswald-Regular.ttf" as="font" crossorigin>
+    <link rel="preload" href="https://at.alicdn.com/t/font_327081_1dta1rlogw17zaor.woff" as="font" crossorigin>
+    <!-- algolia -->
+    
+    <!-- 百度统计  -->
+    
+    <!-- Google tag (gtag.js) -->
+    
+
+<meta name="generator" content="Hexo 7.0.0"></head>
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script type="text/javascript">
+        if (typeof window.$ == undefined) {
+            console.warn('jquery load from jsdelivr failed, will load local script')
+            document.write('<script src="/lib/jquery.min.js" />')
+        }
+    </script>
+    
+        <body class="post-body">
+    
+        <!-- header -->
+        <header class="header header-mobile">
+    <!-- top read progress line -->
+    <div class="header-element">
+        <div class="read-progress"></div>
+    </div>
+    <!-- sidebar menu button -->
+    <div class="header-element">
+        
+            <div class="header-sidebar-menu">
+        
+            
+                <div style="padding-left: 1px;">&#xe775;</div>
+            
+        </div>
+    </div>
+    <!-- header actions -->
+    <div class="header-actions">
+        <!-- theme mode switch button -->
+        <span class="header-theme-btn header-element">
+            <i class="fas fa-adjust"></i>
+        </span>
+        <!-- back to home page text -->
+        <span class="home-link header-element">
+            <a href=/>nszdhd1's blog.</a>
+        </span>
+    </div>
+    <!-- toggle banner for post layout -->
+    
+        
+            <div class="banner">
+        
+            <div class="blog-title header-element">
+                <a href="/">nszdhd1&#39;s blog.</a>
+            </div>
+            <div class="post-title header-element">
+                <a href="#" class="post-name">使用frida获取il2cpp符号信息</a>
+            </div>
+        </div>
+    
+</header>
+
+        <!-- fixed footer -->
+        <footer class="footer-fixed">
+    <!-- back to top button -->
+    <div class="footer-fixed-element">
+        
+            <div class="back-top back-top-hidden">
+        
+        
+            <div>&#xe639;</div>
+        
+        </div>
+    </div>
+</footer>
+
+        <!-- wrapper -->
+        <div class="wrapper">
+            <div class="site-intro" style="
+
+
+
+
+
+
+
+    height:50vh;
+
+">
+    
+    <!-- 主页  -->
+    
+        
+    <!-- 404页  -->
+    
+    <div class="site-intro-placeholder"></div>
+    <div class="site-intro-img" style="background-image: url(/intro/post-bg.jpg)"></div>
+    <div class="site-intro-meta">
+        <!-- 标题  -->
+        <h1 class="intro-title">
+            <!-- 主页  -->
+            
+                使用frida获取il2cpp符号信息
+            <!-- 404 -->
+            
+        </h1>
+        <!-- 副标题 -->
+        <p class="intro-subtitle">
+            <!-- 主页副标题  -->
+            
+                
+            <!-- 404 -->
+            
+        </p>
+        <!-- 文章页 meta -->
+        
+            <div class="post-intros">
+                <!-- 文章页标签  -->
+                
+                    <div class= post-intro-tags >
+    
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="game">game</a>
+    
+</div>
+
+                
+                <!-- 文章字数统计 -->
+                
+                <div class="post-intro-meta">
+                    <!-- 撰写日期 -->
+                    <span class="iconfont-archer post-intro-calander">&#xe676;</span>
+                    <span class="post-intro-time">2020/12/04</span>
+                    <!-- busuanzi -->
+                    
+                        <span id="busuanzi_container_page_pv" class="busuanzi-pv">
+                            <span class="iconfont-archer post-intro-busuanzi">&#xe602;</span>
+                            <span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    
+                    <!-- 文章分享 -->
+                    <span class="share-wrapper">
+                        <span class="iconfont-archer share-icon">&#xe71d;</span>
+                        <span class="share-text">Share</span>
+                        <ul class="share-list">
+                            <li class="iconfont-archer share-qr" data-type="qr">&#xe75b;
+                                <div class="share-qrcode"></div>
+                            </li>
+                            <li class="iconfont-archer" data-type="weibo">&#xe619;</li>
+                            <li class="iconfont-archer" data-type="qzone">&#xe62e;</li>
+                            <li class="iconfont-archer" data-type="twitter">&#xe634;</li>
+                            <li class="iconfont-archer" data-type="facebook">&#xe67a;</li>
+                        </ul>
+                    </span>
+                </div>
+            </div>
+        
+    </div>
+</div>
+
+            <script>
+  // get user agent
+  function getBrowserVersions() {
+    var u = window.navigator.userAgent
+    return {
+      userAgent: u,
+      trident: u.indexOf('Trident') > -1, //IE内核
+      presto: u.indexOf('Presto') > -1, //opera内核
+      webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+      gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+      mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+      ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+      android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+      iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者安卓QQ浏览器
+      iPad: u.indexOf('iPad') > -1, //是否为iPad
+      webApp: u.indexOf('Safari') == -1, //是否为web应用程序，没有头部与底部
+      weixin: u.indexOf('MicroMessenger') == -1, //是否为微信浏览器
+      uc: u.indexOf('UCBrowser') > -1, //是否为android下的UC浏览器
+    }
+  }
+  var browser = {
+    versions: getBrowserVersions(),
+  }
+  console.log('userAgent: ' + browser.versions.userAgent)
+
+  // callback
+  function fontLoaded() {
+    console.log('font loaded')
+    if (document.getElementsByClassName('site-intro-meta')) {
+      document
+        .getElementsByClassName('intro-title')[0]
+        .classList.add('intro-fade-in')
+      document
+        .getElementsByClassName('intro-subtitle')[0]
+        .classList.add('intro-fade-in')
+      var postIntros = document.getElementsByClassName('post-intros')[0]
+      if (postIntros) {
+        postIntros.classList.add('post-fade-in')
+      }
+    }
+  }
+
+  // UC不支持跨域，所以直接显示
+  function asyncCb() {
+    if (browser.versions.uc) {
+      console.log('UCBrowser')
+      fontLoaded()
+    } else {
+      WebFont.load({
+        custom: {
+          families: ['Oswald-Regular'],
+        },
+        loading: function () {
+          // 所有字体开始加载
+          // console.log('font loading');
+        },
+        active: function () {
+          // 所有字体已渲染
+          fontLoaded()
+        },
+        inactive: function () {
+          // 字体预加载失败，无效字体或浏览器不支持加载
+          console.log('inactive: timeout')
+          fontLoaded()
+        },
+        timeout: 5000, // Set the timeout to two seconds
+      })
+    }
+  }
+
+  function asyncErr() {
+    console.warn('script load from CDN failed, will load local script')
+  }
+
+  // load webfont-loader async, and add callback function
+  function async(u, cb, err) {
+    var d = document,
+      t = 'script',
+      o = d.createElement(t),
+      s = d.getElementsByTagName(t)[0]
+    o.src = u
+    if (cb) {
+      o.addEventListener(
+        'load',
+        function (e) {
+          cb(null, e)
+        },
+        false
+      )
+    }
+    if (err) {
+      o.addEventListener(
+        'error',
+        function (e) {
+          err(null, e)
+        },
+        false
+      )
+    }
+    s.parentNode.insertBefore(o, s)
+  }
+
+  var asyncLoadWithFallBack = function (arr, success, reject) {
+    var currReject = function () {
+      reject()
+      arr.shift()
+      if (arr.length) async(arr[0], success, currReject)
+    }
+
+    async(arr[0], success, currReject)
+  }
+
+  asyncLoadWithFallBack(
+    [
+      'https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js',
+      'https://cdn.bootcss.com/webfont/1.6.28/webfontloader.js',
+      "/lib/webfontloader.min.js",
+    ],
+    asyncCb,
+    asyncErr
+  )
+</script>
+
+            <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
+            <div class="container container-unloaded">
+                <main class="main post-page">
+    <article class="article-entry">
+        <h1 id="使用frida获取unity-il2cpp符号信息"><a href="#使用frida获取unity-il2cpp符号信息" class="headerlink" title="使用frida获取unity il2cpp符号信息"></a>使用frida获取unity il2cpp符号信息</h1><p>本次主角是米哈游的《原神》，起因还是在网上看到了一篇关于崩3的符号信息还原的文章，就想看看原神上有没有变化。</p>
+<h2 id="0x1-背景"><a href="#0x1-背景" class="headerlink" title="0x1 背景"></a>0x1 背景</h2><p>本次分析选取的是android平台的，游戏采用unity开发，使用il2cpp模式编译。</p>
+<p>使用 IL2CPP 模式编译，游戏中使用的字符串都被保存在了一个global-metadata.dat的资源文件里，只有在动态运行时才会将这些字符串读入内存。一般使用Il2CppDumper就可以读取global-metadata.dat文件中的信息，帮助反编译。</p>
+<p>有破解就有保护，可能会遇到无法dump或者global-metadata.dat文件结构被修改的情况，无法使用Il2CppDumper，这个时候就需要自己动手了。</p>
+<span id="more"></span>
+
+<h2 id="0x2-IL2CPP-加载过程"><a href="#0x2-IL2CPP-加载过程" class="headerlink" title="0x2 IL2CPP 加载过程"></a>0x2 IL2CPP 加载过程</h2><p>github上随便找一个il2cpp的源码，搜索global-metadata.dat，发现只有函数MetadataCache::Initialize()处使用。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">MetadataCache::Initialize</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    s_GlobalMetadata = vm::MetadataLoader::<span class="built_in">LoadMetadataFile</span>(<span class="string">&quot;global-metadata.dat&quot;</span>);</span><br><span class="line">    s_GlobalMetadataHeader = (<span class="type">const</span> Il2CppGlobalMetadataHeader*)s_GlobalMetadata;</span><br><span class="line">    ...</span><br><span class="line">        </span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+
+<p>查看LoadMetadataFile代码：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span>* <span class="title">MetadataLoader::LoadMetadataFile</span><span class="params">(<span class="type">const</span> <span class="type">char</span>* fileName)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    std::string resourcesDirectory = utils::PathUtils::<span class="built_in">Combine</span>(utils::Runtime::<span class="built_in">GetDataDir</span>(), utils::<span class="built_in">StringView</span>&lt;<span class="type">char</span>&gt;(<span class="string">&quot;Metadata&quot;</span>));</span><br><span class="line"></span><br><span class="line">    std::string resourceFilePath = utils::PathUtils::<span class="built_in">Combine</span>(resourcesDirectory, utils::<span class="built_in">StringView</span>&lt;<span class="type">char</span>&gt;(fileName, <span class="built_in">strlen</span>(fileName)));</span><br><span class="line"></span><br><span class="line">    <span class="type">int</span> error = <span class="number">0</span>;</span><br><span class="line">    FileHandle* handle = File::<span class="built_in">Open</span>(resourceFilePath, kFileModeOpen, kFileAccessRead, kFileShareRead, kFileOptionsNone, &amp;error);</span><br><span class="line">    <span class="keyword">if</span> (error != <span class="number">0</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">    <span class="type">void</span>* fileBuffer = utils::MemoryMappedFile::<span class="built_in">Map</span>(handle);</span><br><span class="line"></span><br><span class="line">    File::<span class="built_in">Close</span>(handle, &amp;error);</span><br><span class="line">    <span class="keyword">if</span> (error != <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        utils::MemoryMappedFile::<span class="built_in">Unmap</span>(fileBuffer);</span><br><span class="line">        fileBuffer = <span class="literal">NULL</span>;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> fileBuffer;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>很明显，就是Initialize时调用LoadMetadataFile将global-metadata.dat映射到内存中。</p>
+<p>还需要稍微了解一下global-metadata.dat文件结构。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">Il2CppGlobalMetadataHeader</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int32_t</span> sanity;</span><br><span class="line">    <span class="type">int32_t</span> version;</span><br><span class="line">    <span class="type">int32_t</span> stringLiteralOffset; <span class="comment">// string data for managed code</span></span><br><span class="line">    <span class="type">int32_t</span> stringLiteralCount;</span><br><span class="line">    <span class="type">int32_t</span> stringLiteralDataOffset;</span><br><span class="line">    <span class="type">int32_t</span> stringLiteralDataCount;</span><br><span class="line">    <span class="type">int32_t</span> stringOffset; <span class="comment">// string data for metadata</span></span><br><span class="line">    <span class="type">int32_t</span> stringCount;</span><br><span class="line">    <span class="type">int32_t</span> eventsOffset; <span class="comment">// Il2CppEventDefinition</span></span><br><span class="line">    <span class="type">int32_t</span> eventsCount;</span><br><span class="line">    <span class="type">int32_t</span> propertiesOffset; <span class="comment">// Il2CppPropertyDefinition</span></span><br><span class="line">    <span class="type">int32_t</span> propertiesCount;</span><br><span class="line">    <span class="type">int32_t</span> methodsOffset; <span class="comment">// Il2CppMethodDefinition</span></span><br><span class="line">    <span class="type">int32_t</span> methodsCount;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="0x3-某手游加载过程"><a href="#0x3-某手游加载过程" class="headerlink" title="0x3 某手游加载过程"></a>0x3 某手游加载过程</h2><p>反编译原神的il2cpp.so，loadmetadataFile()函数，对比原始loadmetadataFile，可以清楚的看到将文件映射进内存后进行了一次解密操作。（在MetadataCache::Initialize中）</p>
+<p><img src="/%E4%BD%BF%E7%94%A8frida%E8%8E%B7%E5%8F%96il2cpp%E7%AC%A6%E5%8F%B7%E4%BF%A1%E6%81%AF/image-20201130152442279.png" alt="image-20201130152442279"></p>
+<p>再查看MetadataCache::Initialize()，根据红框，对比原始代码，可以发现global-metadata.dat文件结构已经被修改，即使成功dump文件也不能使用Il2CppDumper。</p>
+<p><img src="/%E4%BD%BF%E7%94%A8frida%E8%8E%B7%E5%8F%96il2cpp%E7%AC%A6%E5%8F%B7%E4%BF%A1%E6%81%AF/image-20201201210928019.png" alt="image-20201201210928019"></p>
+<h2 id="0x4-hook-SetupMethodsLocked"><a href="#0x4-hook-SetupMethodsLocked" class="headerlink" title="0x4 hook SetupMethodsLocked"></a>0x4 hook SetupMethodsLocked</h2><p>为什么选择在SetupMethodsLocked hook，有其他大佬已经讲得很仔细了，可以参考<a target="_blank" rel="noopener" href="https://www.nevermoe.com/2016/09/08/%e8%bf%98%e5%8e%9f%e4%bd%bf%e7%94%a8il2cpp%e7%9a%84symbol%ef%bc%88%e4%ba%8c%ef%bc%89/">还原使用IL2CPP编译的unity游戏的symbol</a></p>
+<p>阅读源码,通过il2cpp_class_get_methods-&gt;Class::GetMethods-&gt;Class::SetupMethods跟踪到SetupMethodsLocked：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">const</span> MethodInfo* <span class="title">il2cpp_class_get_methods</span><span class="params">(Il2CppClass *klass, <span class="type">void</span>* *iter)</span><span class="comment">//导出函数很好找</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> Class::<span class="built_in">GetMethods</span>(klass, iter);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"> <span class="function"><span class="type">const</span> MethodInfo* <span class="title">Class::GetMethods</span><span class="params">(Il2CppClass *klass, <span class="type">void</span>* *iter)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">     ...</span><br><span class="line">        <span class="keyword">if</span> (!*iter)</span><br><span class="line">        &#123;</span><br><span class="line">            Class::<span class="built_in">SetupMethods</span>(klass);</span><br><span class="line">            <span class="keyword">if</span> (klass-&gt;method_count == <span class="number">0</span>)</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">            *iter = &amp;klass-&gt;methods[<span class="number">0</span>];</span><br><span class="line">            <span class="keyword">return</span> klass-&gt;methods[<span class="number">0</span>];</span><br><span class="line">        &#125;</span><br><span class="line">   ...</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">Class::SetupMethods</span><span class="params">(Il2CppClass *klass)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (klass-&gt;method_count || klass-&gt;rank)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function">FastAutoLock <span class="title">lock</span><span class="params">(&amp;g_MetadataLock)</span></span>;</span><br><span class="line">        <span class="built_in">SetupMethodsLocked</span>(klass, lock);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">SetupMethodsLocked</span><span class="params">(Il2CppClass *klass, <span class="type">const</span> FastAutoLock&amp; lock)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> ((!klass-&gt;method_count &amp;&amp; !klass-&gt;rank) || klass-&gt;methods)</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (klass-&gt;generic_class)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">InitLocked</span>(GenericClass::<span class="built_in">GetTypeDefinition</span>(klass-&gt;generic_class), lock);</span><br><span class="line">            GenericClass::<span class="built_in">SetupMethods</span>(klass);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (klass-&gt;rank)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">InitLocked</span>(klass-&gt;element_class, lock);</span><br><span class="line">            <span class="built_in">SetupVTable</span>(klass, lock);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span> (klass-&gt;method_count == <span class="number">0</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                klass-&gt;methods = <span class="literal">NULL</span>;</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            klass-&gt;methods = (<span class="type">const</span> MethodInfo**)<span class="built_in">IL2CPP_CALLOC</span>(klass-&gt;method_count, <span class="built_in">sizeof</span>(MethodInfo*));</span><br><span class="line">            MethodInfo* methods = (MethodInfo*)<span class="built_in">IL2CPP_CALLOC</span>(klass-&gt;method_count, <span class="built_in">sizeof</span>(MethodInfo));</span><br><span class="line">            MethodInfo* newMethod = methods;</span><br><span class="line"></span><br><span class="line">            MethodIndex start = klass-&gt;typeDefinition-&gt;methodStart;</span><br><span class="line">            <span class="built_in">IL2CPP_ASSERT</span>(start != kFieldIndexInvalid);</span><br><span class="line">            MethodIndex end = start + klass-&gt;method_count;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">for</span> (MethodIndex index = start; index &lt; end; ++index)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="type">const</span> Il2CppMethodDefinition* methodDefinition = MetadataCache::<span class="built_in">GetMethodDefinitionFromIndex</span>(index);</span><br><span class="line"></span><br><span class="line">                newMethod-&gt;name = MetadataCache::<span class="built_in">GetStringFromIndex</span>(methodDefinition-&gt;nameIndex);</span><br><span class="line">                newMethod-&gt;methodPointer = MetadataCache::<span class="built_in">GetMethodPointerFromIndex</span>(methodDefinition-&gt;methodIndex);</span><br><span class="line">                newMethod-&gt;invoker_method = MetadataCache::<span class="built_in">GetMethodInvokerFromIndex</span>(methodDefinition-&gt;invokerIndex);</span><br><span class="line">                newMethod-&gt;declaring_type = klass;</span><br><span class="line">                newMethod-&gt;return_type = MetadataCache::<span class="built_in">GetIl2CppTypeFromIndex</span>(methodDefinition-&gt;returnType);</span><br><span class="line"></span><br><span class="line">                ParameterInfo* parameters = (ParameterInfo*)<span class="built_in">IL2CPP_CALLOC</span>(methodDefinition-&gt;parameterCount, <span class="built_in">sizeof</span>(ParameterInfo));</span><br><span class="line">                ParameterInfo* newParameter = parameters;</span><br><span class="line">                <span class="keyword">for</span> (<span class="type">uint16_t</span> paramIndex = <span class="number">0</span>; paramIndex &lt; methodDefinition-&gt;parameterCount; ++paramIndex)</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="type">const</span> Il2CppParameterDefinition* parameterDefinition = MetadataCache::<span class="built_in">GetParameterDefinitionFromIndex</span>(methodDefinition-&gt;parameterStart + paramIndex);</span><br><span class="line">                    newParameter-&gt;name = MetadataCache::<span class="built_in">GetStringFromIndex</span>(parameterDefinition-&gt;nameIndex);</span><br><span class="line">                    newParameter-&gt;position = paramIndex;</span><br><span class="line">                    newParameter-&gt;token = parameterDefinition-&gt;token;</span><br><span class="line">                    newParameter-&gt;customAttributeIndex = parameterDefinition-&gt;customAttributeIndex;</span><br><span class="line">                    newParameter-&gt;parameter_type = MetadataCache::<span class="built_in">GetIl2CppTypeFromIndex</span>(parameterDefinition-&gt;typeIndex);</span><br><span class="line"></span><br><span class="line">                    newParameter++;</span><br><span class="line">                &#125;</span><br><span class="line">                newMethod-&gt;parameters = parameters;</span><br><span class="line"></span><br><span class="line">                newMethod-&gt;customAttributeIndex = methodDefinition-&gt;customAttributeIndex;</span><br><span class="line">                newMethod-&gt;flags = methodDefinition-&gt;flags;</span><br><span class="line">                newMethod-&gt;iflags = methodDefinition-&gt;iflags;</span><br><span class="line">                newMethod-&gt;slot = methodDefinition-&gt;slot;</span><br><span class="line">                newMethod-&gt;parameters_count = <span class="built_in">static_cast</span>&lt;<span class="type">const</span> <span class="type">uint8_t</span>&gt;(methodDefinition-&gt;parameterCount);</span><br><span class="line">                newMethod-&gt;is_inflated = <span class="literal">false</span>;</span><br><span class="line">                newMethod-&gt;token = methodDefinition-&gt;token;</span><br><span class="line">                newMethod-&gt;methodDefinition = methodDefinition;</span><br><span class="line">                newMethod-&gt;genericContainer = MetadataCache::<span class="built_in">GetGenericContainerFromIndex</span>(methodDefinition-&gt;genericContainerIndex);</span><br><span class="line">                <span class="keyword">if</span> (newMethod-&gt;genericContainer)</span><br><span class="line">                    newMethod-&gt;is_generic = <span class="literal">true</span>;</span><br><span class="line"></span><br><span class="line">                klass-&gt;methods[index - start] = newMethod;</span><br><span class="line"></span><br><span class="line">                newMethod++; <span class="comment">//在这里hook，就可以轻松拿到全部MethodInfo</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>MethodInfo、Il2CppClass的结构也需要了解一下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> <span class="title class_">Il2CppClass</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">const</span> Il2CppImage* image;</span><br><span class="line">    <span class="type">void</span>* gc_desc;</span><br><span class="line">    <span class="type">const</span> <span class="type">char</span>* name;</span><br><span class="line">    <span class="type">const</span> <span class="type">char</span>* namespaze;</span><br><span class="line">    ... </span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">MethodInfo</span></span><br><span class="line">&#123;</span><br><span class="line">    Il2CppMethodPointer methodPointer;</span><br><span class="line">    InvokerMethod invoker_method;</span><br><span class="line">    <span class="type">const</span> <span class="type">char</span>* name;</span><br><span class="line">    Il2CppClass *declaring_type;</span><br><span class="line">    <span class="type">const</span> Il2CppType *return_type;</span><br><span class="line">    <span class="type">const</span> ParameterInfo* parameters;</span><br><span class="line">  ...</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>反编译获取hook地址：</p>
+<p><img src="/%E4%BD%BF%E7%94%A8frida%E8%8E%B7%E5%8F%96il2cpp%E7%AC%A6%E5%8F%B7%E4%BF%A1%E6%81%AF/image-20201203142517555.png" alt="image-20201203142517555"></p>
+<p>编写frida js：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// hook SetupMethodsLocked</span></span><br><span class="line"><span class="keyword">var</span> <span class="variable language_">module</span> = <span class="title class_">Process</span>.<span class="title function_">findModuleByName</span>(<span class="string">&quot;libil2cpp.so&quot;</span>);</span><br><span class="line"><span class="keyword">var</span> p_size = <span class="number">8</span>;</span><br><span class="line"><span class="title class_">Interceptor</span>.<span class="title function_">attach</span>(<span class="title function_">ptr</span>(<span class="variable language_">module</span>.<span class="property">base</span>).<span class="title function_">add</span>(<span class="number">0x72F09EC</span>).<span class="title function_">add</span>(<span class="number">0x204</span>),&#123;</span><br><span class="line">    <span class="attr">onEnter</span>:<span class="keyword">function</span>(<span class="params">args</span>)&#123;</span><br><span class="line">    <span class="keyword">var</span> newMethod = <span class="variable language_">this</span>.<span class="property">context</span>.<span class="property">x20</span></span><br><span class="line">    <span class="keyword">var</span> pointer = newMethod.<span class="title function_">readPointer</span>(); <span class="comment">//MethodInfo</span></span><br><span class="line">    <span class="keyword">var</span> name = newMethod.<span class="title function_">add</span>(p_size * <span class="number">2</span>).<span class="title function_">readPointer</span>().<span class="title function_">readCString</span>();</span><br><span class="line">    <span class="keyword">var</span> klass = newMethod.<span class="title function_">add</span>(p_size * <span class="number">3</span>).<span class="title function_">readPointer</span>();<span class="comment">//Il2CppClass</span></span><br><span class="line">    <span class="keyword">var</span> klass_name = klass.<span class="title function_">add</span>(p_size * <span class="number">2</span>).<span class="title function_">readPointer</span>().<span class="title function_">readCString</span>();</span><br><span class="line">    <span class="keyword">var</span> klass_paze = klass.<span class="title function_">add</span>(p_size * <span class="number">3</span>).<span class="title function_">readPointer</span>().<span class="title function_">readCString</span>();</span><br><span class="line">    <span class="title function_">send</span>(klass_paze+<span class="string">&quot;.&quot;</span>+klass_name+<span class="string">&quot;:&quot;</span>+name+<span class="string">&quot;    -&gt; &quot;</span>+pointer.<span class="title function_">sub</span>(<span class="variable language_">module</span>.<span class="property">base</span>));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>成功hook，但是你会发现，跟本没什么卵用。因为它被混淆了。。。。</p>
+<p><img src="/%E4%BD%BF%E7%94%A8frida%E8%8E%B7%E5%8F%96il2cpp%E7%AC%A6%E5%8F%B7%E4%BF%A1%E6%81%AF/image-20201207213554471.png" alt="image-20201207213554471">  </p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ol>
+<li><a target="_blank" rel="noopener" href="https://floe-ice.cn/archives/502">[unity]Real-time Dump</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.palug.cn/2376.html">[Honkai 3rd]v3.5符号还原</a></li>
+</ol>
+
+    </article>
+    <!-- license -->
+    
+        <div class="license-wrapper">
+            <p>原文作者：<a href="http://example.com">newbiemiao</a>
+            <p>原文链接：<a href="http://example.com/2020/12/04/%E4%BD%BF%E7%94%A8frida%E8%8E%B7%E5%8F%96il2cpp%E7%AC%A6%E5%8F%B7%E4%BF%A1%E6%81%AF/">http://example.com/2020/12/04/%E4%BD%BF%E7%94%A8frida%E8%8E%B7%E5%8F%96il2cpp%E7%AC%A6%E5%8F%B7%E4%BF%A1%E6%81%AF/</a>
+            <p>发表日期：<a href="http://example.com/2020/12/04/%E4%BD%BF%E7%94%A8frida%E8%8E%B7%E5%8F%96il2cpp%E7%AC%A6%E5%8F%B7%E4%BF%A1%E6%81%AF/">December 4th 2020, 3:55:31 pm</a>
+            <p>更新日期：<a href="http://example.com/2020/12/04/%E4%BD%BF%E7%94%A8frida%E8%8E%B7%E5%8F%96il2cpp%E7%AC%A6%E5%8F%B7%E4%BF%A1%E6%81%AF/">November 15th 2023, 10:39:53 am</a>
+            <p>版权声明：本文采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+        </div>
+    
+    <!-- paginator -->
+    <ul class="post-paginator">
+        <li class="next">
+            
+                <div class="nextSlogan">Next Post</div>
+                <a href="/2021/01/15/%E6%8A%96%E9%9F%B3%E8%AF%84%E8%AE%BA%E7%88%AC%E5%8F%96/" title="抖音评论爬取">
+                    <div class="nextTitle">抖音评论爬取</div>
+                </a>
+            
+        </li>
+        <li class="previous">
+            
+                <div class="prevSlogan">Previous Post</div>
+                <a href="/2020/08/27/SO%E5%8A%A0%E5%AF%86/" title="SO加密">
+                    <div class="prevTitle">SO加密</div>
+                </a>
+            
+        </li>
+    </ul>
+    <!-- comment -->
+    
+        <div class="post-comment">
+            <!-- 来必力 City 版安装代码 -->
+
+
+            
+
+            
+
+            
+
+            <!-- utteranc评论 -->
+
+
+            <!-- partial('_partial/comment/changyan') -->
+            <!--PC版-->
+
+
+            
+            
+
+            
+
+        </div>
+    
+    <!-- timeliness note -->
+    <!-- idea from: https://hexo.fluid-dev.com/posts/hexo-injector/#%E6%96%87%E7%AB%A0%E6%97%B6%E6%95%88%E6%80%A7%E6%8F%90%E7%A4%BA -->
+    
+    <!-- Mathjax -->
+    
+</main>
+
+                <!-- profile -->
+                
+            </div>
+            <footer class="footer footer-unloaded">
+    <!-- social  -->
+    
+        <div class="social">
+            
+    
+        
+            
+                <a href="mailto:673304120@qq.com" class="iconfont-archer email" title=email ></a>
+            
+        
+    
+        
+            
+                <a href="//github.com/nszdhd1" class="iconfont-archer github" target="_blank" title=github></a>
+            
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+
+        </div>
+    
+    <!-- powered by Hexo  -->
+    <div class="copyright">
+        <span id="hexo-power">Powered by <a href="https://hexo.io/" target="_blank">Hexo</a></span><span class="iconfont-archer power">&#xe635;</span><span id="theme-info">theme <a href="https://github.com/fi3ework/hexo-theme-archer" target="_blank">Archer</a></span>
+    </div>
+    <!-- website approve for Chinese user -->
+    
+    <!-- 不蒜子  -->
+    
+        <div class="busuanzi-container">
+            
+             
+                <span id="busuanzi_container_site_pv">PV: <span id="busuanzi_value_site_pv"></span> :)</span>
+            
+        </div>
+    	
+</footer>
+
+        </div>
+        <!-- toc -->
+        
+            <div class="toc-wrapper toc-wrapper-loding" style=
+
+
+
+
+
+
+
+    top:50vh;
+
+>
+                <div class="toc-catalog">
+                    <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+                </div>
+                <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8frida%E8%8E%B7%E5%8F%96unity-il2cpp%E7%AC%A6%E5%8F%B7%E4%BF%A1%E6%81%AF"><span class="toc-number">1.</span> <span class="toc-text">使用frida获取unity il2cpp符号信息</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#0x1-%E8%83%8C%E6%99%AF"><span class="toc-number">1.1.</span> <span class="toc-text">0x1 背景</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#0x2-IL2CPP-%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B"><span class="toc-number">1.2.</span> <span class="toc-text">0x2 IL2CPP 加载过程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#0x3-%E6%9F%90%E6%89%8B%E6%B8%B8%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B"><span class="toc-number">1.3.</span> <span class="toc-text">0x3 某手游加载过程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#0x4-hook-SetupMethodsLocked"><span class="toc-number">1.4.</span> <span class="toc-text">0x4 hook SetupMethodsLocked</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83"><span class="toc-number">1.5.</span> <span class="toc-text">参考</span></a></li></ol></li></ol>
+            </div>
+        
+        <!-- sidebar -->
+        <div class="sidebar sidebar-hide">
+    <ul class="sidebar-tabs sidebar-tabs-active-0">
+        <li class="sidebar-tab-archives"><span class="iconfont-archer">&#xe67d;</span><span class="tab-name">Archive</span></li>
+        <li class="sidebar-tab-tags"><span class="iconfont-archer">&#xe61b;</span><span class="tab-name">Tag</span></li>
+        <li class="sidebar-tab-categories"><span class="iconfont-archer">&#xe666;</span><span class="tab-name">Cate</span></li>
+    </ul>
+    <div class="sidebar-content sidebar-content-show-archive">
+        <div class="sidebar-panel-archives">
+    <!-- 在 ejs 中将 archive 按照时间排序 -->
+    
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    
+    
+    
+    
+    <div class="total-and-search">
+        <div class="total-archive">
+        Total : 16
+        </div>
+        <!-- search  -->
+        
+    </div>
+    
+    <div class="post-archive">
+    
+        
+            
+            
+            <div class="archive-year"> 2022 </div>
+            <ul class="year-list">
+            
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/22</span>
+            <a class="archive-post-title" href="/2022/12/22/%E5%A6%82%E4%BD%95%E4%BF%AE%E6%94%B9unityHybridCLR%E7%83%AD%E6%9B%B4dll/">如何修改unity HybridCLR 热更dll</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/14</span>
+            <a class="archive-post-title" href="/2022/11/14/Genshin-IL2CPP-RunTime-Dump/">Genshin IL2CPP RunTime Dump</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/08</span>
+            <a class="archive-post-title" href="/2022/09/08/GameGuardian%E7%9A%84Lua%E8%84%9A%E6%9C%AC%E6%B7%B7%E6%B7%86%E5%88%86%E6%9E%90/">GameGuardian的Lua脚本混淆分析</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/21</span>
+            <a class="archive-post-title" href="/2022/03/21/%E5%88%A9%E7%94%A8Frida%E5%AE%9E%E7%8E%B0lua%E7%83%AD%E6%9B%B4%E6%96%B0/">利用Frida实现lua热更新</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">01/14</span>
+            <a class="archive-post-title" href="/2022/01/14/%E4%BD%BF%E7%94%A8unidbg%E8%BF%87%E4%BF%9D%E6%8A%A4/">使用unidbg过保护</a>
+        </li>
+    
+        
+            
+            
+                
+                </ul>
+            
+            <div class="archive-year"> 2021 </div>
+            <ul class="year-list">
+            
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">06/15</span>
+            <a class="archive-post-title" href="/2021/06/15/%E9%9D%9Eroot%E7%8E%AF%E5%A2%83%E4%B8%8Bfrida%E7%9A%84%E4%B8%A4%E7%A7%8D%E4%BD%BF%E7%94%A8%E6%96%B9%E5%BC%8F/">非root环境下frida的两种使用方式</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">06/15</span>
+            <a class="archive-post-title" href="/2021/06/15/%E4%BD%BF%E7%94%A8LIEF%E6%89%93%E9%80%A0MTP%E5%8A%A0%E5%9B%BA/">使用LIEF打造MTP加固</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">01/15</span>
+            <a class="archive-post-title" href="/2021/01/15/%E6%8A%96%E9%9F%B3%E8%AF%84%E8%AE%BA%E7%88%AC%E5%8F%96/">抖音评论爬取</a>
+        </li>
+    
+        
+            
+            
+                
+                </ul>
+            
+            <div class="archive-year"> 2020 </div>
+            <ul class="year-list">
+            
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/04</span>
+            <a class="archive-post-title" href="/2020/12/04/%E4%BD%BF%E7%94%A8frida%E8%8E%B7%E5%8F%96il2cpp%E7%AC%A6%E5%8F%B7%E4%BF%A1%E6%81%AF/">使用frida获取il2cpp符号信息</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">08/27</span>
+            <a class="archive-post-title" href="/2020/08/27/SO%E5%8A%A0%E5%AF%86/">SO加密</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">07/03</span>
+            <a class="archive-post-title" href="/2020/07/03/Unity%E4%BF%9D%E6%8A%A4%E4%B9%8Bassetbundle/">Unity保护之assetbundle</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">07/03</span>
+            <a class="archive-post-title" href="/2020/07/03/Unity%E4%BF%9D%E6%8A%A4%E4%B9%8Bil2cpp/">Unity保护之il2cpp</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">07/03</span>
+            <a class="archive-post-title" href="/2020/07/03/%E5%9F%BA%E4%BA%8Eva%E7%9A%84luajit-hook/">基于va的luajit hook</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">07/03</span>
+            <a class="archive-post-title" href="/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/">网易保护分析</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/07</span>
+            <a class="archive-post-title" href="/2020/04/07/magisk-riru/">magisk-riru 使用</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/09</span>
+            <a class="archive-post-title" href="/2020/03/09/Magisk%E6%A3%80%E6%B5%8B/">Magisk检测</a>
+        </li>
+    
+    </div>
+</div>
+
+        <div class="sidebar-panel-tags">
+    <div class="sidebar-tags-name">
+        
+            <span class="sidebar-tag-name" data-tags="Analytics">
+                <span class="iconfont-archer">&#xe606;</span>
+                Analytics
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="game">
+                <span class="iconfont-archer">&#xe606;</span>
+                game
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="other">
+                <span class="iconfont-archer">&#xe606;</span>
+                other
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="protect">
+                <span class="iconfont-archer">&#xe606;</span>
+                protect
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="tools">
+                <span class="iconfont-archer">&#xe606;</span>
+                tools
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="Misc">
+                <span class="iconfont-archer">&#xe606;</span>
+                Misc
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="Hook">
+                <span class="iconfont-archer">&#xe606;</span>
+                Hook
+            </span>
+        
+    </div>
+    <div class="iconfont-archer sidebar-tags-empty">&#xe678;</div>
+    <div class="tag-load-fail" style="display: none; color: #ccc; font-size: 0.6rem;">
+        缺失模块，请参考主题文档进行安装配置：https://github.com/fi3ework/hexo-theme-archer#%E5%AE%89%E8%A3%85%E4%B8%BB%E9%A2%98
+    </div> 
+    <div class="sidebar-tags-list"></div>
+</div>
+
+        <div class="sidebar-panel-categories">
+    <div class="sidebar-categories-name">
+    
+    </div>
+    <div class="iconfont-archer sidebar-categories-empty">&#xe678;</div>
+    <div class="sidebar-categories-list"></div>
+</div>
+
+    </div>
+</div>
+
+        <!-- site-meta -->
+        <script>
+    var siteMetaRoot = "/"
+    if (siteMetaRoot === "undefined") {
+        siteMetaRoot = '/'
+    }
+    var siteMeta = {
+        url: "http://example.com",
+        root: siteMetaRoot,
+        author: "newbiemiao"
+    }
+</script>
+
+        <!-- import experimental options here -->
+        <!-- Custom Font -->
+
+
+        <!-- main func -->
+        <script src="/scripts/main.js?v=20211217"></script>
+        <!-- dark mode -->
+        <script src="/scripts/dark.js?v=20211217"></script>
+        <!-- fancybox -->
+        <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" defer></script>
+        <!-- algolia -->
+        
+        <!-- busuanzi -->
+        
+            <script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" async></script>
+        
+        <!-- CNZZ -->
+        
+        <!-- async load share.js -->
+        
+            <script src="/scripts/share.js?v=20211217" async></script>
+        
+        <!-- mermaid -->
+        
+    </body>
+</html>

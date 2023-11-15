@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <!-- title -->
+
+
+    
+
+<!-- keywords -->
+
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="author" content="newbiemiao">
+    <meta name="renderer" content="webkit">
+    <meta name="copyright" content="newbiemiao">
+    
+        <meta name="keywords" content="hexo,hexo-theme,hexo-blog">
+    
+    <meta name="description" content="">
+    <meta name="description" content="so加密笔记基础知识一、ELF文件（更详细可看 elf讲解） ELF是Linux下的可执行连接格式文件，类似于windows下的PE文件。 ELF文件（目标文件）格式主要三种：  可重定向文件(Relocatable file)：文件保存着代码和适当的数据，用来和其他的目标文件一起来创建一个可执行文件或者是一个共享目标文件。（目标文件或者静态库文件，即linux通常后缀为.a和.o的文件）这是由汇">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SO加密">
+<meta property="og:url" content="http://example.com/2020/08/27/SO%E5%8A%A0%E5%AF%86/index.html">
+<meta property="og:site_name" content="喵喵的blog">
+<meta property="og:description" content="so加密笔记基础知识一、ELF文件（更详细可看 elf讲解） ELF是Linux下的可执行连接格式文件，类似于windows下的PE文件。 ELF文件（目标文件）格式主要三种：  可重定向文件(Relocatable file)：文件保存着代码和适当的数据，用来和其他的目标文件一起来创建一个可执行文件或者是一个共享目标文件。（目标文件或者静态库文件，即linux通常后缀为.a和.o的文件）这是由汇">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/SO%E5%8A%A0%E5%AF%86/image-20200722200900804.png">
+<meta property="og:image" content="http://example.com/SO%E5%8A%A0%E5%AF%86/image-20200722202815692.png">
+<meta property="og:image" content="http://example.com/SO%E5%8A%A0%E5%AF%86/image-20200722202418781.png">
+<meta property="og:image" content="http://example.com/SO%E5%8A%A0%E5%AF%86/image-20200722204307424.png">
+<meta property="og:image" content="http://example.com/SO%E5%8A%A0%E5%AF%86/image-20200722205838088.png">
+<meta property="og:image" content="http://example.com/SO%E5%8A%A0%E5%AF%86/image-20200723202546045.png">
+<meta property="og:image" content="http://example.com/SO%E5%8A%A0%E5%AF%86/image-20200826211930404.png">
+<meta property="og:image" content="http://example.com/SO%E5%8A%A0%E5%AF%86/image-20200826211956696.png">
+<meta property="og:image" content="http://example.com/SO%E5%8A%A0%E5%AF%86/image-20200827143911255.png">
+<meta property="og:image" content="http://example.com/SO%E5%8A%A0%E5%AF%86/image-20200827144338193.png">
+<meta property="og:image" content="http://example.com/SO%E5%8A%A0%E5%AF%86/image-20200827144827705.png">
+<meta property="og:image" content="http://example.com/SO%E5%8A%A0%E5%AF%86/image-20200827145222734.png">
+<meta property="og:image" content="http://example.com/SO%E5%8A%A0%E5%AF%86/image-20200827150229908.png">
+<meta property="og:image" content="http://example.com/SO%E5%8A%A0%E5%AF%86/image-20200827152258578.png">
+<meta property="og:image" content="http://example.com/SO%E5%8A%A0%E5%AF%86/image-20200827152450124.png">
+<meta property="og:image" content="http://example.com/SO%E5%8A%A0%E5%AF%86/image-20200827152727259.png">
+<meta property="og:image" content="http://example.com/SO%E5%8A%A0%E5%AF%86/image-20200827152830212.png">
+<meta property="article:published_time" content="2020-08-27T11:53:03.000Z">
+<meta property="article:modified_time" content="2023-11-15T02:39:53.796Z">
+<meta property="article:author" content="newbiemiao">
+<meta property="article:tag" content="protect">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/SO%E5%8A%A0%E5%AF%86/image-20200722200900804.png">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <link rel="icon" href="/assets/favicon.ico">
+    
+    <title>SO加密 · nszdhd1&#39;s blog</title>
+    <!-- /*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
+/* This file is meant as a standalone workflow for
+- testing support for link[rel=preload]
+- enabling async CSS loading in browsers that do not support rel=preload
+- applying rel preload css once loaded, whether supported or not.
+*/ -->
+<script>
+    (function (w) {
+        'use strict'
+        // rel=preload support test
+        if (!w.loadCSS) {
+            w.loadCSS = function () {}
+        }
+        // define on the loadCSS obj
+        var rp = (loadCSS.relpreload = {})
+        // rel=preload feature support test
+        // runs once and returns a function for compat purposes
+        rp.support = (function () {
+            var ret
+            try {
+                ret = w.document.createElement('link').relList.supports('preload')
+            } catch (e) {
+                ret = false
+            }
+            return function () {
+                return ret
+            }
+        })()
+
+        // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+        // then change that media back to its intended value on load
+        rp.bindMediaToggle = function (link) {
+            // remember existing media attr for ultimate state, or default to 'all'
+            var finalMedia = link.media || 'all'
+
+            function enableStylesheet() {
+                link.media = finalMedia
+            }
+
+            // bind load handlers to enable media
+            if (link.addEventListener) {
+                link.addEventListener('load', enableStylesheet)
+            } else if (link.attachEvent) {
+                link.attachEvent('onload', enableStylesheet)
+            }
+
+            // Set rel and non-applicable media type to start an async request
+            // note: timeout allows this to happen async to let rendering continue in IE
+            setTimeout(function () {
+                link.rel = 'stylesheet'
+                link.media = 'only x'
+            })
+            // also enable media after 3 seconds,
+            // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+            setTimeout(enableStylesheet, 3000)
+        }
+
+        // loop through link elements in DOM
+        rp.poly = function () {
+            // double check this to prevent external calls from running
+            if (rp.support()) {
+                return
+            }
+            var links = w.document.getElementsByTagName('link')
+            for (var i = 0; i < links.length; i++) {
+                var link = links[i]
+                // qualify links to those with rel=preload and as=style attrs
+                if (
+                    link.rel === 'preload' &&
+                    link.getAttribute('as') === 'style' &&
+                    !link.getAttribute('data-loadcss')
+                ) {
+                    // prevent rerunning on link
+                    link.setAttribute('data-loadcss', true)
+                    // bind listeners to toggle media back
+                    rp.bindMediaToggle(link)
+                }
+            }
+        }
+
+        // if unsupported, run the polyfill
+        if (!rp.support()) {
+            // run once at least
+            rp.poly()
+
+            // rerun poly on an interval until onload
+            var run = w.setInterval(rp.poly, 500)
+            if (w.addEventListener) {
+                w.addEventListener('load', function () {
+                    rp.poly()
+                    w.clearInterval(run)
+                })
+            } else if (w.attachEvent) {
+                w.attachEvent('onload', function () {
+                    rp.poly()
+                    w.clearInterval(run)
+                })
+            }
+        }
+
+        // commonjs
+        if (typeof exports !== 'undefined') {
+            exports.loadCSS = loadCSS
+        } else {
+            w.loadCSS = loadCSS
+        }
+    })(typeof global !== 'undefined' ? global : this)
+</script>
+
+    <style type="text/css">
+    @font-face {
+        font-family: 'Oswald-Regular';
+        src: url("/font/Oswald-Regular.ttf");
+    }
+
+    body {
+        margin: 0;
+    }
+
+    header,
+    footer,
+    .back-top,
+    .sidebar,
+    .container,
+    .site-intro-meta,
+    .toc-wrapper {
+        display: none;
+    }
+
+    .site-intro {
+        position: relative;
+        z-index: 3;
+        width: 100%;
+        /* height: 50vh; */
+        overflow: hidden;
+    }
+
+    .site-intro-placeholder {
+        position: absolute;
+        z-index: -2;
+        top: 0;
+        left: 0;
+        width: calc(100% + 300px);
+        height: 100%;
+        background: repeating-linear-gradient(-45deg, #444 0, #444 80px, #333 80px, #333 160px);
+        background-position: center center;
+        transform: translate3d(-226px, 0, 0);
+        animation: gradient-move 2.5s ease-out 0s infinite;
+    }
+
+    @keyframes gradient-move {
+        0% {
+            transform: translate3d(-226px, 0, 0);
+        }
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+    }
+</style>
+
+    <link rel="preload" href="/css/style.css?v=20211217" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="/css/dark.css?v=20211217" as="style">
+    <link rel="stylesheet" href="/css/dark.css">
+    <link rel="stylesheet" href="/css/mobile.css?v=20211217" media="(max-width: 960px)">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" as="script">
+    <link rel="preload" href="/scripts/main.js?v=20211217" as="script">
+    <link rel="preload" href="/scripts/dark.js?v=20211217" as="script">
+    <link rel="preload" href="/font/Oswald-Regular.ttf" as="font" crossorigin>
+    <link rel="preload" href="https://at.alicdn.com/t/font_327081_1dta1rlogw17zaor.woff" as="font" crossorigin>
+    <!-- algolia -->
+    
+    <!-- 百度统计  -->
+    
+    <!-- Google tag (gtag.js) -->
+    
+
+<meta name="generator" content="Hexo 7.0.0"></head>
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script type="text/javascript">
+        if (typeof window.$ == undefined) {
+            console.warn('jquery load from jsdelivr failed, will load local script')
+            document.write('<script src="/lib/jquery.min.js" />')
+        }
+    </script>
+    
+        <body class="post-body">
+    
+        <!-- header -->
+        <header class="header header-mobile">
+    <!-- top read progress line -->
+    <div class="header-element">
+        <div class="read-progress"></div>
+    </div>
+    <!-- sidebar menu button -->
+    <div class="header-element">
+        
+            <div class="header-sidebar-menu">
+        
+            
+                <div style="padding-left: 1px;">&#xe775;</div>
+            
+        </div>
+    </div>
+    <!-- header actions -->
+    <div class="header-actions">
+        <!-- theme mode switch button -->
+        <span class="header-theme-btn header-element">
+            <i class="fas fa-adjust"></i>
+        </span>
+        <!-- back to home page text -->
+        <span class="home-link header-element">
+            <a href=/>nszdhd1's blog.</a>
+        </span>
+    </div>
+    <!-- toggle banner for post layout -->
+    
+        
+            <div class="banner">
+        
+            <div class="blog-title header-element">
+                <a href="/">nszdhd1&#39;s blog.</a>
+            </div>
+            <div class="post-title header-element">
+                <a href="#" class="post-name">SO加密</a>
+            </div>
+        </div>
+    
+</header>
+
+        <!-- fixed footer -->
+        <footer class="footer-fixed">
+    <!-- back to top button -->
+    <div class="footer-fixed-element">
+        
+            <div class="back-top back-top-hidden">
+        
+        
+            <div>&#xe639;</div>
+        
+        </div>
+    </div>
+</footer>
+
+        <!-- wrapper -->
+        <div class="wrapper">
+            <div class="site-intro" style="
+
+
+
+
+
+
+
+    height:50vh;
+
+">
+    
+    <!-- 主页  -->
+    
+        
+    <!-- 404页  -->
+    
+    <div class="site-intro-placeholder"></div>
+    <div class="site-intro-img" style="background-image: url(/intro/post-bg.jpg)"></div>
+    <div class="site-intro-meta">
+        <!-- 标题  -->
+        <h1 class="intro-title">
+            <!-- 主页  -->
+            
+                SO加密
+            <!-- 404 -->
+            
+        </h1>
+        <!-- 副标题 -->
+        <p class="intro-subtitle">
+            <!-- 主页副标题  -->
+            
+                
+            <!-- 404 -->
+            
+        </p>
+        <!-- 文章页 meta -->
+        
+            <div class="post-intros">
+                <!-- 文章页标签  -->
+                
+                    <div class= post-intro-tags >
+    
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="protect">protect</a>
+    
+</div>
+
+                
+                <!-- 文章字数统计 -->
+                
+                <div class="post-intro-meta">
+                    <!-- 撰写日期 -->
+                    <span class="iconfont-archer post-intro-calander">&#xe676;</span>
+                    <span class="post-intro-time">2020/08/27</span>
+                    <!-- busuanzi -->
+                    
+                        <span id="busuanzi_container_page_pv" class="busuanzi-pv">
+                            <span class="iconfont-archer post-intro-busuanzi">&#xe602;</span>
+                            <span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    
+                    <!-- 文章分享 -->
+                    <span class="share-wrapper">
+                        <span class="iconfont-archer share-icon">&#xe71d;</span>
+                        <span class="share-text">Share</span>
+                        <ul class="share-list">
+                            <li class="iconfont-archer share-qr" data-type="qr">&#xe75b;
+                                <div class="share-qrcode"></div>
+                            </li>
+                            <li class="iconfont-archer" data-type="weibo">&#xe619;</li>
+                            <li class="iconfont-archer" data-type="qzone">&#xe62e;</li>
+                            <li class="iconfont-archer" data-type="twitter">&#xe634;</li>
+                            <li class="iconfont-archer" data-type="facebook">&#xe67a;</li>
+                        </ul>
+                    </span>
+                </div>
+            </div>
+        
+    </div>
+</div>
+
+            <script>
+  // get user agent
+  function getBrowserVersions() {
+    var u = window.navigator.userAgent
+    return {
+      userAgent: u,
+      trident: u.indexOf('Trident') > -1, //IE内核
+      presto: u.indexOf('Presto') > -1, //opera内核
+      webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+      gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+      mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+      ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+      android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+      iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者安卓QQ浏览器
+      iPad: u.indexOf('iPad') > -1, //是否为iPad
+      webApp: u.indexOf('Safari') == -1, //是否为web应用程序，没有头部与底部
+      weixin: u.indexOf('MicroMessenger') == -1, //是否为微信浏览器
+      uc: u.indexOf('UCBrowser') > -1, //是否为android下的UC浏览器
+    }
+  }
+  var browser = {
+    versions: getBrowserVersions(),
+  }
+  console.log('userAgent: ' + browser.versions.userAgent)
+
+  // callback
+  function fontLoaded() {
+    console.log('font loaded')
+    if (document.getElementsByClassName('site-intro-meta')) {
+      document
+        .getElementsByClassName('intro-title')[0]
+        .classList.add('intro-fade-in')
+      document
+        .getElementsByClassName('intro-subtitle')[0]
+        .classList.add('intro-fade-in')
+      var postIntros = document.getElementsByClassName('post-intros')[0]
+      if (postIntros) {
+        postIntros.classList.add('post-fade-in')
+      }
+    }
+  }
+
+  // UC不支持跨域，所以直接显示
+  function asyncCb() {
+    if (browser.versions.uc) {
+      console.log('UCBrowser')
+      fontLoaded()
+    } else {
+      WebFont.load({
+        custom: {
+          families: ['Oswald-Regular'],
+        },
+        loading: function () {
+          // 所有字体开始加载
+          // console.log('font loading');
+        },
+        active: function () {
+          // 所有字体已渲染
+          fontLoaded()
+        },
+        inactive: function () {
+          // 字体预加载失败，无效字体或浏览器不支持加载
+          console.log('inactive: timeout')
+          fontLoaded()
+        },
+        timeout: 5000, // Set the timeout to two seconds
+      })
+    }
+  }
+
+  function asyncErr() {
+    console.warn('script load from CDN failed, will load local script')
+  }
+
+  // load webfont-loader async, and add callback function
+  function async(u, cb, err) {
+    var d = document,
+      t = 'script',
+      o = d.createElement(t),
+      s = d.getElementsByTagName(t)[0]
+    o.src = u
+    if (cb) {
+      o.addEventListener(
+        'load',
+        function (e) {
+          cb(null, e)
+        },
+        false
+      )
+    }
+    if (err) {
+      o.addEventListener(
+        'error',
+        function (e) {
+          err(null, e)
+        },
+        false
+      )
+    }
+    s.parentNode.insertBefore(o, s)
+  }
+
+  var asyncLoadWithFallBack = function (arr, success, reject) {
+    var currReject = function () {
+      reject()
+      arr.shift()
+      if (arr.length) async(arr[0], success, currReject)
+    }
+
+    async(arr[0], success, currReject)
+  }
+
+  asyncLoadWithFallBack(
+    [
+      'https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js',
+      'https://cdn.bootcss.com/webfont/1.6.28/webfontloader.js',
+      "/lib/webfontloader.min.js",
+    ],
+    asyncCb,
+    asyncErr
+  )
+</script>
+
+            <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
+            <div class="container container-unloaded">
+                <main class="main post-page">
+    <article class="article-entry">
+        <h1 id="so加密笔记"><a href="#so加密笔记" class="headerlink" title="so加密笔记"></a>so加密笔记</h1><h2 id="基础知识"><a href="#基础知识" class="headerlink" title="基础知识"></a>基础知识</h2><h3 id="一、ELF文件"><a href="#一、ELF文件" class="headerlink" title="一、ELF文件"></a>一、ELF文件</h3><p>（更详细可看 <a target="_blank" rel="noopener" href="https://blog.csdn.net/jinking01/article/details/105387253">elf讲解</a>）</p>
+<p>ELF是Linux下的可执行连接格式文件，类似于windows下的PE文件。</p>
+<p>ELF文件（目标文件）格式主要三种：</p>
+<ol>
+<li><p>可重定向文件(Relocatable file)：文件保存着代码和适当的数据，用来和其他的目标文件一起来创建一个可执行文件或者是一个共享目标文件。（目标文件或者静态库文件，即linux通常后缀为.a和.o的文件）这是由汇编器汇编生成的 .o 文件。后面的链接器(link editor)拿一个或一些 Relocatable object files 作为输入，经链接处理后，生成一个可执行的对象文件 (Executable file) 或者一个可被共享的对象文件(Shared object file)，内核可加载模块 .ko 文件也是 Relocatable object file</p>
+</li>
+<li><p>可执行文件(Executable file)：文件保存着一个用来执行的程序。（例如bash，gcc等）</p>
+</li>
+<li><p>共享目标文件：即 .so 文件。如果拿前面的静态库来生成可执行程序，那每个生成的可执行程序中都会有一份库代码的拷贝。如果在磁盘中存储这些可执行程序，那就会占用额外的磁盘空 间；另外如果拿它们放到Linux系统上一起运行，也会浪费掉宝贵的物理内存。如果将静态库换成动态库，那么这些问题都不会出现</p>
+</li>
+</ol>
+<h4 id="1-1-ELF-文件结构"><a href="#1-1-ELF-文件结构" class="headerlink" title="1.1 ELF 文件结构"></a>1.1 ELF 文件结构</h4><p>elf文件主要有两种格式，一是链接状态、二是运行状态。</p>
+<p><img src="/SO%E5%8A%A0%E5%AF%86/image-20200722200900804.png" alt="image-20200722200900804"></p>
+<p>这里再放一张 32位数据类型，方便理解。</p>
+<p><img src="/SO%E5%8A%A0%E5%AF%86/image-20200722202815692.png" alt="image-20200722202815692"></p>
+<span id="more"></span>
+
+<p>首先看图：</p>
+<p><img src="/SO%E5%8A%A0%E5%AF%86/image-20200722202418781.png" alt="image-20200722202418781"></p>
+<p>一个ELF文件由以下三部分组成：</p>
+<ul>
+<li>ELF头(ELF header) - 描述文件的主要特性：类型，CPU架构，入口地址，现有部分的大小和偏移等等；</li>
+<li>程序头表(Program header table) - 列举了所有有效的段(segments)和他们的属性。 程序头表需要加载器将文件中的节加载到虚拟内存段中；</li>
+<li>节头表(Section header table) - 包含对节(sections)的描述。</li>
+</ul>
+<h4 id="1-2-ELF头-ELF-header"><a href="#1-2-ELF头-ELF-header" class="headerlink" title="1.2 ELF头(ELF header)"></a>1.2 ELF头(ELF header)</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 32位 elf头 */</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="type">unsigned</span> <span class="type">char</span>  e_ident[EI_NIDENT]; <span class="comment">/* Magic number and other info */</span></span><br><span class="line">    Elf32_Half  e_type;         <span class="comment">/* Object file type */</span></span><br><span class="line">    Elf32_Half  e_machine;      <span class="comment">/* Architecture */</span></span><br><span class="line">    Elf32_Word  e_version;      <span class="comment">/* Object file version */</span></span><br><span class="line">    Elf32_Addr  e_entry;        <span class="comment">/* Entry point virtual address */</span></span><br><span class="line">    Elf32_Off   e_phoff;        <span class="comment">/* Program header table file offset */</span></span><br><span class="line">    Elf32_Off   e_shoff;        <span class="comment">/* Section header table file offset */</span></span><br><span class="line">    Elf32_Word  e_flags;        <span class="comment">/* Processor-specific flags */</span></span><br><span class="line">    Elf32_Half  e_ehsize;       <span class="comment">/* ELF header size in bytes */</span></span><br><span class="line">    Elf32_Half  e_phentsize;        <span class="comment">/* Program header table entry size */</span></span><br><span class="line">    Elf32_Half  e_phnum;        <span class="comment">/* Program header table entry count */</span></span><br><span class="line">    Elf32_Half  e_shentsize;        <span class="comment">/* Section header table entry size */</span></span><br><span class="line">    Elf32_Half  e_shnum;        <span class="comment">/* Section header table entry count */</span></span><br><span class="line">    Elf32_Half  e_shstrndx;     <span class="comment">/* Section header string table index */</span></span><br><span class="line">&#125; Elf32_Ehdr;</span><br></pre></td></tr></table></figure>
+
+<p>这里可以借助 010editor 和 readelf 来理解文件，蓝色的这一块就是名叫libhooklib.so文件的elf头。</p>
+<p><img src="/SO%E5%8A%A0%E5%AF%86/image-20200722204307424.png" alt="image-20200722204307424"></p>
+<h4 id="1-3-程序头表-Program-header-table"><a href="#1-3-程序头表-Program-header-table" class="headerlink" title="1.3  程序头表(Program header table)"></a>1.3  程序头表(Program header table)</h4><p>一个可执行文件或共享目标文件的程序头表(program header table)是一个数组， 数组中的每一个元素称为“程序头(program header)”，每一个程序头描述了一个 “段(segment)”或者一块用于准备执行程序的信息。一个目标文件中的“段 (segment)”包含一个或者多个“节(section)”。程序头只对可执行文件或共享目标 文件有意义，对于其它类型的目标文件，该信息可以忽略。在目标文件的文件头 (elf header)中，e_phentsize 和 e_phnum 成员指定了程序头的大小。</p>
+<p>根据elf头，可以看到 Program header table 在文件中的偏移为52（0x34）。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 程序头表Program header.就是段描述头 */</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    Elf32_Word  p_type;         <span class="comment">// 见下面的enum segment_type</span></span><br><span class="line">    Elf32_Off   p_offset;       <span class="comment">/* Segment file offset */</span></span><br><span class="line">    Elf32_Addr  p_vaddr;        <span class="comment">/* Segment virtual address */</span></span><br><span class="line">    Elf32_Addr  p_paddr;        <span class="comment">/* Segment physical address */</span></span><br><span class="line">    Elf32_Word  p_filesz;       <span class="comment">/* Segment size in file */</span></span><br><span class="line">    Elf32_Word  p_memsz;        <span class="comment">/* Segment size in memory */</span></span><br><span class="line">    Elf32_Word  p_flags;        <span class="comment">/* Segment flags , I.E execute|read|write */</span></span><br><span class="line">    Elf32_Word  p_align;        <span class="comment">/* Segment alignment */</span></span><br><span class="line">&#125; Elf32_Phdr;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 段类型 */</span></span><br><span class="line"><span class="class"><span class="keyword">enum</span> <span class="title">segment_type</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    PT_NULL,    <span class="comment">// 忽略</span></span><br><span class="line">    PT_LOAD,    <span class="comment">// 可加载程序段</span></span><br><span class="line">    PT_DYNAMIC, <span class="comment">// 动态加载信息</span></span><br><span class="line">    PT_INTERP,  <span class="comment">// 动态加载器名称</span></span><br><span class="line">    PT_NOTE,    <span class="comment">// 一些辅助信息</span></span><br><span class="line">    PT_SHLIB,   <span class="comment">// 保留</span></span><br><span class="line">    PT_PHDR     <span class="comment">// 程序头表</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/SO%E5%8A%A0%E5%AF%86/image-20200722205838088.png" alt="image-20200722205838088"></p>
+<p>这里需要了解一下PT_LOAD、PT_DYNAMIC、PT_PHDR这三个类型的程序头。</p>
+<h5 id="PT-PHDR"><a href="#PT-PHDR" class="headerlink" title="PT_PHDR"></a>PT_PHDR</h5><p>PT_HDR段保存了程序头表本身的位置和大小。Phdr表保存了所有的Phdr对文件（以及内存镜像）中段的描述信息</p>
+<h5 id="PT-LOAD"><a href="#PT-LOAD" class="headerlink" title="PT_LOAD"></a>PT_LOAD</h5><p>一个可执行文件至少有一个PT_LOAD类型的段。这类程序头描述的是可装载的段，也就是说，这种类型的段将被装载或映射到内存中。</p>
+<p>例如，一个需要动态链接的ELF可执行文件通常包含以下两个可装载的段（类型为PT_LOAD）：</p>
+<p>存放程序代码的text段；</p>
+<p>存放全局变量和动态链接信息的data段。</p>
+<p>上面的两个段将会被映射到内存中，并根据p_align中存放的值在内存中对齐。</p>
+<p>Text段（代码段）的权限设置为PF_X|PF_R时，可读可执行。</p>
+<p>Data段的权限设置为PF_W|PF_R，可读可写。</p>
+<h5 id="PT-DYNAMIC"><a href="#PT-DYNAMIC" class="headerlink" title="PT_DYNAMIC"></a>PT_DYNAMIC</h5><p>动态段是动态链接可执行文件所特有的，包含了动态链接器所必需的一些信息。在动态段中包含了一些标记值和指针，包含但不限于以下内容：</p>
+<blockquote>
+<ul>
+<li>运行时需要链接的共享库列表；</li>
+<li>全局偏移表（GOT）的地址——ELF动态链接库部分；</li>
+<li>重定位条目的相关信息。</li>
+</ul>
+</blockquote>
+<h4 id="1-4-节头表-Section-header-table"><a href="#1-4-节头表-Section-header-table" class="headerlink" title="1.4 节头表(Section header table)"></a>1.4 节头表(Section header table)</h4><p>在程序中，段（segment）并不等于节（section）。段是程序执行的必要组成部分，在每个段中，会有代码或者数据被划分为不同的节。节头表是对这些节的位置和大小描述，主要用于链接和调试。节头表对于程序的执行来说不是必需的，没有节头表，程序仍然可以正常执行，因为节头表没有对程序的内存布局进行描述，对程序内存布局描述是程序头表的任务。</p>
+<p>如果二进制文件中缺少节头，并不意味着节就不存在。只是没有办法通过节头来引用节，对于调试器或者反编译程序来说，只是可以参考的信息变少了而已。</p>
+<p>每一个节都保存了某种类型的代码或者数据。数据可以是程序中的全局变量，也可以是链接器所需要的动态链接信息。正如前面所提到的，每个ELF目标文件都有节，但是不一定有节头，尤其是有人故意将节头从节头表中删除了之后。当然，默认是有节头的。</p>
+<p>ELF文件节头结构如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    Elf32_Word  sh_name;        <span class="comment">/* Section name (string tbl index) */</span></span><br><span class="line">    Elf32_Word  sh_type;        <span class="comment">/* Section type */</span></span><br><span class="line">    Elf32_Word  sh_flags;       <span class="comment">/* Section flags */</span></span><br><span class="line">    Elf32_Addr  sh_addr;        <span class="comment">/* Section virtual addr at execution */</span></span><br><span class="line">    Elf32_Off   sh_offset;      <span class="comment">/* Section file offset */</span></span><br><span class="line">    Elf32_Word  sh_size;        <span class="comment">/* Section size in bytes */</span></span><br><span class="line">    Elf32_Word  sh_link;        <span class="comment">/* Link to another section */</span></span><br><span class="line">    Elf32_Word  sh_info;        <span class="comment">/* Additional section information */</span></span><br><span class="line">    Elf32_Word  sh_addralign;       <span class="comment">/* Section alignment */</span></span><br><span class="line">    Elf32_Word  sh_entsize;     <span class="comment">/* Entry size if section holds table */</span></span><br><span class="line">&#125; Elf32_Shdr;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>.text节是保留了程序代码指令的代码节。一段可执行程序，如果存在Phdr，.text节就会存放在text段中。由于.text节保存了程序代码，因此节的类型为SHT_PROGBITS。</li>
+<li>.rodata节保存了只读数据，因此只能存放于一个可执行文件的只读段中。也因此，只能在text段（不是data段）中找到.rodata节。由于.rodata节是只读的，因此节类型为SHT_PROGBITS。</li>
+<li>过程链接表（Procedure Linkage Table，PLT），.plt节中包含了动态链接器调用从共享库导入的函数所必需的相关代码。由于其存在于text段中，同样保存了代码，因此节类型为SHT_PROGBITS。</li>
+<li>.data节存在于data段中，保存了初始化的全局变量等数据。由于其保存了程序的变量数据，因此节类型被标记为SHT_PROGBITS。</li>
+<li>.bss节保存了未进行初始化的全局数据，是data段的一部分，占用空间不超过4字节，仅表示这个节本身的空间。程序加载时数据被初始化为0，在程序执行期间可以进行赋值。由于.bss节未保存实际的数据，因此节类型为SHT_PROGBITS。</li>
+<li>.got节保存了全局偏移表。.got节和.plt节一起提供了对导入的共享库函数的访问入口，由动态链接器在运行时进行修改。如果攻击者获得了堆或者.bss漏洞的一个指针大小的写原语，就可以对该节任意进行修改。.got.plt节跟程序执行有关，因此节类型被标记为SHT_PROGBITS。</li>
+<li>.dynsym节保存了从共享库导入的动态符号信息，该节保存在text段中，节类型被标记为SHT_PROGBITS。</li>
+<li>.dynstr节保存了动态符号字符串表，表中存放了一系列字符串，这些字符串代表了符号的名称，以空字符作为终止符。</li>
+<li>.rel.*节 重定位节保存了重定位相关的信息，这些信息描述；了在链接或者运行时，对ELF目标文件的某部分内容或者进程镜像进行补充或者修改。重定位节保存了重定位相关的数据，因此节类型被标记为SHT_REL。</li>
+<li>.hash节有时也称为.gnu.hahs，保存了一个用于查找符号的散列表。</li>
+<li>.symtab节保存了ElfN_Sym类型的符号信息，因此节类型被标记为SHT_SYMTAB。</li>
+<li>.strtab节保存的是符号字符串表，表中的内容会被.symtab的ElfN_Sym结构中的st_name条目引用。由于其保存了字符串表，因此节类型被标记为SHT_STRTAB。</li>
+<li>.shstrtab节保存节头字符串表，该表是一个以空字符终止的字符串的集合，字符串保存了每个节的节名，如.text、.data等。有一个名为e_shsrndx的ELF文件头条目会指向.shstrtab节，e_shstrndx中保存了.shstrtab的偏移量。由于其保存了字符串表，因此节类型被标记为SHT_STRTAB。</li>
+<li>.ctors（构造器）和.dtors（析构器）这两个节保存了指向析构函数和析构函数的指针，构造函数是在main函数执行之前需要执行的代码，析构函数是在main函数之后需要执行的代码。</li>
+</ul>
+<h5 id="符号表"><a href="#符号表" class="headerlink" title="符号表"></a>符号表</h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span> </span><br><span class="line">Elf32_Word st_name; <span class="comment">//符号表项名称。如果该值非0，则表示符号名的字</span></span><br><span class="line"><span class="comment">//符串表索引(offset)，否则符号表项没有名称。</span></span><br><span class="line">Elf32_Addr st_value; <span class="comment">//符号的取值。依赖于具体的上下文，可能是一个绝对值、一个地址等等。</span></span><br><span class="line">Elf32_Word st_size; <span class="comment">//符号的尺寸大小。例如一个数据对象的大小是对象中包含的字节数。</span></span><br><span class="line"><span class="type">unsigned</span> <span class="type">char</span> st_info; <span class="comment">//符号的类型和绑定属性。</span></span><br><span class="line"><span class="type">unsigned</span> <span class="type">char</span> st_other; <span class="comment">//未定义。</span></span><br><span class="line">Elf32_Half st_shndx; <span class="comment">//每个符号表项都以和其他节区的关系的方式给出定义。</span></span><br><span class="line"><span class="comment">//此成员给出相关的节区头部表索引。</span></span><br><span class="line">&#125; Elf32_sym;</span><br></pre></td></tr></table></figure>
+
+<p><strong>符号是对某些类型的数据或代码（如全局变量或函数）的符号引用，函数名或变量名就是符号名</strong>。例如，<code>printf()</code>函数会在动态链接符号表<code>.dynsym</code>中存有一个指向该函数的符号项（以<code>Elf_Sym</code>数据结构表示）。在大多数共享库和动态链接可执行文件中，存在两个符号表。即<code>.dynsym</code>和<code>.symtab</code>。</p>
+<p><strong><code>.dynsym</code>保存了引用来自外部文件符号的全局符号</strong>。如<code>printf</code>库函数。**<code>.dynsym</code>保存的符号是<code>.symtab</code>所保存符合的子集，<code>.symtab</code>中还保存了可执行文件的本地符号**。如全局变量，代码中定义的本地函数等。</p>
+<p>既然<code>.dynsym</code>是<code>.symtab</code>的子集，那为何要同时存在两个符号表呢？</p>
+<p>通过<code>readelf -S</code>命令可以查看可执行文件的输出，一部分节标志位（<code>sh_flags</code>）被标记为了<strong>A（ALLOC）、WA（WRITE&#x2F;ALLOC）、AX（ALLOC&#x2F;EXEC）</strong>。其中，<code>.dynsym</code>被标记为ALLOC，而<code>.symtab</code>则没有标记。</p>
+<p>ALLOC表示有该标记的节会在运行时分配并装载进入内存，而<code>.symtab</code>不是在运行时必需的，因此不会被装载到内存中。**<code>.dynsym</code>保存的符号只能在运行时被解析，因此是运行时动态链接器所需的唯一符号**。<code>.dynsym</code>对于动态链接可执行文件的执行是必需的，而<code>.symtab</code>只是用来进行调试和链接的。</p>
+<p><img src="/SO%E5%8A%A0%E5%AF%86/image-20200723202546045.png" alt="image-20200723202546045"></p>
+<h5 id="字符串表"><a href="#字符串表" class="headerlink" title="字符串表"></a>字符串表</h5><p>类似于符号表，在大多数共享库和动态链接可执行文件中，也存在两个字符串表。即<code>.dynstr</code>和<code>.strtab</code>，分别对应于<code>.dynsym</code>和<code>symtab</code>。此外，还有一个<code>.shstrtab</code>的节头字符串表，用于保存节头表中用到的字符串，可通过<code>sh_name</code>进行索引。</p>
+<p>字符串表中包含有若干个以 ’ null ’ 结尾的字符序列，即字符串。在目标文件中， 这些字符串通常是符号的名字或者节的名字。在目标文件的其它部分中，当需要引 用某个字符串时，只需要提供该字符串在字符串表中的序号即可。 </p>
+<p>字符串表中的第一个字符串（序号为 0）永远是空串，即”null”，它可以用于表 示一个空的名字或者没有名字。所以，字符串表的第一个字节是’null’。由于每一 个字符串都是以’null’结尾，所以字符串表的最后一个字节也必然为’null’。 </p>
+<p>字符串表也可以是空的，不含有任何字符串，这时，节头中的 sh_size 成员必须 是 0。 </p>
+<p>一个目标文件中可能有多个字符串表，其中一个称为“节名字表(.shstrtab)”， 它包含所有节的名字。每一个节头的 sh_name 成员应该是一个索引值，它指向节 名字表中的一个位置，从这个位置开始到接下来第一个’null’字符为止的这个字符 串，正是这个节的名字。</p>
+<h5 id="重定位"><a href="#重定位" class="headerlink" title="重定位"></a>重定位</h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line"> Elf32_Addr r_offset;<span class="comment">//出重定位所作用的位置</span></span><br><span class="line"> Elf32_Word r_info;<span class="comment">//重定位所作用的符号表索引，也给出了重定位的类型</span></span><br><span class="line">&#125; Elf32_Rel;</span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line"> Elf32_Addr r_offset;</span><br><span class="line"> Elf32_Word r_info;</span><br><span class="line"> Elf32_Sword r_addend;</span><br><span class="line">&#125; Elf32_Rela;</span><br></pre></td></tr></table></figure>
+
+<p>重定位(relocation)是把符号引用与符号定义连接在一起的过程。比如，当程序 调用一个函数时，将从当前运行的指令跳转到一个新的指令地址去执行。在编写程 序的时候，我们只需指明所要调用的函数名（即符号引用），在重定位的过程中， 函数名会与实际的函数所在地址（即符号定义）联系起来，使程序知道应该跳转到 哪里去。 </p>
+<p>重定位文件必须知道如何修改其所包含的“节”的内容，在构建可执行文件或 共享目标文件的时候，把节中的符号引用换成这些符号在进程空间中的虚拟地址。 包含这些转换信息的数据也就是“重定位项(relocation entries)”。</p>
+<h3 id="关于linker"><a href="#关于linker" class="headerlink" title="关于linker"></a>关于linker</h3><p>参考：<a target="_blank" rel="noopener" href="https://cloud.tencent.com/developer/article/1193474">so加载过程</a>、<a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000007008889">参考2</a></p>
+<p>作用：1. 关于解密时机的选择</p>
+<p>​			2. 静态文件可以修改的地方</p>
+<h3 id="ELF-静态注入"><a href="#ELF-静态注入" class="headerlink" title="ELF  静态注入"></a>ELF  静态注入</h3><p>参考：<a target="_blank" rel="noopener" href="https://gslab.qq.com/portal.php?mod=view&aid=163">腾讯</a></p>
+<p>作用：无源码情况下解密（主要是分无源码和有源码）</p>
+<h2 id="正文开始"><a href="#正文开始" class="headerlink" title="正文开始"></a>正文开始</h2><h3 id="so节加密demo"><a href="#so节加密demo" class="headerlink" title="so节加密demo"></a>so节加密demo</h3><p>demo是我将一个testfunc的方法放在 .itext,然后将itext节加密，这样就把testfunc保护起来了</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">testfunc</span><span class="params">()</span>__<span class="title function_">attribute__</span><span class="params">((section(<span class="string">&quot;.itext&quot;</span>)))</span>&#123;</span><br><span class="line">    LOGD(<span class="string">&quot;im encrypt&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/SO%E5%8A%A0%E5%AF%86/image-20200826211930404.png" alt="image-20200826211930404"></p>
+<p><img src="/SO%E5%8A%A0%E5%AF%86/image-20200826211956696.png" alt="image-20200826211956696"></p>
+<p>加密python：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> lief</span><br><span class="line"><span class="keyword">import</span> math</span><br><span class="line"></span><br><span class="line">sobin =lief.parse(<span class="string">&quot;libnative-lib.so&quot;</span>)</span><br><span class="line"></span><br><span class="line">sobin.add_library(<span class="string">&quot;libpro.so&quot;</span>) <span class="comment"># 这个就是前面腾讯的ELF注入</span></span><br><span class="line"></span><br><span class="line">itext = sobin.get_section(<span class="string">&quot;.itext&quot;</span>)</span><br><span class="line"></span><br><span class="line">offset = itext.offset</span><br><span class="line">size = itext.size</span><br><span class="line"><span class="built_in">print</span>(size)</span><br><span class="line"></span><br><span class="line">sobin.header.section_header_offset = offset <span class="comment"># 虽然被加载了，但修改了不会被影响，所以可以用来记录偏移和大小</span></span><br><span class="line">sobin.header.entrypoint = size</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">copyfile(<span class="string">&quot;libnative-lib.so&quot;</span>,<span class="string">&quot;libout.so&quot;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">infile =  <span class="built_in">open</span>(<span class="string">&quot;libnative-lib.so&quot;</span>,<span class="string">&quot;rb&quot;</span>)</span><br><span class="line">file = infile.read()</span><br><span class="line">out = <span class="built_in">open</span>(<span class="string">&quot;libout.so&quot;</span>,<span class="string">&quot;wb&quot;</span>)</span><br><span class="line"></span><br><span class="line">enc = []</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> itext.content:</span><br><span class="line">    enc.append(struct.pack(<span class="string">&#x27;h&#x27;</span>,~i)[<span class="number">0</span>])</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">hex</span>(file.find(<span class="built_in">bytes</span>(itext.content))))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">out.write(file.replace(<span class="built_in">bytes</span>(itext.content),<span class="built_in">bytes</span>(enc)))</span><br><span class="line">out.close()</span><br></pre></td></tr></table></figure>
+
+
+
+<p>解密cpp文件：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// libpro.so</span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">init_getString</span><span class="params">()</span> __<span class="title function_">attribute__</span><span class="params">((constructor))</span>;</span><br><span class="line"><span class="type">unsigned</span> <span class="type">long</span> <span class="title function_">getLibAddr</span><span class="params">()</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">init_getString</span><span class="params">()</span>&#123;</span><br><span class="line">    <span class="type">char</span> name[<span class="number">15</span>];</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> nblock;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> nsize;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> base;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> text_addr;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> i;</span><br><span class="line">    Elf32_Ehdr *ehdr;</span><br><span class="line">    Elf32_Shdr *shdr;</span><br><span class="line"></span><br><span class="line">    base = getLibAddr();</span><br><span class="line"></span><br><span class="line">    ehdr = (Elf32_Ehdr *)base;</span><br><span class="line"></span><br><span class="line">   <span class="comment">// text_addr = ehdr-&gt;e_shoff + base;</span></span><br><span class="line">  <span class="comment">//  nsize = ehdr-&gt;e_entry &amp; 0xffff;</span></span><br><span class="line">   <span class="comment">// npage =nsize / PAGE_SIZE + ((nsize % PAGE_SIZE == 0) ? 0 : 1);</span></span><br><span class="line">    </span><br><span class="line">    text_addr = ehdr-&gt;e_flags + base;</span><br><span class="line">    nsize = ehdr-&gt;e_entry &amp; <span class="number">0xffff</span>;</span><br><span class="line">    npage =nsize / PAGE_SIZE + ((nsize % PAGE_SIZE == <span class="number">0</span>) ? <span class="number">0</span> : <span class="number">1</span>);</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span>(mprotect((<span class="type">void</span> *) (text_addr / PAGE_SIZE * PAGE_SIZE), <span class="number">4096</span> * npage, PROT_READ | PROT_EXEC | PROT_WRITE) != <span class="number">0</span>)&#123;</span><br><span class="line">        __android_log_print(ANDROID_LOG_INFO, <span class="string">&quot;JNITag&quot;</span>, <span class="string">&quot;mem privilege change failed&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span>(i=<span class="number">0</span>;i&lt; nsize; i++)&#123;</span><br><span class="line">        <span class="type">char</span> *addr = (<span class="type">char</span>*)(text_addr + i);</span><br><span class="line">        *addr = ~(*addr);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(mprotect((<span class="type">void</span> *) (text_addr / PAGE_SIZE * PAGE_SIZE), <span class="number">4096</span> * npage, PROT_READ | PROT_EXEC) != <span class="number">0</span>)&#123;</span><br><span class="line">        __android_log_print(ANDROID_LOG_INFO, <span class="string">&quot;JNITag&quot;</span>, <span class="string">&quot;mem privilege change failed&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    __android_log_print(ANDROID_LOG_INFO, <span class="string">&quot;JNITag&quot;</span>, <span class="string">&quot;Decrypt success&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">unsigned</span> <span class="type">long</span> <span class="title function_">getLibAddr</span><span class="params">()</span>&#123;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> ret = <span class="number">0</span>;</span><br><span class="line">    <span class="type">char</span> name[] = <span class="string">&quot;libnative-lib.so&quot;</span>;</span><br><span class="line">    <span class="type">char</span> buf[<span class="number">4096</span>], *temp;</span><br><span class="line">    <span class="type">int</span> pid;</span><br><span class="line">    FILE *fp;</span><br><span class="line">    pid = getpid();</span><br><span class="line">    <span class="built_in">sprintf</span>(buf, <span class="string">&quot;/proc/%d/maps&quot;</span>, pid);</span><br><span class="line">    fp = fopen(buf, <span class="string">&quot;r&quot;</span>);</span><br><span class="line">    <span class="keyword">if</span>(fp == <span class="literal">NULL</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">puts</span>(<span class="string">&quot;open failed&quot;</span>);</span><br><span class="line">        <span class="keyword">goto</span> _error;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">while</span>(fgets(buf, <span class="keyword">sizeof</span>(buf), fp))&#123;</span><br><span class="line">        <span class="keyword">if</span>(<span class="built_in">strstr</span>(buf, name))&#123;</span><br><span class="line">            temp = strtok(buf, <span class="string">&quot;-&quot;</span>);</span><br><span class="line">            ret = strtoul(temp, <span class="literal">NULL</span>, <span class="number">16</span>);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    _error:</span><br><span class="line">    fclose(fp);</span><br><span class="line">    <span class="keyword">return</span> ret;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>会遇到的情况：<br> 对so进行section加密后，提示.dynamic section header was not found<br>遇到问题：Android7.0后JNI库必须保留Section Headers。由于加密时修改了shoff值，导致加载so库值解析Section Headers 解析不了，.dynamic section header was not found。</p>
+<p>修改测量：shoff和entry目的是为了存储加密的偏移大小和加密的大小。使用e_flags和e_entry来储存段的偏移和大小</p>
+<h3 id="腾讯so加密"><a href="#腾讯so加密" class="headerlink" title="腾讯so加密"></a>腾讯so加密</h3><p>首先，当王者荣耀加载libil2cpp.so时，会先加载libtprt.so</p>
+<p><img src="/SO%E5%8A%A0%E5%AF%86/image-20200827143911255.png" alt="image-20200827143911255"></p>
+<p>libtprt.so对自身的tptext节进行了加密，分析init_array,可以看到解密函数如下，关键函数时mprotect，因为解密会用到。</p>
+<p><img src="/SO%E5%8A%A0%E5%AF%86/image-20200827144338193.png" alt="image-20200827144338193"></p>
+<p><img src="/SO%E5%8A%A0%E5%AF%86/image-20200827144827705.png" alt="image-20200827144827705"></p>
+<p>根据分析解密函数：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">tprt = lief.parse(name)</span><br><span class="line">tptext_section = tprt.get_section(<span class="string">&quot;.tptext&quot;</span>).content</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">len</span>(tptext_section))</span><br><span class="line">offset = tprt.get_section(<span class="string">&quot;.tptext&quot;</span>).offset</span><br><span class="line">out = <span class="string">b&quot;&quot;</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(tptext_section)):</span><br><span class="line">    out += (tptext_section[i] ^ <span class="number">0xb8</span>).to_bytes(<span class="number">1</span>,byteorder=<span class="string">&#x27;little&#x27;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">len</span>(out))</span><br><span class="line">tpp = tprt_bin[:offset]+out+tprt_bin[offset+<span class="built_in">len</span>(tptext_section):]</span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">&quot;tpp.so&quot;</span>, <span class="string">&#x27;wb&#x27;</span>) <span class="keyword">as</span> fp:</span><br><span class="line">    fp.write(tpp)</span><br></pre></td></tr></table></figure>
+
+<p><img src="/SO%E5%8A%A0%E5%AF%86/image-20200827145222734.png" alt="image-20200827145222734"></p>
+<p>tptext节里的函数主要用于初始化各类保护，会被jni_onload调用。现在tprt已经被成功加载，现在就需要解密libil2cpp.so（linker加载先加载链接库，再执行构造函数）</p>
+<p><img src="/SO%E5%8A%A0%E5%AF%86/image-20200827150229908.png" alt="image-20200827150229908"></p>
+<p>问题1：关于ADRL作用<a target="_blank" rel="noopener" href="http://blog.sina.com.cn/s/blog_4b5210840100c80i.html">http://blog.sina.com.cn/s/blog_4b5210840100c80i.html</a></p>
+<p>取得基址后，根据base+0x1d0处的偏移获得解密函数地址，调用解密函数，在此处调用libtprt.so的导出函数g_tprt_pfn_array，init_proc -&gt; 调用g_tprt_pfn_array（“.text”,?,3）-&gt; 解密  .text段</p>
+<p><img src="/SO%E5%8A%A0%E5%AF%86/image-20200827152258578.png" alt="image-20200827152258578"></p>
+<p><img src="/SO%E5%8A%A0%E5%AF%86/image-20200827152450124.png" alt="image-20200827152450124"></p>
+<p>查看lintprt.so的导出函数，</p>
+<p><img src="/SO%E5%8A%A0%E5%AF%86/image-20200827152727259.png" alt="image-20200827152727259"></p>
+<p><img src="/SO%E5%8A%A0%E5%AF%86/image-20200827152830212.png" alt="image-20200827152830212"></p>
+<p>end：到目前为止，都很简单，加密的难点在于如何修改elf文件要在能正常运行的情况下添加需要的数据。</p>
+
+    </article>
+    <!-- license -->
+    
+        <div class="license-wrapper">
+            <p>原文作者：<a href="http://example.com">newbiemiao</a>
+            <p>原文链接：<a href="http://example.com/2020/08/27/SO%E5%8A%A0%E5%AF%86/">http://example.com/2020/08/27/SO%E5%8A%A0%E5%AF%86/</a>
+            <p>发表日期：<a href="http://example.com/2020/08/27/SO%E5%8A%A0%E5%AF%86/">August 27th 2020, 7:53:03 pm</a>
+            <p>更新日期：<a href="http://example.com/2020/08/27/SO%E5%8A%A0%E5%AF%86/">November 15th 2023, 10:39:53 am</a>
+            <p>版权声明：本文采用<a rel="license noopener" target="_blank" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+        </div>
+    
+    <!-- paginator -->
+    <ul class="post-paginator">
+        <li class="next">
+            
+                <div class="nextSlogan">Next Post</div>
+                <a href="/2020/12/04/%E4%BD%BF%E7%94%A8frida%E8%8E%B7%E5%8F%96il2cpp%E7%AC%A6%E5%8F%B7%E4%BF%A1%E6%81%AF/" title="使用frida获取il2cpp符号信息">
+                    <div class="nextTitle">使用frida获取il2cpp符号信息</div>
+                </a>
+            
+        </li>
+        <li class="previous">
+            
+                <div class="prevSlogan">Previous Post</div>
+                <a href="/2020/07/03/Unity%E4%BF%9D%E6%8A%A4%E4%B9%8Bassetbundle/" title="Unity保护之assetbundle">
+                    <div class="prevTitle">Unity保护之assetbundle</div>
+                </a>
+            
+        </li>
+    </ul>
+    <!-- comment -->
+    
+        <div class="post-comment">
+            <!-- 来必力 City 版安装代码 -->
+
+
+            
+
+            
+
+            
+
+            <!-- utteranc评论 -->
+
+
+            <!-- partial('_partial/comment/changyan') -->
+            <!--PC版-->
+
+
+            
+            
+
+            
+
+        </div>
+    
+    <!-- timeliness note -->
+    <!-- idea from: https://hexo.fluid-dev.com/posts/hexo-injector/#%E6%96%87%E7%AB%A0%E6%97%B6%E6%95%88%E6%80%A7%E6%8F%90%E7%A4%BA -->
+    
+    <!-- Mathjax -->
+    
+</main>
+
+                <!-- profile -->
+                
+            </div>
+            <footer class="footer footer-unloaded">
+    <!-- social  -->
+    
+        <div class="social">
+            
+    
+        
+            
+                <a href="mailto:673304120@qq.com" class="iconfont-archer email" title=email ></a>
+            
+        
+    
+        
+            
+                <a href="//github.com/nszdhd1" class="iconfont-archer github" target="_blank" title=github></a>
+            
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+
+        </div>
+    
+    <!-- powered by Hexo  -->
+    <div class="copyright">
+        <span id="hexo-power">Powered by <a href="https://hexo.io/" target="_blank">Hexo</a></span><span class="iconfont-archer power">&#xe635;</span><span id="theme-info">theme <a href="https://github.com/fi3ework/hexo-theme-archer" target="_blank">Archer</a></span>
+    </div>
+    <!-- website approve for Chinese user -->
+    
+    <!-- 不蒜子  -->
+    
+        <div class="busuanzi-container">
+            
+             
+                <span id="busuanzi_container_site_pv">PV: <span id="busuanzi_value_site_pv"></span> :)</span>
+            
+        </div>
+    	
+</footer>
+
+        </div>
+        <!-- toc -->
+        
+            <div class="toc-wrapper toc-wrapper-loding" style=
+
+
+
+
+
+
+
+    top:50vh;
+
+>
+                <div class="toc-catalog">
+                    <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+                </div>
+                <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#so%E5%8A%A0%E5%AF%86%E7%AC%94%E8%AE%B0"><span class="toc-number">1.</span> <span class="toc-text">so加密笔记</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86"><span class="toc-number">1.1.</span> <span class="toc-text">基础知识</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E3%80%81ELF%E6%96%87%E4%BB%B6"><span class="toc-number">1.1.1.</span> <span class="toc-text">一、ELF文件</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1-ELF-%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84"><span class="toc-number">1.1.1.1.</span> <span class="toc-text">1.1 ELF 文件结构</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-2-ELF%E5%A4%B4-ELF-header"><span class="toc-number">1.1.1.2.</span> <span class="toc-text">1.2 ELF头(ELF header)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-3-%E7%A8%8B%E5%BA%8F%E5%A4%B4%E8%A1%A8-Program-header-table"><span class="toc-number">1.1.1.3.</span> <span class="toc-text">1.3  程序头表(Program header table)</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#PT-PHDR"><span class="toc-number">1.1.1.3.1.</span> <span class="toc-text">PT_PHDR</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#PT-LOAD"><span class="toc-number">1.1.1.3.2.</span> <span class="toc-text">PT_LOAD</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#PT-DYNAMIC"><span class="toc-number">1.1.1.3.3.</span> <span class="toc-text">PT_DYNAMIC</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-4-%E8%8A%82%E5%A4%B4%E8%A1%A8-Section-header-table"><span class="toc-number">1.1.1.4.</span> <span class="toc-text">1.4 节头表(Section header table)</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%AC%A6%E5%8F%B7%E8%A1%A8"><span class="toc-number">1.1.1.4.1.</span> <span class="toc-text">符号表</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AD%97%E7%AC%A6%E4%B8%B2%E8%A1%A8"><span class="toc-number">1.1.1.4.2.</span> <span class="toc-text">字符串表</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E9%87%8D%E5%AE%9A%E4%BD%8D"><span class="toc-number">1.1.1.4.3.</span> <span class="toc-text">重定位</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B3%E4%BA%8Elinker"><span class="toc-number">1.1.2.</span> <span class="toc-text">关于linker</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ELF-%E9%9D%99%E6%80%81%E6%B3%A8%E5%85%A5"><span class="toc-number">1.1.3.</span> <span class="toc-text">ELF  静态注入</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%AD%A3%E6%96%87%E5%BC%80%E5%A7%8B"><span class="toc-number">1.2.</span> <span class="toc-text">正文开始</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#so%E8%8A%82%E5%8A%A0%E5%AF%86demo"><span class="toc-number">1.2.1.</span> <span class="toc-text">so节加密demo</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%85%BE%E8%AE%AFso%E5%8A%A0%E5%AF%86"><span class="toc-number">1.2.2.</span> <span class="toc-text">腾讯so加密</span></a></li></ol></li></ol></li></ol>
+            </div>
+        
+        <!-- sidebar -->
+        <div class="sidebar sidebar-hide">
+    <ul class="sidebar-tabs sidebar-tabs-active-0">
+        <li class="sidebar-tab-archives"><span class="iconfont-archer">&#xe67d;</span><span class="tab-name">Archive</span></li>
+        <li class="sidebar-tab-tags"><span class="iconfont-archer">&#xe61b;</span><span class="tab-name">Tag</span></li>
+        <li class="sidebar-tab-categories"><span class="iconfont-archer">&#xe666;</span><span class="tab-name">Cate</span></li>
+    </ul>
+    <div class="sidebar-content sidebar-content-show-archive">
+        <div class="sidebar-panel-archives">
+    <!-- 在 ejs 中将 archive 按照时间排序 -->
+    
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    
+    
+    
+    
+    <div class="total-and-search">
+        <div class="total-archive">
+        Total : 16
+        </div>
+        <!-- search  -->
+        
+    </div>
+    
+    <div class="post-archive">
+    
+        
+            
+            
+            <div class="archive-year"> 2022 </div>
+            <ul class="year-list">
+            
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/22</span>
+            <a class="archive-post-title" href="/2022/12/22/%E5%A6%82%E4%BD%95%E4%BF%AE%E6%94%B9unityHybridCLR%E7%83%AD%E6%9B%B4dll/">如何修改unity HybridCLR 热更dll</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/14</span>
+            <a class="archive-post-title" href="/2022/11/14/Genshin-IL2CPP-RunTime-Dump/">Genshin IL2CPP RunTime Dump</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/08</span>
+            <a class="archive-post-title" href="/2022/09/08/GameGuardian%E7%9A%84Lua%E8%84%9A%E6%9C%AC%E6%B7%B7%E6%B7%86%E5%88%86%E6%9E%90/">GameGuardian的Lua脚本混淆分析</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/21</span>
+            <a class="archive-post-title" href="/2022/03/21/%E5%88%A9%E7%94%A8Frida%E5%AE%9E%E7%8E%B0lua%E7%83%AD%E6%9B%B4%E6%96%B0/">利用Frida实现lua热更新</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">01/14</span>
+            <a class="archive-post-title" href="/2022/01/14/%E4%BD%BF%E7%94%A8unidbg%E8%BF%87%E4%BF%9D%E6%8A%A4/">使用unidbg过保护</a>
+        </li>
+    
+        
+            
+            
+                
+                </ul>
+            
+            <div class="archive-year"> 2021 </div>
+            <ul class="year-list">
+            
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">06/15</span>
+            <a class="archive-post-title" href="/2021/06/15/%E9%9D%9Eroot%E7%8E%AF%E5%A2%83%E4%B8%8Bfrida%E7%9A%84%E4%B8%A4%E7%A7%8D%E4%BD%BF%E7%94%A8%E6%96%B9%E5%BC%8F/">非root环境下frida的两种使用方式</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">06/15</span>
+            <a class="archive-post-title" href="/2021/06/15/%E4%BD%BF%E7%94%A8LIEF%E6%89%93%E9%80%A0MTP%E5%8A%A0%E5%9B%BA/">使用LIEF打造MTP加固</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">01/15</span>
+            <a class="archive-post-title" href="/2021/01/15/%E6%8A%96%E9%9F%B3%E8%AF%84%E8%AE%BA%E7%88%AC%E5%8F%96/">抖音评论爬取</a>
+        </li>
+    
+        
+            
+            
+                
+                </ul>
+            
+            <div class="archive-year"> 2020 </div>
+            <ul class="year-list">
+            
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/04</span>
+            <a class="archive-post-title" href="/2020/12/04/%E4%BD%BF%E7%94%A8frida%E8%8E%B7%E5%8F%96il2cpp%E7%AC%A6%E5%8F%B7%E4%BF%A1%E6%81%AF/">使用frida获取il2cpp符号信息</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">08/27</span>
+            <a class="archive-post-title" href="/2020/08/27/SO%E5%8A%A0%E5%AF%86/">SO加密</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">07/03</span>
+            <a class="archive-post-title" href="/2020/07/03/Unity%E4%BF%9D%E6%8A%A4%E4%B9%8Bassetbundle/">Unity保护之assetbundle</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">07/03</span>
+            <a class="archive-post-title" href="/2020/07/03/Unity%E4%BF%9D%E6%8A%A4%E4%B9%8Bil2cpp/">Unity保护之il2cpp</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">07/03</span>
+            <a class="archive-post-title" href="/2020/07/03/%E5%9F%BA%E4%BA%8Eva%E7%9A%84luajit-hook/">基于va的luajit hook</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">07/03</span>
+            <a class="archive-post-title" href="/2020/07/03/%E7%BD%91%E6%98%93%E4%BF%9D%E6%8A%A4%E5%88%86%E6%9E%90/">网易保护分析</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/07</span>
+            <a class="archive-post-title" href="/2020/04/07/magisk-riru/">magisk-riru 使用</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/09</span>
+            <a class="archive-post-title" href="/2020/03/09/Magisk%E6%A3%80%E6%B5%8B/">Magisk检测</a>
+        </li>
+    
+    </div>
+</div>
+
+        <div class="sidebar-panel-tags">
+    <div class="sidebar-tags-name">
+        
+            <span class="sidebar-tag-name" data-tags="Analytics">
+                <span class="iconfont-archer">&#xe606;</span>
+                Analytics
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="game">
+                <span class="iconfont-archer">&#xe606;</span>
+                game
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="other">
+                <span class="iconfont-archer">&#xe606;</span>
+                other
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="protect">
+                <span class="iconfont-archer">&#xe606;</span>
+                protect
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="tools">
+                <span class="iconfont-archer">&#xe606;</span>
+                tools
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="Misc">
+                <span class="iconfont-archer">&#xe606;</span>
+                Misc
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="Hook">
+                <span class="iconfont-archer">&#xe606;</span>
+                Hook
+            </span>
+        
+    </div>
+    <div class="iconfont-archer sidebar-tags-empty">&#xe678;</div>
+    <div class="tag-load-fail" style="display: none; color: #ccc; font-size: 0.6rem;">
+        缺失模块，请参考主题文档进行安装配置：https://github.com/fi3ework/hexo-theme-archer#%E5%AE%89%E8%A3%85%E4%B8%BB%E9%A2%98
+    </div> 
+    <div class="sidebar-tags-list"></div>
+</div>
+
+        <div class="sidebar-panel-categories">
+    <div class="sidebar-categories-name">
+    
+    </div>
+    <div class="iconfont-archer sidebar-categories-empty">&#xe678;</div>
+    <div class="sidebar-categories-list"></div>
+</div>
+
+    </div>
+</div>
+
+        <!-- site-meta -->
+        <script>
+    var siteMetaRoot = "/"
+    if (siteMetaRoot === "undefined") {
+        siteMetaRoot = '/'
+    }
+    var siteMeta = {
+        url: "http://example.com",
+        root: siteMetaRoot,
+        author: "newbiemiao"
+    }
+</script>
+
+        <!-- import experimental options here -->
+        <!-- Custom Font -->
+
+
+        <!-- main func -->
+        <script src="/scripts/main.js?v=20211217"></script>
+        <!-- dark mode -->
+        <script src="/scripts/dark.js?v=20211217"></script>
+        <!-- fancybox -->
+        <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" defer></script>
+        <!-- algolia -->
+        
+        <!-- busuanzi -->
+        
+            <script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" async></script>
+        
+        <!-- CNZZ -->
+        
+        <!-- async load share.js -->
+        
+            <script src="/scripts/share.js?v=20211217" async></script>
+        
+        <!-- mermaid -->
+        
+    </body>
+</html>
